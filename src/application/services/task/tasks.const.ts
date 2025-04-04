@@ -1,0 +1,3 @@
+export const TASK = {
+    SYNC_TWOGIS_REVIEWS: 'SYNC_TWOGIS_REVIEWS',
+}
