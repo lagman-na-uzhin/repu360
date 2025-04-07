@@ -1,23 +1,12 @@
-export const PERMISSION_MODULES = {
-    PARTNER: ["REGISTER_PARTNER", "HANDLE_LEAD"],
-    USER: ["CREATE_USER", "UPDATE_USER"],
-
-} as const;
-
-type PermissionModules = keyof typeof PERMISSION_MODULES;
-type UserPermissionType = typeof PERMISSION_MODULES[PermissionModules][number];
-
+import {MANAGER_PERMISSION_ACTION, MANAGER_PERMISSION_RESOURCE} from "@domain/manager/model/manager-role";
 
 export class ManagerPermission {
     private constructor(
-        readonly _module: UserPermissionType
+        readonly _resource: MANAGER_PERMISSION_RESOURCE,
+        readonly _action: MANAGER_PERMISSION_ACTION,
     ) {}
 
-    static create(module: UserPermissionType) {
-        return new ManagerPermission(module);
-    }
-
-    static fromPersistence(module: UserPermissionType) {
-        return new ManagerPermission(module);
+    static create(resource: MANAGER_PERMISSION_RESOURCE, action: MANAGER_PERMISSION_ACTION) {
+        return new ManagerPermission(resource, action);
     }
 }

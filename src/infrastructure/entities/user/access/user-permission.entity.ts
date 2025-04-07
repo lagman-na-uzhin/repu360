@@ -1,7 +1,7 @@
 import { PrimaryGeneratedColumn, Column, ManyToOne, Entity } from 'typeorm';
 import {UserPermissionType} from "@domain/manager/value-object/manager-permission";
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
-import {PartnerUserRole} from "@domain/partner/model/partner-user/partner-user-role";
+import {PartnerUserRole} from "@domain/company/model/employee/employee-role";
 
 @Entity('user_permission')
 export class UserPermissionEntity {

@@ -3,7 +3,7 @@ import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 import {
     AddOrganizationCommand,
 } from "@application/use-cases/default/organization/dto/add-organization.command";
-import {IPartnerRepository} from "@domain/partner/repositories/partner-repository.interface";
+import {IPartnerRepository} from "@domain/company/repositories/company-repository.interface";
 import {Organization} from "@domain/organization/organization";
 import {IOrganizationRepository} from "@domain/organization/repositories/organization-repository.interface";
 

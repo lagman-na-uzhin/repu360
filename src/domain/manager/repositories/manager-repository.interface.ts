@@ -1,6 +1,6 @@
-import {Manager} from "@domain/manager/manager";
+import {Employee} from "@domain/company/model/employee/employee";
 
-export interface IUserRepository {
-    getById(id: string): Promise<Manager | null>;
-    getByEmail(email: string): Promise<Manager | null>;
+export interface IEmployeeRepository {
+    getById(id: string): Promise<Employee | null>;
+    getByEmail(email: string): Promise<Employee | null>;
 }

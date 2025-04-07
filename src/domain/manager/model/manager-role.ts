@@ -6,6 +6,15 @@ export enum MANAGER_TYPE {
     ADMIN = 'ADMIN',
 }
 
+export enum MANAGER_PERMISSION_RESOURCE {
+    PARTNER = "PARTNER"
+}
+
+export enum MANAGER_PERMISSION_ACTION {
+    CREATE = "CREATE"
+}
+
+
 export class ManagerRoleId extends UniqueEntityID {}
 
 export class ManagerRole {
@@ -23,4 +32,9 @@ export class ManagerRole {
     static fromPersistence(id: string, name: string, type: MANAGER_TYPE, permissions: ManagerPermission[]) {
         return new ManagerRole(new ManagerRoleId(id), name, type, permissions);
     }
+
+    hasPermission(resource: MANAGER_PERMISSION_RESOURCE, action: MANAGER_PERMISSION_ACTION): boolean {
+        return this._permissions.some(p => p._action === action && p._resource === resource);
+    }
+
 }

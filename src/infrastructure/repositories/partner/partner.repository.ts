@@ -2,14 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PartnerEntity } from 'src/infrastructure/entities/ partner/partner.entity';
-import { Partner, PartnerId } from '@domain/partner/partner';
-import { IPartnerRepository } from '@domain/partner/repositories/partner-repository.interface';
-import { PartnerUser } from '@domain/partner/model/partner-user/partner-user';
+import { Company, PartnerId } from '@domain/company/company';
+import { IPartnerRepository } from '@domain/company/repositories/company-repository.interface';
+import { PartnerUser } from '@domain/company/model/employee/employee';
 import { UserEntity } from 'src/infrastructure/entities/user/user.entity';
-import { PartnerTariff } from '@domain/partner/model/tariff/partner-tariff';
+import { PartnerTariff } from '@domain/company/model/tariff/tariff';
 import { TariffEntity } from 'src/infrastructure/entities/tariff/tariff.entity';
-import {PartnerTariffFeatures} from "@domain/partner/model/tariff/partner-tariff-feature";
-import {PartnerUserRole} from "@domain/partner/value-object/partner-manager-role.vo";
+import {PartnerTariffFeatures} from "@domain/company/model/tariff/tariff-feature";
+import {PartnerUserRole} from "@domain/company/value-object/company-manager-role.vo";
 
 @Injectable()
 export class PartnerOrmRepository implements IPartnerRepository {
@@ -18,7 +18,7 @@ export class PartnerOrmRepository implements IPartnerRepository {
     private readonly repo: Repository<PartnerEntity>,
   ) {}
 
-  async getById(id: string): Promise<Partner | null> {
+  async getById(id: string): Promise<Company | null> {
     const entity = await this.repo.findOne({
       where: { id },
       relations: ['tariff', 'tariff.features', 'users']
@@ -26,15 +26,15 @@ export class PartnerOrmRepository implements IPartnerRepository {
     return entity ? this.toModel(entity) : null;
   }
 
-  async save(partner: Partner): Promise<void> {
+  async save(partner: Company): Promise<void> {
     console.log(this.toEntity(partner));
     await this.repo.save(this.toEntity(partner))
   }
 
-  private toModel(entity: PartnerEntity): Partner {
+  private toModel(entity: PartnerEntity): Company {
     const tariff = entity.tariff ? this.toPartnerTariffModel(entity.tariff) : null;
     const users = entity.users.map(this.toPartnerUserModel);
-    return Partner.fromPersistence(
+    return Company.fromPersistence(
         entity.id,
         entity.companyName,
         tariff,
@@ -82,7 +82,7 @@ export class PartnerOrmRepository implements IPartnerRepository {
     )
   }
 
-  private toEntity(model: Partner): Partial<PartnerEntity> {
+  private toEntity(model: Company): Partial<PartnerEntity> {
     console.log(model.users.map(u => this.toUserEntity(u, model.id)), "model.users.map(u => this.toUserEntity(u, model.id))");
     return {
       id: model.id.toString(),

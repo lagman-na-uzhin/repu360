@@ -1,9 +1,6 @@
 export interface IJwtServicePayload {
   authId: string;
-  authPartnerId: string | null;
-  authRole: string;
-  ownerId: number;
-  permission?: object;
+  ownerId?: string;
 }
 
 export interface IJwtService {

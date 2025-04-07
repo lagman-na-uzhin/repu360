@@ -1,5 +1,5 @@
-import {ManagerPermission} from "@domain/manager/value-object/manager-permission";
+import {EmployeeRole} from "@domain/company/model/employee/employee-role";
 
 export interface ICacheRepository {
-    setUserAuthToken(userId: string, userPermissions: ManagerPermission | null): Promise<void>
+    setUserAuthToken(userId: string, userPermissions: EmployeeRole | null): Promise<void>
 }

@@ -4,9 +4,9 @@ import { OrganizationOrmRepository } from 'src/infrastructure/repositories/organ
 import { UserOrmRepository } from 'src/infrastructure/repositories/user/user.repository';
 import {
   RegisterPartnerUseCase
-} from "@application/use-cases/default/partner/partner-register/partner-register.usecase";
-import {IPartnerUserRepository} from "@domain/partner/repositories/partner-user-repository.interface";
-import {IPartnerRepository} from "@domain/partner/repositories/partner-repository.interface";
+} from "@application/use-cases/control/company/company-register/company-register.usecase";
+import {IPartnerUserRepository} from "@domain/company/repositories/employee-repository.interface";
+import {IPartnerRepository} from "@domain/company/repositories/company-repository.interface";
 import { PartnerOrmRepository } from '@infrastructure/repositories/partner/partner.repository';
 import { BcryptService } from '@infrastructure/services/hash/bcrypt.service';
 import { IHashService } from '@application/services/hash/hash-service.interface';

@@ -5,7 +5,7 @@ import { PartnerProxy } from '@infrastructure/usecase-proxy/partner/partner.prox
 import { RegisterPartnerDto } from '@presentation/default/partner/dto/register-partner.dto';
 import {
   RegisterPartnerUseCase
-} from "@application/use-cases/default/partner/partner-register/partner-register.usecase";
+} from "@application/use-cases/control/company/company-register/company-register.usecase";
 
 @Controller('partner')
 export class PartnerController {

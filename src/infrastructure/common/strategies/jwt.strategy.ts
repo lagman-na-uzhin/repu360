@@ -6,6 +6,9 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { CACHE_KEY } from '@application/repositories/cache/cache-key.const';
 import { FastifyRequest } from 'fastify';
+import {EmployeeRole} from "@domain/company/model/employee/employee-role";
+import {Employee} from "@domain/company/model/employee/employee";
+import {ManagerId} from "@domain/manager/manager";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -27,15 +30,21 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: IJwtServicePayload) {
     const redisClient = this.redisService.getOrThrow('default');
 
-    const userAuthToken = !payload?.ownerId
-        ? await redisClient.get(CACHE_KEY.USER.AUTH_TOKEN(payload.authId.toString()))
-        : await redisClient.get(CACHE_KEY.USER.MULTIPLE_AUTH_TOKEN(payload.ownerId.toString(), payload.authId.toString()));
+    const userAuth = payload?.ownerId
+        ? await redisClient.get(CACHE_KEY.USER.MULTIPLE_AUTH_TOKEN(payload.ownerId, payload.authId))
+        : await redisClient.get(CACHE_KEY.USER.AUTH_TOKEN(payload.authId));
 
-    console.log(userAuthToken, 'userAuthToken')
-    if (!userAuthToken) return false;
+    if (!userAuth) return false;
 
-    const permissions = JSON.parse(userAuthToken);
+    const parsedData = JSON.parse(userAuth);
 
-    return { ...payload, permissions };
+    const employeeRole = EmployeeRole.fromPersistence(
+        parsedData.id,
+        parsedData.name,
+        parsedData.type,
+        parsedData.permissions,
+    );
+
+    return {ownerId: payload?.ownerId ? new ManagerId(payload.ownerId) : null, actor: employeeRole};
   }
 }

@@ -1,63 +1,45 @@
 import { createParamDecorator } from '@nestjs/common';
+import {ManagerId} from "@domain/manager/manager";
+import {EmployeeRole} from "@domain/company/model/employee/employee-role";
 
 export const UserBody = createParamDecorator((data, req) => {
-  const { authId, authPartnerId, authRole, ownerId } = req
+  const { actor, ownerId }: {actor: EmployeeRole, ownerId: ManagerId | null} = req
     .switchToHttp()
     .getRequest().user;
 
   const body = req.switchToHttp().getRequest().body;
 
-  delete body?.authId;
-  delete body?.authRole;
-  delete body?.partnerId;
-  delete body?.ownerId;
 
   return {
-    authId: ownerId ? ownerId : authId,
-    partnerId: authPartnerId,
-    authRole,
+    actor,
     ownerId,
     ...body,
   };
 });
 
 export const UserInitQuery = createParamDecorator((data, req) => {
-  const { authId, authPartnerId, authRole, ownerId } = req
-    .switchToHttp()
-    .getRequest().user;
+  const { actor, ownerId }: {actor: EmployeeRole, ownerId: ManagerId | null} = req
+      .switchToHttp()
+      .getRequest().user;
 
   const query = req.switchToHttp().getRequest().query;
 
-  delete query?.authId;
-  delete query?.authRole;
-  delete query?.partnerId;
-  delete query?.ownerId;
-
   return {
-    authId: authId,
-    partnerId: authPartnerId,
-    authRole,
+    actor,
     ownerId,
     ...query,
   };
 });
 
 export const UserQuery = createParamDecorator((data, req) => {
-  const { authId, authPartnerId, authRole, ownerId } = req
-    .switchToHttp()
-    .getRequest().user;
+  const { actor, ownerId }: {actor: EmployeeRole, ownerId: ManagerId | null} = req
+      .switchToHttp()
+      .getRequest().user;
 
   const query = req.switchToHttp().getRequest().query;
 
-  delete query?.authId;
-  delete query?.authRole;
-  delete query?.partnerId;
-  delete query?.ownerId;
-
   return {
-    authId: ownerId ? ownerId : authId,
-    partnerId: authPartnerId,
-    authRole,
+    actor,
     ownerId,
     ...query,
   };

@@ -1,13 +1,13 @@
 import { PREFIX } from 'src/infrastructure/usecase-proxy/prefix';
 import { UseCaseProxy } from 'src/infrastructure/usecase-proxy/usecase-proxy';
 import { UserOrmRepository } from 'src/infrastructure/repositories/user/user.repository';
-import { UserLoginUseCase } from "@application/use-cases/default/user/login/login.usecase";
+import { UserLoginUseCase } from "@application/use-cases/default/employee/login/login.usecase";
 import { IJwtService } from "src/application/services/jwt/jwt-service.interface";
 import { IHashService } from "src/application/services/hash/hash-service.interface";
 import { BcryptService } from "src/infrastructure/services/hash/bcrypt.service";
 import {ICacheRepository} from "src/application/repositories/cache/cache-repository.interface";
 import {IUserRepository} from "@domain/manager/repositories/manager-repository.interface";
-import {UserMeUseCase} from "@application/use-cases/default/user/me/me.usecase";
+import {UserMeUseCase} from "@application/use-cases/default/employee/me/me.usecase";
 import { CacheRepository } from '@infrastructure/repositories/cache/cache.repository';
 import { JwtTokenService } from '@infrastructure/services/jwt/jwt.service';
 

@@ -10,7 +10,7 @@ import { TwogisPlacementDetailEntity } from '@infrastructure/entities/placement/
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
 import {OrganizationPlacement} from "@domain/placement/platform-placement";
 import { Platform } from '@domain/common/enums/platfoms.enum';
-import { PartnerId } from '@domain/partner/partner';
+import { PartnerId } from '@domain/company/company';
 import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
 import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-detail';
 
@@ -57,8 +57,8 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     const entities = await this.repo
       .createQueryBuilder('organization')
       .leftJoinAndSelect('organization.platforms', 'platforms')
-      .leftJoin('organization.partner', 'partner')
-      .leftJoin('partner.tariff', 'tariff')
+      .leftJoin('organization.company', 'partner')
+      .leftJoin('company.tariff', 'tariff')
       .where('tariff.isActive = :isActive', { isActive: true })
       .andWhere('organization.isActive = :isActive', { isActive: true })
       .execute();
@@ -69,8 +69,8 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     const entities: OrganizationPlacementEntity[] = await this.placementRepo
       .createQueryBuilder('platforms')
       .leftJoin('platforms.organization', 'organization')
-      .leftJoin('organization.partner', 'partner')
-      .leftJoin('partner.tariff', 'tariff')
+      .leftJoin('organization.company', 'partner')
+      .leftJoin('company.tariff', 'tariff')
       .where('tariff.isActive = :isActive', { isActive: true })
       .andWhere('organization.isActive = :isActive', { isActive: true })
       .andWhere('platforms.placement-details = :type', {
