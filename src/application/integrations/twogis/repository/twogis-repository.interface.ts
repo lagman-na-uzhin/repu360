@@ -4,11 +4,11 @@ import {
 import { Profile } from '@domain/review/profile';
 import { Review } from '@domain/review/review';
 import {UniqueEntityID} from "@domain/common/unique-id";
-import { OrganizationPlacementId } from '@domain/placement/platform-placement';
+import { PlacementId } from '@domain/placement/placement';
 
 export interface ITwogisRepository {
     getOrganizationReviews(
-        organizationPlcamentId: OrganizationPlacementId,
+        organizationPlcamentId: PlacementId,
         twogisOrganizationExternalId: string,
         payload: GetOrganizationReviewsInDto,
     ): Promise<{ review: Review; profile: Profile }[] | null>

@@ -1,5 +1,5 @@
-import {OrganizationPlacementId} from "@domain/placement/platform-placement";
+import {PlacementId} from "@domain/placement/placement";
 
 export class SyncReviewsPcInput {
-    organizationPlacement: OrganizationPlacementId;
+    organizationPlacement: PlacementId;
 }

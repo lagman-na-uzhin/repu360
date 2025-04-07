@@ -1,7 +1,7 @@
 import { UniqueEntityID } from '@domain/common/unique-id';
 import { Platform } from "@domain/common/enums/platfoms.enum";
 import { ReviewMedia } from '@domain/review/model/review/review-media';
-import { OrganizationPlacementId } from "@domain/placement/platform-placement";
+import { PlacementId } from "@domain/placement/placement";
 import { TwogisReviewPlacementDetail } from "@domain/review/model/review/twogis-review-placement-detail";
 import { YandexReviewPlacementDetail } from "@domain/review/model/review/yandex-review-placement-detail";
 import { ProfileId } from "@domain/review/profile";
@@ -14,7 +14,7 @@ export class ReviewId extends UniqueEntityID {}
 export class Review {
     private constructor(
       private readonly _id: ReviewId,
-      private readonly _organizationPlacementId: OrganizationPlacementId,
+      private readonly _organizationPlacementId: PlacementId,
       private readonly _profileId: ProfileId,
       private readonly _platform: Platform,
       private _text: string,
@@ -25,7 +25,7 @@ export class Review {
     ) {}
 
     static create(
-      organizationPlacementId: OrganizationPlacementId,
+      organizationPlacementId: PlacementId,
       profileId: ProfileId,
       platform: Platform,
       text: string,
@@ -52,7 +52,7 @@ export class Review {
     ): Review {
         return new Review(
           new ReviewId(reviewId),
-          new OrganizationPlacementId(organizationPlacementId),
+          new PlacementId(organizationPlacementId),
           new ProfileId(profileId),
           platform,
           text,
@@ -99,7 +99,7 @@ export class Review {
         return this._id;
     }
 
-    get organizationPlacementId(): OrganizationPlacementId {
+    get organizationPlacementId(): PlacementId {
         return this._organizationPlacementId;
     }
 

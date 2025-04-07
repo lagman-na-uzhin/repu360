@@ -9,7 +9,7 @@ import { Review } from '@domain/review/review';
 import { ITwogisClient } from 'src/application/integrations/twogis/client/twogis-client.interface';
 import { Profile, ProfileId } from '@domain/review/profile';
 import { UniqueEntityID } from '@domain/common/unique-id';
-import { OrganizationPlacementId } from '@domain/placement/platform-placement';
+import { PlacementId } from '@domain/placement/placement';
 import { Platform } from '@domain/common/enums/platfoms.enum';
 import { TwogisReviewPlacementDetail } from '@domain/review/model/review/twogis-review-placement-detail';
 import { TwogisProfilePlacementDetail } from '@domain/review/model/profile/twogis-profile-placement-detail';
@@ -50,7 +50,7 @@ export class TwogisRepository implements ITwogisRepository {
 
   private createReviewModel(
     contract: ITwogisReview,
-    organizationPlacementId: OrganizationPlacementId,
+    organizationPlacementId: PlacementId,
     profileId: ProfileId,
   ): Review {
     return Review.create(

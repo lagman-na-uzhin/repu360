@@ -11,7 +11,7 @@ import { Profile } from '@domain/review/profile';
 import {
   SyncReviewsPcInput
 } from "@application/use-cases/background/review/twogis/sync-reviews/sync-reviews-pc.input";
-import {OrganizationPlacement} from "@domain/placement/platform-placement";
+import {Placement} from "@domain/placement/placement";
 
 export class SyncTwogisReviewsProcessUseCase {
   constructor(
@@ -32,13 +32,13 @@ export class SyncTwogisReviewsProcessUseCase {
     await this.saveEntities(reviewsToSave, profilesToSave);
   }
 
-  private async getPlatformOrFail(placementId: UniqueEntityID): Promise<OrganizationPlacement> {
+  private async getPlatformOrFail(placementId: UniqueEntityID): Promise<Placement> {
     const platform = await this.organizationRepo.getPlacementById(placementId.toString());
     if (!platform) throw new Error(EXCEPTION.ORGANIZATION.PLATFORM_NOT_FOUND);
     return platform;
   }
 
-  private async getUnSyncedReviewObj(placement: OrganizationPlacement): Promise<{ profile: Profile, review: Review }[] | null> {
+  private async getUnSyncedReviewObj(placement: Placement): Promise<{ profile: Profile, review: Review }[] | null> {
     const twogisDetails = placement.getTwogisPlacementDetail();
     return this.twogisRepo.getOrganizationReviews(placement.id, twogisDetails.externalId, {type: twogisDetails.type})
   }

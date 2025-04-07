@@ -6,7 +6,7 @@ import { ReviewEntity } from 'src/infrastructure/entities/review/review.entity';
 import { Review, ReviewId } from '@domain/review/review';
 import {TwogisReviewPlacementDetailEntity} from "@infrastructure/entities/review/placement-details/twogis-review.entity";
 import {YandexReviewPlacementDetailEntity} from "@infrastructure/entities/review/placement-details/yandex-review.entity";
-import { OrganizationPlacementId } from '@domain/placement/platform-placement';
+import { PlacementId } from '@domain/placement/placement';
 import { ProfileId } from '@domain/review/profile';
 import { Platform } from '@domain/common/enums/platfoms.enum';
 import { TwogisReviewPlacementDetail } from '@domain/review/model/review/twogis-review-placement-detail';

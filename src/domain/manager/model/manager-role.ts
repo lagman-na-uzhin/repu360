@@ -1,10 +1,6 @@
 import {UniqueEntityID} from "@domain/common/unique-id";
 import {ManagerPermission} from "@domain/manager/value-object/manager-permission";
-
-export enum MANAGER_TYPE {
-    MANAGER = "MANAGER",
-    ADMIN = 'ADMIN',
-}
+import {MANAGER_TYPE} from "@domain/manager/types/manager-role.types";
 
 export enum MANAGER_PERMISSION_RESOURCE {
     PARTNER = "PARTNER"

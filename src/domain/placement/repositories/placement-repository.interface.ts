@@ -1,6 +1,6 @@
-import {OrganizationPlacement} from "@domain/placement/platform-placement";
+import {Placement} from "@domain/placement/placement";
 
 export interface IPlacementRepository {
-    save(placement: OrganizationPlacement): Promise<OrganizationPlacement>
-    getACtiveTwogisPlacements(): Promise<OrganizationPlacement[]>
+    save(placement: Placement): Promise<Placement>
+    getACtiveTwogisPlacements(): Promise<Placement[]>
 }

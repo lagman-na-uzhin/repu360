@@ -3,7 +3,7 @@ import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 import {
     IOrganizationRepository
 } from "@domain/organization/repositories/organization-repository.interface";
-import {OrganizationPlacement } from "@domain/placement/platform-placement";
+import {Placement } from "@domain/placement/placement";
 import {
     TwogisAddPlacementCommand
 } from "@application/use-cases/default/placement/dto/twogis-add-placement.command";
@@ -17,11 +17,11 @@ export class AddTwogisPlacementUseCase {
     ) {}
 
     @LogMethod(AddTwogisPlacementUseCase.name)
-    async execute(command: TwogisAddPlacementCommand): Promise<OrganizationPlacement> {
+    async execute(command: TwogisAddPlacementCommand): Promise<Placement> {
         const organization = await this.organizationRepo.getById(command.organizationId.toString());
         if (!organization) throw new Error(EXCEPTION.ORGANIZATION.NOT_FOUND);
 
-        const placement = OrganizationPlacement.create(
+        const placement = Placement.create(
             organization.id,
             command.platform,
             TwogisPlacementDetail.create(command.externalId, command.type)

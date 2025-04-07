@@ -3,14 +3,13 @@ import { OrganizationId } from '@domain/organization/organization';
 import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-detail';
 import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
 import { Platform } from '@domain/common/enums/platfoms.enum';
+import { PlacementDetail } from "@domain/placement/types/placement-detail.types";
 
-export class OrganizationPlacementId extends UniqueEntityID {}
+export class PlacementId extends UniqueEntityID {}
 
-type PlacementDetail = TwogisPlacementDetail | YandexPlacementDetail;
-
-export class OrganizationPlacement {
+export class Placement {
     private constructor(
-      private readonly _id: OrganizationPlacementId,
+      private readonly _id: PlacementId,
       private _organizationId: OrganizationId,
       private _platform: Platform,
       private _placementDetail: PlacementDetail
@@ -20,10 +19,10 @@ export class OrganizationPlacement {
       organizationId: OrganizationId,
       platform: Platform,
       placementDetail: PlacementDetail
-    ): OrganizationPlacement {
-        OrganizationPlacement.validatePlacementDetail(platform, placementDetail);
+    ): Placement {
+        Placement.validatePlacementDetail(platform, placementDetail);
 
-        return new OrganizationPlacement(new OrganizationPlacementId(), organizationId, platform, placementDetail);
+        return new Placement(new PlacementId(), organizationId, platform, placementDetail);
     }
 
     static fromPersistence(
@@ -31,10 +30,10 @@ export class OrganizationPlacement {
       organizationId: string,
       platform: Platform,
       placementDetail: PlacementDetail
-    ): OrganizationPlacement {
-        OrganizationPlacement.validatePlacementDetail(platform, placementDetail);
+    ): Placement {
+        Placement.validatePlacementDetail(platform, placementDetail);
 
-        return new OrganizationPlacement(new OrganizationPlacementId(id), new OrganizationId(organizationId), platform, placementDetail);
+        return new Placement(new PlacementId(id), new OrganizationId(organizationId), platform, placementDetail);
     }
 
     getYandexPlacementDetail(): YandexPlacementDetail {
@@ -46,7 +45,7 @@ export class OrganizationPlacement {
     }
 
 
-    get id(): OrganizationPlacementId {
+    get id(): PlacementId {
         return this._id;
     }
 
@@ -71,7 +70,7 @@ export class OrganizationPlacement {
     }
 
     set placementDetail(value: PlacementDetail) {
-        OrganizationPlacement.validatePlacementDetail(this._platform, value);
+        Placement.validatePlacementDetail(this._platform, value);
         this._placementDetail = value;
     }
 
