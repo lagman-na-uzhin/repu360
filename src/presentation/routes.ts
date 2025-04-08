@@ -1,11 +1,21 @@
 export const ROUTES = {
-  PARTNER: {
-    BASE: 'partner',
+  COMPANY: {
+    BASE: 'company',
     REGISTER: 'register',
-    DETAILS: ':id/details',
   },
-  USER: {
-    BASE: 'users',
-    PROFILE: ':id/profile',
+  EMPLOYEE: {
+    BASE: 'employee',
+    LOGIN: 'login',
+    ME: 'me'
   },
-};
+
+
+  CONTROL: {
+    BASE: 'control',
+    AUTH: 'login',
+
+    COMPANY: {
+      BASE: 'company',
+      REGISTER: 'register',
+  }
+}

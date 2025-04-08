@@ -9,7 +9,7 @@ import { Organization, OrganizationId } from '@domain/organization/organization'
 import { TwogisPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
 import {Placement} from "@domain/placement/placement";
-import { Platform } from '@domain/common/enums/platfoms.enum';
+import { Platform } from '@domain/placement/types/platfoms.enum';
 import { PartnerId } from '@domain/company/company';
 import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
 import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-detail';

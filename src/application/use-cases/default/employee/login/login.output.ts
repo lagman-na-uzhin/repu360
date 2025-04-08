@@ -1,4 +1,4 @@
-import {Employee} from "@domain/company/model/employee/employee";
+import {Employee} from "@domain/employee/employee";
 
 export class LoginOutput {
     constructor(

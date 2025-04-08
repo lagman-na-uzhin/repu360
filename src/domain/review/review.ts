@@ -1,5 +1,5 @@
 import { UniqueEntityID } from '@domain/common/unique-id';
-import { Platform } from "@domain/common/enums/platfoms.enum";
+import { Platform } from "@domain/placement/types/platfoms.enum";
 import { ReviewMedia } from '@domain/review/model/review/review-media';
 import { PlacementId } from "@domain/placement/placement";
 import { TwogisReviewPlacementDetail } from "@domain/review/model/review/twogis-review-placement-detail";
@@ -22,6 +22,10 @@ export class Review {
       private _media: ReviewMedia[],
       private _placementDetail: ReviewPlacementDetail,
       // private _complaints: Complaint[]
+
+      private readonly _createdAt: Date = new Date(),
+      private _updatedAt: Date | null = null,
+      private _deletedAt: Date | null = null
     ) {}
 
     static create(

@@ -7,7 +7,7 @@ import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/
 import { ProfileEntity } from 'src/infrastructure/entities/profile/profile.entity';
 import { TwogisReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/twogis-review.entity';
 import { YandexReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/yandex-review.entity';
-import {Platform} from "@domain/common/enums/platfoms.enum";
+import {Platform} from "@domain/placement/types/platfoms.enum";
 import { ReviewMediaEntity } from '@infrastructure/entities/review/review-media.entity';
 import {ReviewComplaintEntity} from "@infrastructure/entities/review/complaint/review-complaint.entity";
 

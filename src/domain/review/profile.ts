@@ -1,5 +1,5 @@
 import { UniqueEntityID } from "@domain/common/unique-id";
-import { Platform } from "@domain/common/enums/platfoms.enum";
+import { Platform } from "@domain/placement/types/platfoms.enum";
 import { TwogisProfilePlacementDetail } from "@domain/review/model/profile/twogis-profile-placement-detail";
 import { YandexProfilePlacementDetail } from "@domain/review/model/profile/yandex-profile-placement-detail";
 
@@ -14,7 +14,11 @@ export class Profile {
       private _firstname: string,
       private _surname: string,
       private _avatar: string | null,
-      private _detail: ProfileDetail
+      private _detail: ProfileDetail,
+
+      private readonly _createdAt: Date = new Date(),
+      private _updatedAt: Date | null = null,
+      private _deletedAt: Date | null = null
     ) {}
 
     static create(

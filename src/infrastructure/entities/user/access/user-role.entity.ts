@@ -1,5 +1,5 @@
 import {PrimaryGeneratedColumn, Column, Entity, OneToMany} from 'typeorm';
-import {USER_TYPE} from "@domain/company/model/employee/employee-role";
+import {USER_TYPE} from "@domain/employee/model/employee-role";
 import {UserPermissionEntity} from "@infrastructure/entities/user/access/user-permission.entity";
 
 @Entity('user_role')

@@ -4,7 +4,7 @@ import { ManagerName } from '@domain/manager/value-object/manager-name.vo';
 import { ManagerPhone } from '@domain/manager/value-object/manager-phone.vo';
 import { ManagerPassword } from '@domain/manager/value-object/manager-password.vo';
 import { ManagerRole } from "@domain/manager/model/manager-role";
-import {Lead} from "@domain/manager/model/lead";
+import {Lead} from "@domain/manager/model/lead/lead";
 
 export class ManagerId extends UniqueEntityID {}
 
@@ -16,7 +16,11 @@ export class Manager {
       private _phone: ManagerPhone,
       private _password: ManagerPassword,
       private _role: ManagerRole,
-      private _leads: Lead[]
+      private _leads: Lead[],
+
+      private readonly _createdAt: Date = new Date(),
+      private _updatedAt: Date | null = null,
+      private _deletedAt: Date | null = null
     ) {}
 
     static create(

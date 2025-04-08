@@ -1,10 +1,10 @@
 import {UniqueEntityID} from "@domain/common/unique-id";
-import {EMPLOYEE_TYPE} from "@domain/company/types/employee-type.types";
+import {EMPLOYEE_TYPE} from "@domain/employee/types/employee-type.types";
 import {
     EmployeePermissions,
     PermissionAction,
     PermissionResource
-} from "@domain/company/types/employee-permissions.types";
+} from "@domain/employee/repositories/employee-permissions.types";
 
 
 export class EmployeeRoleId extends UniqueEntityID {}

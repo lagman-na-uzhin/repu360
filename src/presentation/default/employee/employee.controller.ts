@@ -1,18 +1,20 @@
 import {Body, Controller, Get, Inject, Post, UseGuards, Req, Res} from '@nestjs/common';
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { UseCaseProxy } from '@infrastructure/usecase-proxy/usecase-proxy';
-import {LoginDto} from "@presentation/default/user/dto/login.dto";
+import {LoginDto} from "@presentation/default/employee/dto/login.dto";
 import {UserLoginUseCase} from "@application/use-cases/default/employee/login/login.usecase";
 import {UserProxy} from "@infrastructure/usecase-proxy/user/user.proxy";
 import {UserMeUseCase} from "@application/use-cases/default/employee/me/me.usecase";
 import {UserInitQuery} from "@infrastructure/common/decorators/user.decorator";
-import {UserMeDto} from "@presentation/default/user/dto/me.dto";
+import {UserMeDto} from "@presentation/default/employee/dto/me.dto";
 import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
 import {LoginInput} from "@application/use-cases/default/employee/login/login.input";
 import {UserMeInput} from "@application/use-cases/default/employee/me/me.input";
+import {ROUTES} from "@presentation/routes";
+import {EmployeeId} from "@domain/employee/employee";
 
-@Controller('user')
-export class UserController {
+@Controller(ROUTES.EMPLOYEE.BASE)
+export class EmployeeController {
     constructor(
         @Inject(UserProxy.LOGIN_USE_CASE)
         private readonly userLoginUseCaseProxy: UseCaseProxy<UserLoginUseCase>,
@@ -20,7 +22,7 @@ export class UserController {
         private readonly userMeUseCaseProxy: UseCaseProxy<UserMeUseCase>,
     ) {}
 
-    @Post('login')
+    @Post(ROUTES.EMPLOYEE.LOGIN)
     async login(
         @Body() payload: LoginDto,
         @Req() request: FastifyRequest,
@@ -44,10 +46,10 @@ export class UserController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('me')
+    @Get(ROUTES.EMPLOYEE.ME)
     async me(@UserInitQuery() payload: UserMeDto) {
         return this.userMeUseCaseProxy
             .getInstance()
-            .execute(new UserMeInput(new UserId(payload.authId)));
+            .execute(new UserMeInput(new EmployeeId(payload.authId)));
     }
 }

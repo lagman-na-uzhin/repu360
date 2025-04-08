@@ -8,7 +8,7 @@ import {TwogisReviewPlacementDetailEntity} from "@infrastructure/entities/review
 import {YandexReviewPlacementDetailEntity} from "@infrastructure/entities/review/placement-details/yandex-review.entity";
 import { PlacementId } from '@domain/placement/placement';
 import { ProfileId } from '@domain/review/profile';
-import { Platform } from '@domain/common/enums/platfoms.enum';
+import { Platform } from '@domain/placement/types/platfoms.enum';
 import { TwogisReviewPlacementDetail } from '@domain/review/model/review/twogis-review-placement-detail';
 import { YandexReviewPlacementDetail } from '@domain/review/model/review/yandex-review-placement-detail';
 import { ReviewMedia } from '@domain/review/model/review/review-media';

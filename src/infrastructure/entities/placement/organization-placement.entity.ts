@@ -10,7 +10,7 @@ import {OrganizationEntity} from "@infrastructure/entities/organization/organiza
 import {ReviewEntity} from "@infrastructure/entities/review/review.entity";
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
 import { TwogisPlacementDetailEntity, } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
-import {Platform} from "@domain/common/enums/platfoms.enum";
+import {Platform} from "@domain/placement/types/platfoms.enum";
 
 @Entity('organization_placement')
 export class OrganizationPlacementEntity {

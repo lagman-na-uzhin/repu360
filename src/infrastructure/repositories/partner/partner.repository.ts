@@ -4,11 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PartnerEntity } from 'src/infrastructure/entities/ partner/partner.entity';
 import { Company, PartnerId } from '@domain/company/company';
 import { IPartnerRepository } from '@domain/company/repositories/company-repository.interface';
-import { PartnerUser } from '@domain/company/model/employee/employee';
+import { PartnerUser } from '@domain/employee/employee';
 import { UserEntity } from 'src/infrastructure/entities/user/user.entity';
-import { PartnerTariff } from '@domain/company/model/tariff/tariff';
+import { PartnerTariff } from '@domain/subscription/model/tariff';
 import { TariffEntity } from 'src/infrastructure/entities/tariff/tariff.entity';
-import {PartnerTariffFeatures} from "@domain/company/model/tariff/tariff-feature";
+import {PartnerTariffFeatures} from "@domain/subscription/model/tariff-feature";
 import {PartnerUserRole} from "@domain/company/value-object/company-manager-role.vo";
 
 @Injectable()

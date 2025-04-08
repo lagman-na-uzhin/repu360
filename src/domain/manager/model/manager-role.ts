@@ -18,7 +18,11 @@ export class ManagerRole {
         private readonly _id: ManagerRoleId,
         private _name: string,
         private _type: MANAGER_TYPE,
-        private _permissions: ManagerPermission[]
+        private _permissions: ManagerPermission[],
+
+        private readonly _createdAt: Date = new Date(),
+        private _updatedAt: Date | null = null,
+        private _deletedAt: Date | null = null
     ) {}
 
     static create(type: MANAGER_TYPE, permissions: ManagerPermission[], name?: string) {

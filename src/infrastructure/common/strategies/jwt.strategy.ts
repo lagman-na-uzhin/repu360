@@ -6,8 +6,8 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { CACHE_KEY } from '@application/repositories/cache/cache-key.const';
 import { FastifyRequest } from 'fastify';
-import {EmployeeRole} from "@domain/company/model/employee/employee-role";
-import {Employee} from "@domain/company/model/employee/employee";
+import {EmployeeRole} from "@domain/employee/model/employee-role";
+import {Employee} from "@domain/employee/employee";
 import {ManagerId} from "@domain/manager/manager";
 
 @Injectable()

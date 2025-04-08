@@ -1,6 +1,6 @@
 import { UniqueEntityID } from "@domain/common/unique-id";
 import { EXCEPTION } from "@domain/common/exceptions/exceptions.const";
-import { PartnerTariffFeatures } from "@domain/company/model/tariff/tariff-feature";
+import { PartnerTariffFeatures } from "@domain/subscription/model/tariff-feature";
 import { CompanyId } from "@domain/company/company";
 import {TariffFeatures} from "@domain/company/types/tariff-features.types";
 
@@ -11,7 +11,12 @@ export class Tariff {
     private readonly _id: TariffId,
     private _isActive: boolean,
     private _price: number,
-    private _features: TariffFeatures
+    private _features: TariffFeatures,
+
+    private readonly _createdAt: Date = new Date(),
+    private _updatedAt: Date | null = null,
+    private _deletedAt: Date | null = null
+
   ) {}
 
   static create(isActive: boolean, price: number, _features: TariffFeatures) {

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {IJwtService, IJwtServicePayload} from "@application/services/jwt/jwt-service.interface";
 import {EnvConfigService} from "@infrastructure/config/env-config/env-config.service";
-import {EmployeeRole} from "@domain/company/model/employee/employee-role";
+import {EmployeeRole} from "@domain/employee/model/employee-role";
 import {ManagerRole} from "@domain/manager/model/manager-role";
 
 @Injectable()

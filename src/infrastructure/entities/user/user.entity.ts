@@ -20,7 +20,7 @@ export class UserEntity {
   })
   phone: string;
 
-  @Column()
+  @Column({nullable: true})
   password: string;
 
   @Column({ nullable: true, type: 'text' })

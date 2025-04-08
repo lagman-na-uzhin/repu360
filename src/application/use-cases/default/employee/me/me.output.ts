@@ -1,4 +1,4 @@
-import {PartnerUserRole} from "@domain/company/model/employee/employee-role";
+import {PartnerUserRole} from "@domain/employee/model/employee-role";
 
 export class UserMeOutput {
     constructor(

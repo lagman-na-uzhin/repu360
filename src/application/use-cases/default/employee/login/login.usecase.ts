@@ -5,7 +5,7 @@ import {ICacheRepository} from "@application/repositories/cache/cache-repository
 import {IEmployeeRepository} from "@domain/manager/repositories/manager-repository.interface";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {LoginOutput} from "@application/use-cases/default/employee/login/login.output";
-import {Employee} from "@domain/company/model/employee/employee";
+import {Employee} from "@domain/employee/employee";
 
 export class UserLoginUseCase {
     constructor(

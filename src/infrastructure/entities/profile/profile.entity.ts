@@ -4,7 +4,7 @@ import {
   TwogisProfilePlacementDetailEntity,
 } from '@infrastructure/entities/profile/placement-details/twogis-profile.entity';
 import { YandexProfilePlacementDetailEntity } from "@infrastructure/entities/profile/placement-details/yandex-profile.entity";
-import {Platform} from "@domain/common/enums/platfoms.enum";
+import {Platform} from "@domain/placement/types/platfoms.enum";
 
 @Entity('profile')
 export class ProfileEntity {

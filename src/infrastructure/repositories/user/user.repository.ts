@@ -5,10 +5,10 @@ import { UserEntity } from 'src/infrastructure/entities/user/user.entity';
 import { Manager } from '@domain/manager/manager';
 import {
   IPartnerUserRepository
-} from "@domain/company/repositories/employee-repository.interface";
+} from "@domain/employee/repositories/employee-repository.interface";
 import {ManagerPermission} from "@domain/manager/value-object/manager-permission";
 import { IUserRepository } from '@domain/manager/repositories/manager-repository.interface';
-import {PartnerUserRole, UserRoleId} from "@domain/company/model/employee/employee-role";
+import {PartnerUserRole, UserRoleId} from "@domain/employee/model/employee-role";
 import {UserPermissionEntity} from "@infrastructure/entities/user/access/user-permission.entity";
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
 

@@ -1,6 +1,6 @@
 import { createParamDecorator } from '@nestjs/common';
 import {ManagerId} from "@domain/manager/manager";
-import {EmployeeRole} from "@domain/company/model/employee/employee-role";
+import {EmployeeRole} from "@domain/employee/model/employee-role";
 
 export const UserBody = createParamDecorator((data, req) => {
   const { actor, ownerId }: {actor: EmployeeRole, ownerId: ManagerId | null} = req

@@ -1,5 +1,5 @@
 import {OrganizationId} from "@domain/organization/organization";
-import {Platform} from "@domain/common/enums/platfoms.enum";
+import {Platform} from "@domain/placement/types/platfoms.enum";
 
 export class TwogisAddPlacementCommand {
     constructor(

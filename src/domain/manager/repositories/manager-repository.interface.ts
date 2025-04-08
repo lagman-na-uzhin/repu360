@@ -1,4 +1,4 @@
-import {Employee} from "@domain/company/model/employee/employee";
+import {Employee} from "@domain/employee/employee";
 
 export interface IEmployeeRepository {
     getById(id: string): Promise<Employee | null>;
