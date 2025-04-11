@@ -1,9 +1,9 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
 import { ReviewEntity } from '@infrastructure/entities/review/review.entity';
 
 @Entity('review_media')
 export class ReviewMediaEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn("uuid")
   public id: string;
 
   @Column()
@@ -12,9 +12,7 @@ export class ReviewMediaEntity {
   @Column()
   public url: string;
 
-  @Column()
-  public dateCreated: Date;
-
-  @ManyToOne(() => ReviewEntity, (review) => review.media, { onDelete: 'CASCADE'})
+  @ManyToOne(() => ReviewEntity, (review) => review.media)
+  @JoinColumn({ name: "review_id" })
   review: ReviewEntity;
 }

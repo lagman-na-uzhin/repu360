@@ -12,7 +12,7 @@ import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/or
     @Column()
     placementId: string;
 
-    @OneToOne(() => OrganizationPlacementEntity, { onDelete: 'CASCADE' })
+    @OneToOne(() => OrganizationPlacementEntity)
     @JoinColumn({ name: 'placement_id'})
     platform: OrganizationPlacementEntity;
 }

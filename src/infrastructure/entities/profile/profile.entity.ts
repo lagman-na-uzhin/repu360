@@ -1,4 +1,4 @@
-import {Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
 import { ReviewEntity } from '@infrastructure/entities/review/review.entity';
 import {
   TwogisProfilePlacementDetailEntity,
@@ -8,27 +8,27 @@ import {Platform} from "@domain/placement/types/platfoms.enum";
 
 @Entity('profile')
 export class ProfileEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   public id: string;
 
   @Column({ nullable: true })
-  firstname: string;
+  public firstname: string;
 
   @Column({ nullable: true })
-  surname: string;
+  public surname: string;
 
   @Column({ nullable: true })
-  avatar: string;
+  public avatar: string;
 
   @Column({ type: 'enum', enum: Platform })
-  platform: Platform
+  public platform: Platform
 
   @OneToMany(() => ReviewEntity, (review) => review.profile)
   reviews: ReviewEntity[];
 
-  @OneToOne(() => TwogisProfilePlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'] })
+  @OneToOne(() => TwogisProfilePlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true })
   twogisDetail?: TwogisProfilePlacementDetailEntity;
 
-  @OneToOne(() => YandexProfilePlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'] })
+  @OneToOne(() => YandexProfilePlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true })
   yandexDetail?: YandexProfilePlacementDetailEntity;
 }

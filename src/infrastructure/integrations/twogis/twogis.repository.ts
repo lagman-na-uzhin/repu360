@@ -1,14 +1,14 @@
-import { ITwogisRepository } from '@application/integrations/twogis/repository/twogis-repository.interface';
-import { GetOrganizationReviewsInDto } from '@application/integrations/twogis/client/dto/in/get-organization-reviews.in.dto';
+import { ITwogisRepository } from '@application/interfaces/integrations/twogis/repository/twogis-repository.interface';
+import { GetOrganizationReviewsInDto } from '@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto';
 import {
   IOrganizationReviewsOutDto,
   ITwogisPreviewUrls,
   ITwogisReview,
-} from '@application/integrations/twogis/client/dto/out/organization-reviews.out.dto';
+} from '@application/interfaces/integrations/twogis/client/dto/out/organization-reviews.out.dto';
 import { Review } from '@domain/review/review';
-import { ITwogisClient } from 'src/application/integrations/twogis/client/twogis-client.interface';
+import { ITwogisClient } from '@application/interfaces/integrations/twogis/client/twogis-client.interface';
 import { Profile, ProfileId } from '@domain/review/profile';
-import { UniqueEntityID } from '@domain/common/unique-id';
+import { UniqueID } from '@domain/common/unique-id';
 import { PlacementId } from '@domain/placement/placement';
 import { Platform } from '@domain/placement/types/platfoms.enum';
 import { TwogisReviewPlacementDetail } from '@domain/review/model/review/twogis-review-placement-detail';
@@ -18,7 +18,7 @@ import { ReviewMedia } from '@domain/review/model/review/review-media';
 export class TwogisRepository implements ITwogisRepository {
   constructor(private readonly twogisClient: ITwogisClient) {}
   async getOrganizationReviews(
-    organizationPlatformId: UniqueEntityID,
+    organizationPlatformId: UniqueID,
     twogisOrganizationExternalId: string,
     payload: GetOrganizationReviewsInDto,
   ): Promise<{ review: Review; profile: Profile }[] | null> {

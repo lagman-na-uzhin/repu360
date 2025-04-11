@@ -1,5 +1,5 @@
-import {Tariff} from "@domain/subscription/model/tariff";
+import {Tariff, TariffId} from "@domain/subscription/model/tariff";
 
 export interface ITariffRepository {
-    getById(id: string): Promise<Tariff | null>
+    getById(id: TariffId): Promise<Tariff | null>
 }

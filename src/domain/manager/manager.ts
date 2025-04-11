@@ -1,4 +1,4 @@
-import { UniqueEntityID } from '@domain/common/unique-id';
+import { UniqueID } from '@domain/common/unique-id';
 import { ManagerEmail } from '@domain/manager/value-object/manager-email.vo';
 import { ManagerName } from '@domain/manager/value-object/manager-name.vo';
 import { ManagerPhone } from '@domain/manager/value-object/manager-phone.vo';
@@ -6,7 +6,7 @@ import { ManagerPassword } from '@domain/manager/value-object/manager-password.v
 import { ManagerRole } from "@domain/manager/model/manager-role";
 import {Lead} from "@domain/manager/model/lead/lead";
 
-export class ManagerId extends UniqueEntityID {}
+export class ManagerId extends UniqueID {}
 
 export class Manager {
     private constructor(

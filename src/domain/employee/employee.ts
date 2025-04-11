@@ -1,12 +1,12 @@
-import { UniqueEntityID } from "@domain/common/unique-id";
-import { EmployeeName } from '@domain/employee/value-object/employee-user-name.vo';
+import { UniqueID } from "@domain/common/unique-id";
+import { EmployeeName } from '@domain/employee/value-object/employee-name.vo';
 import { EmployeeEmail } from '@domain/employee/value-object/employee-email.vo';
-import { EmployeePhone } from '@domain/employee/value-object/employee-user-phone.vo';
-import { EmployeePassword } from '@domain/employee/value-object/employee-user-password.vo';
+import { EmployeePhone } from '@domain/employee/value-object/employee-phone.vo';
+import { EmployeePassword } from '@domain/employee/value-object/employee-password.vo';
 import { EmployeeRole } from "@domain/employee/model/employee-role";
 import {CompanyId} from "@domain/company/company";
 
-export class EmployeeId extends UniqueEntityID {}
+export class EmployeeId extends UniqueID {}
 
 export class Employee {
     private constructor(
@@ -31,7 +31,7 @@ export class Employee {
         email: EmployeeEmail,
         phone: EmployeePhone,
         password: EmployeePassword,
-        avatar: string | null
+        avatar: string | null = null
     ): Employee {
         return new Employee(
           new EmployeeId(),
@@ -99,6 +99,10 @@ export class Employee {
 
     get id(): EmployeeId {
         return this._id;
+    }
+
+    get companyId() {
+        return this._companyId;
     }
 
     get name() {

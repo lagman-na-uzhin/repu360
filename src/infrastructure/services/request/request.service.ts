@@ -10,8 +10,8 @@ import {
   ERR_CODE_RESPONSE,
 } from './request.const';
 import { RequestDto } from './request.dto';
-import {IProxy} from "src/application/repositories/proxy/proxy-repository.interface";
-import {ERR_REQUEST, RESPONSE_TYPE} from "src/application/services/request/request.enum";
+import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {ERR_REQUEST, RESPONSE_TYPE} from "@application/interfaces/services/request/request.enum";
 
 @Injectable()
 export class RequestService {

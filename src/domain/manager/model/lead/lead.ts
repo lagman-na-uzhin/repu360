@@ -1,7 +1,7 @@
-import {UniqueEntityID} from "@domain/common/unique-id";
+import {UniqueID} from "@domain/common/unique-id";
 import {LeadContact} from "@domain/manager/model/lead/lead-contact";
 
-export class LeadId extends UniqueEntityID {}
+export class LeadId extends UniqueID {}
 
 export class Lead {
     private constructor(

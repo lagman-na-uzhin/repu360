@@ -12,7 +12,7 @@ import {UseCaseProxy} from "src/infrastructure/usecase-proxy/usecase-proxy";
 import {
   SyncTwogisReviewsProcessUseCase
 } from "@application/use-cases/background/review/twogis/sync-reviews/sync-reviews-pc.usecase";
-import {QUEUES} from "src/application/services/task/task-service.interface";
+import {QUEUES} from "@application/interfaces/services/task/task-service.interface";
 
 @Injectable()
 @Processor(QUEUES.SYNC_TWOGIS_REVIEWS)

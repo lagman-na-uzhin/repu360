@@ -1,6 +1,6 @@
-import {Company} from "@domain/company/company";
+import {Company, CompanyId} from "@domain/company/company";
 
 export interface ICompanyRepository {
-    getById(id: string): Promise<Company | null>
+    getById(id: CompanyId): Promise<Company | null>
     save(partner: Company): Promise<void>
 }

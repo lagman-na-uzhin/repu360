@@ -1,10 +1,10 @@
 import { MINUTE } from 'time-constants';
-import {IProxyService} from "@application/services/proxy/proxy-service.interface";
-import {ITaskService, QUEUES} from "@application/services/task/task-service.interface";
+import {IProxyService} from "@application/interfaces/services/proxy/proxy-service.interface";
+import {ITaskService, QUEUES} from "@application/interfaces/services/task/task-service.interface";
 import {
   IOrganizationRepository
 } from "@domain/organization/repositories/organization-repository.interface";
-import {UniqueEntityID} from "@domain/common/unique-id";
+import {UniqueID} from "@domain/common/unique-id";
 import { SyncTwogisReviewsProcessDto } from '@presentation/background/platform/twogis/dto/sync-twogis-reviews.dto';
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 
@@ -14,7 +14,7 @@ export class SyncTwogisReviewsScheduleUseCase {
     private readonly taskService: ITaskService,
   ) {}
 
-  private readonly timeMap = new Map<UniqueEntityID, number>();
+  private readonly timeMap = new Map<UniqueID, number>();
 
   async execute() {
     const twogisPlacements =
@@ -33,7 +33,7 @@ export class SyncTwogisReviewsScheduleUseCase {
     }
   }
 
-  private async initTask(organizationPlatformId: UniqueEntityID):Promise<void>  {
+  private async initTask(organizationPlatformId: UniqueID):Promise<void>  {
     const payload: SyncTwogisReviewsProcessDto = {organizationPlatformId};
     await this.taskService.addTask({
       queue: QUEUES.SYNC_TWOGIS_REVIEWS,

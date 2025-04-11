@@ -1,5 +1,5 @@
-import {Lead} from "@domain/manager/model/lead/lead";
+import {Lead, LeadId} from "@domain/manager/model/lead/lead";
 
 export interface ILeadRepository {
-    getById(id: string): Promise<Lead | null>
+    getById(id: LeadId): Promise<Lead | null>
 }

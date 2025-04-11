@@ -7,7 +7,7 @@ import {
 import {
   IOrganizationRepository
 } from "@domain/organization/repositories/organization-repository.interface";
-import {ITwogisRepository} from "src/application/integrations/twogis/repository/twogis-repository.interface";
+import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
 import {IReviewRepository} from "@domain/review/repositories/review-repository.interface";
 import {IProfileRepository} from "@domain/review/repositories/profile-repository.interface";
 import {TwogisRepository} from "src/infrastructure/integrations/twogis/twogis.repository";
@@ -16,8 +16,9 @@ import {ProfileOrmRepository} from "src/infrastructure/repositories/profile/prof
 import {
   SyncTwogisReviewsScheduleUseCase
 } from "@application/use-cases/background/review/twogis/sync-reviews/sync-reviews-sh.usecase";
-import {ITaskService} from "src/application/services/task/task-service.interface";
+import {ITaskService} from "@application/interfaces/services/task/task-service.interface";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
+import {PlacementOrmRepository} from "@infrastructure/repositories/placement/placement.repository";
 
 export enum ReviewProxy {
   SYNC_TWOGIS_REVIEWS_PROCESS_USE_CASE = `${PREFIX.REVIEW_PROXY}SyncReviewsProcessUseCaseProxy`,
@@ -26,14 +27,14 @@ export enum ReviewProxy {
 
 export const reviewProxyProviders = [
   {
-    inject: [OrganizationOrmRepository, TwogisRepository, ReviewOrmRepository, ProfileOrmRepository],
+    inject: [PlacementOrmRepository, TwogisRepository, ReviewOrmRepository, ProfileOrmRepository],
     provide: ReviewProxy.SYNC_TWOGIS_REVIEWS_PROCESS_USE_CASE,
-    useFactory: (organizationRepo: IOrganizationRepository, twogisRepo: ITwogisRepository, reviewRepo: IReviewRepository, profileRepo: IProfileRepository) => {
-        return new UseCaseProxy(new SyncTwogisReviewsProcessUseCase(organizationRepo, twogisRepo, reviewRepo, profileRepo))
+    useFactory: (placementRepo: IPlacementRepository, twogisRepo: ITwogisRepository, reviewRepo: IReviewRepository, profileRepo: IProfileRepository) => {
+        return new UseCaseProxy(new SyncTwogisReviewsProcessUseCase(placementRepo, twogisRepo, reviewRepo, profileRepo))
     }
   },
   {
-    inject: [OrganizationOrmRepository, ],
+    inject: [PlacementOrmRepository, ],
     provide: ReviewProxy.SYNC_TWOGIS_REVIEWS_SCHEDULE_USE_CASE,
     useFactory: (placementRepo: IPlacementRepository, taskService: ITaskService) => {
       return new UseCaseProxy(new SyncTwogisReviewsScheduleUseCase(placementRepo, taskService))

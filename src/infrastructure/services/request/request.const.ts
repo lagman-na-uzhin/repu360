@@ -1,4 +1,4 @@
-import {ERR_REQUEST} from "src/application/services/request/request.enum";
+import {ERR_REQUEST} from "@application/interfaces/services/request/request.enum";
 
 export const ERR_CODE_RESPONSE = (status: number) => {
   const codes = {

@@ -4,7 +4,7 @@ import { REPOSITORIES } from '.';
 import { EnvConfigModule } from '../config/env-config/env-config.module';
 import { TypeOrmConfigModule } from '../config/orm/typeorm.module';
 import { ORGANIZATION_ENTITIES } from 'src/infrastructure/entities/organization';
-import { PARTNER_ENTITIES } from 'src/infrastructure/entities/ partner';
+import { PARTNER_ENTITIES } from 'src/infrastructure/entities/company';
 import { REVIEW_ENTITIES } from 'src/infrastructure/entities/review';
 import { RepositoriesService } from 'src/infrastructure/repositories/repositories.service';
 import { RequestModule } from 'src/infrastructure/services/request/request.module';

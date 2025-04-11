@@ -1,9 +1,9 @@
-import {UniqueEntityID} from "@domain/common/unique-id";
+import {UniqueID} from "@domain/common/unique-id";
 import {LeadContactPhone} from "@domain/manager/value-object/lead/lead-contact-phone.vo";
 import {LeadContactName} from "@domain/manager/value-object/lead/lead-contact-name.vo";
 import {LeadContactEmail} from "@domain/manager/value-object/lead/lead-contact-email.vo";
 
-export class LeadContactId extends UniqueEntityID {}
+export class LeadContactId extends UniqueID {}
 
 export class LeadContact {
     private constructor(

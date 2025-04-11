@@ -1,11 +1,11 @@
-import { UniqueEntityID } from '@domain/common/unique-id';
+import { UniqueID } from '@domain/common/unique-id';
 import { OrganizationId } from '@domain/organization/organization';
 import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-detail';
 import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
 import { Platform } from '@domain/placement/types/platfoms.enum';
 import { PlacementDetail } from "@domain/placement/types/placement-detail.types";
 
-export class PlacementId extends UniqueEntityID {}
+export class PlacementId extends UniqueID {}
 
 export class Placement {
     private constructor(

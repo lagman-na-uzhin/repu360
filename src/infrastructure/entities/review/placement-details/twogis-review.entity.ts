@@ -10,7 +10,7 @@ import {Unique} from "typeorm";
 @Entity('twogis_review_placement_detail')
 @Unique(['externalId'])
 export class TwogisReviewPlacementDetailEntity {
-    @PrimaryColumn()
+    @PrimaryColumn("uuid")
     reviewId: string;
 
     @Column()

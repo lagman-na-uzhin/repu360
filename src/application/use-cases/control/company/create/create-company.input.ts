@@ -1,11 +1,16 @@
-import {BaseManagerInput} from "@application/use-cases/common/base-manager-input";
-import {CompanyName} from "@domain/company/value-object/company-name.vo";
-import {LeadId} from "@domain/manager/model/lead/lead";
+import { BaseManagerInput } from "@application/common/base-manager-input";
+import { CompanyName } from "@domain/company/value-object/company-name.vo";
+import { Manager } from "@domain/manager/manager";
 
-export class CreateCompanyInput extends BaseManagerInput{
-  constructor(
-    public readonly leadId: LeadId,
+export class CreateCompanyInput extends BaseManagerInput {
+  private constructor(
+      public readonly companyName: CompanyName,
+      manager: Manager
+  ) {
+    super(manager);
+  }
 
-    public readonly companyName: CompanyName,
-  ) {super()}
+  public static of(name: string, manager: Manager) {
+    return new CreateCompanyInput(new CompanyName(name), manager);
+  }
 }

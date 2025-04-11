@@ -7,8 +7,9 @@ import {
   IsString,
   Length,
 } from 'class-validator';
+import {ManagerDto} from "@presentation/common/dto/manager-body.dto";
 
-export class RegisterPartnerDto {
+export class CreateCompanyDto extends ManagerDto {
   @IsNotEmpty()
   @IsString()
   public name: string;
@@ -26,14 +27,4 @@ export class RegisterPartnerDto {
   @IsEmail()
   @Transform(({ value }) => value.toLowerCase())
   public email: string;
-
-  @IsOptional()
-  @IsInt()
-  @Transform(({ value }) => parseInt(value))
-  public inviteId: number;
-
-  @IsOptional()
-  @IsInt()
-  @Transform(({ value }) => parseInt(value))
-  public agentId: number;
 }

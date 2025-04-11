@@ -1,16 +1,16 @@
-import {ITwogisClient} from "src/application/integrations/twogis/client/twogis-client.interface";
-import {IProxy} from "src/application/repositories/proxy/proxy-repository.interface";
+import {ITwogisClient} from "@application/interfaces/integrations/twogis/client/twogis-client.interface";
+import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
 import {
     GetOrganizationReviewsInDto
-} from "src/application/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
-import {IProxyService} from "src/application/services/proxy/proxy-service.interface";
+} from "@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
+import {IProxyService} from "@application/interfaces/services/proxy/proxy-service.interface";
 import {
     GET_ORGANIZATION_REVIEWS_CONFIG,
     GET_ORGANIZATION_REVIEWS_NEXT_CONFIG
 } from "src/infrastructure/integrations/twogis/twogis.client.const";
 import {
     IOrganizationReviewsOutDto
-} from "src/application/integrations/twogis/client/dto/out/organization-reviews.out.dto";
+} from "@application/interfaces/integrations/twogis/client/dto/out/organization-reviews.out.dto";
 
 export class TwogisClient implements ITwogisClient {
     constructor(

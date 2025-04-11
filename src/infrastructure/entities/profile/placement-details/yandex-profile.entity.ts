@@ -4,7 +4,7 @@ import { ProfileEntity } from '@infrastructure/entities/profile/profile.entity';
 @Entity('yandex_profile_placement_detail')
 @Unique(['externalId'])
 export class YandexProfilePlacementDetailEntity {
-  @PrimaryColumn()
+  @PrimaryColumn('uuid')
   profileId: string;
 
   @Column()

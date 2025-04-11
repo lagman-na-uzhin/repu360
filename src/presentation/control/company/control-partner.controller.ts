@@ -1,26 +1,26 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import {Controller, HttpStatus, Inject, Post} from '@nestjs/common';
 import { UseCaseProxy } from '@infrastructure/usecase-proxy/usecase-proxy';
-import { SUCCESS } from '@infrastructure/common/interceptors/http-success-codes.const';
-import { PartnerProxy } from '@infrastructure/usecase-proxy/partner/partner.proxy';
-import { RegisterPartnerDto } from '@presentation/control/company/dto/register-partner.dto';
-import {
-  RegisterPartnerUseCase
-} from "@application/use-cases/control/company/create/create-company.usecase";
+import { CompanyProxy } from '@infrastructure/usecase-proxy/company/company.proxy';
+import {CreateCompanyDto} from '@presentation/control/company/dto/register-partner.dto';
+import {CreateCompanyUseCase} from "@application/use-cases/control/company/create/create-company.usecase";
 import {ROUTES} from "@presentation/routes";
+import {CreateCompanyInput} from "@application/use-cases/control/company/create/create-company.input";
+import {ManagerBody} from "@infrastructure/common/decorators/user.decorator";
 
 @Controller(ROUTES.CONTROL.COMPANY.BASE)
 export class ControlCompanyController {
   constructor(
-    @Inject(PartnerProxy.REGISTER_PARTNER_USE_CASE)
-    private readonly registerPartnerUseCaseProxy: UseCaseProxy<RegisterPartnerUseCase>,
+    @Inject(CompanyProxy.CREATE_COMPANY_USE_CASE)
+    private readonly createCompanyUseCaseProxy: UseCaseProxy<CreateCompanyUseCase>,
   ) {}
 
-  @Post(ROUTES.CONTROL.COMPANY.REGISTER)
-  async register(@Body() payload: RegisterPartnerDto) {
+  @Post(ROUTES.CONTROL.COMPANY.CREATE)
+  async create(@ManagerBody() dto: CreateCompanyDto) {
+    const input = CreateCompanyInput.of(dto.companyName, dto.manager)
+
     return {
-      statusCode: 201,
-      data: await this.registerPartnerUseCaseProxy.getInstance().execute(payload),
-      message: SUCCESS.PARTNER.SUCCESS_REGISTER,
+      statusCode: HttpStatus.CREATED,
+      data: await this.createCompanyUseCaseProxy.getInstance().execute(input),
     };
   }
 }

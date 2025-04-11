@@ -1,42 +1,42 @@
-import {PrimaryGeneratedColumn, Column, ManyToOne, Entity, OneToOne} from 'typeorm';
-import { PartnerEntity } from 'src/infrastructure/entities/ partner/partner.entity';
+import {PrimaryGeneratedColumn, Column, ManyToOne, Entity, OneToOne, JoinColumn, PrimaryColumn} from 'typeorm';
+import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
 
 @Entity('user')
 export class UserEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryColumn("uuid")
   public id: string;
 
   @Column()
-  name: string;
+  public name: string;
 
   @Column({
     unique: true,
   })
-  email: string;
+  public email: string;
 
   @Column({
     unique: true,
   })
-  phone: string;
+  public phone: string;
 
   @Column({nullable: true})
-  password: string;
+  public password: string;
 
   @Column({ nullable: true, type: 'text' })
-  avatar: string | null;
+  public avatar: string | null;
 
   @Column({ nullable: true })
-  partnerId: string;
+  public companyId: string;
 
   @Column()
-  roleId: string;
+  public roleId: string;
 
-  @ManyToOne(() => PartnerEntity, (partner) => partner.users, {
-    onDelete: 'CASCADE',
-  })
-  partner: PartnerEntity;
+  @ManyToOne(() => CompanyEntity, (company) => company.employees )
+  @JoinColumn({ name: "company_id" })
+  company: CompanyEntity;
 
   @OneToOne(() => UserRoleEntity, {cascade: ['insert', 'soft-remove', 'update'], eager: true })
+  @JoinColumn({name: "role_id"})
   role: UserRoleEntity;
 }

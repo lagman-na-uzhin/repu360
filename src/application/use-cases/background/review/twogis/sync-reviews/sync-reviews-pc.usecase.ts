@@ -1,6 +1,6 @@
-import {ITwogisRepository} from "@application/integrations/twogis/repository/twogis-repository.interface";
+import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
 import {Review} from "@domain/review/review";
-import {UniqueEntityID} from "@domain/common/unique-id";
+import {UniqueID} from "@domain/common/unique-id";
 import {
   IOrganizationRepository
 } from "@domain/organization/repositories/organization-repository.interface";
@@ -11,19 +11,20 @@ import { Profile } from '@domain/review/profile';
 import {
   SyncReviewsPcInput
 } from "@application/use-cases/background/review/twogis/sync-reviews/sync-reviews-pc.input";
-import {Placement} from "@domain/placement/placement";
+import {Placement, PlacementId} from "@domain/placement/placement";
+import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 
 export class SyncTwogisReviewsProcessUseCase {
   constructor(
-      private readonly organizationRepo: IOrganizationRepository,
+      private readonly placementRepo: IPlacementRepository,
       private readonly twogisRepo: ITwogisRepository,
       private readonly reviewRepo: IReviewRepository,
       private readonly profileRepo: IProfileRepository,
   ) {}
 
-  async execute(command: SyncReviewsPcInput) {
-    const platform = await this.getPlatformOrFail(command.organizationPlacement);
-    const unSyncedObj = await this.getUnSyncedReviewObj(platform);
+  async execute(input: SyncReviewsPcInput) {
+    const placement = await this.getPlacementOrFail(input.organizationPlacement);
+    const unSyncedObj = await this.getUnSyncedReviewObj(placement);
 
     if (!unSyncedObj) return;
 
@@ -32,15 +33,15 @@ export class SyncTwogisReviewsProcessUseCase {
     await this.saveEntities(reviewsToSave, profilesToSave);
   }
 
-  private async getPlatformOrFail(placementId: UniqueEntityID): Promise<Placement> {
-    const platform = await this.organizationRepo.getPlacementById(placementId.toString());
-    if (!platform) throw new Error(EXCEPTION.ORGANIZATION.PLATFORM_NOT_FOUND);
-    return platform;
+  private async getPlacementOrFail(placementId: PlacementId): Promise<Placement> {
+    const placement = await this.placementRepo.getById(placementId);
+    if (!placement) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_NOT_FOUND);
+    return placement;
   }
 
   private async getUnSyncedReviewObj(placement: Placement): Promise<{ profile: Profile, review: Review }[] | null> {
-    const twogisDetails = placement.getTwogisPlacementDetail();
-    return this.twogisRepo.getOrganizationReviews(placement.id, twogisDetails.externalId, {type: twogisDetails.type})
+    const twogisDetail = placement.getTwogisPlacementDetail();
+    return this.twogisRepo.getOrganizationReviews(placement.id, twogisDetail.externalId, {type: twogisDetail.type})
   }
 
   private async processUnSyncedReviews(unSyncedObj: { profile: Profile; review: Review }[]) {

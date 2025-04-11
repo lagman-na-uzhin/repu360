@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OrganizationEntity } from '@infrastructure/entities/organization/organization.entity';
 import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
-import { UniqueEntityID } from '@domain/common/unique-id';
+import { UniqueID } from '@domain/common/unique-id';
 import { Organization, OrganizationId } from '@domain/organization/organization';
 import { TwogisPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
@@ -57,7 +57,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     const entities = await this.repo
       .createQueryBuilder('organization')
       .leftJoinAndSelect('organization.platforms', 'platforms')
-      .leftJoin('organization.company', 'partner')
+      .leftJoin('organization.company', 'company')
       .leftJoin('company.tariff', 'tariff')
       .where('tariff.isActive = :isActive', { isActive: true })
       .andWhere('organization.isActive = :isActive', { isActive: true })
@@ -69,7 +69,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     const entities: OrganizationPlacementEntity[] = await this.placementRepo
       .createQueryBuilder('platforms')
       .leftJoin('platforms.organization', 'organization')
-      .leftJoin('organization.company', 'partner')
+      .leftJoin('organization.company', 'company')
       .leftJoin('company.tariff', 'tariff')
       .where('tariff.isActive = :isActive', { isActive: true })
       .andWhere('organization.isActive = :isActive', { isActive: true })

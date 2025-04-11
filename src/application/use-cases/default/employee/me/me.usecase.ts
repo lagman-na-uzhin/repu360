@@ -1,21 +1,27 @@
-import {IUserRepository} from "@domain/manager/repositories/manager-repository.interface";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
-import {UserMeInput} from "@application/use-cases/default/employee/me/me.input";
-import {Manager} from "@domain/manager/manager";
-import {UserMeOutput} from "@application/use-cases/default/employee/me/me.output";
+import {EmployeeMeInput} from "@application/use-cases/default/employee/me/me.input";
+import {EmployeeMeOutput} from "@application/use-cases/default/employee/me/me.output";
+import {IEmployeeRepository} from "@domain/employee/repositories/employee-repository.interface";
 
 export class UserMeUseCase {
     constructor(
-        private readonly userRepo: IUserRepository
+        private readonly employeeRepo: IEmployeeRepository
     ) {
     }
-    async execute(input: UserMeInput): Promise<Manager> {
-        const user = await this.userRepo.getById(input.authId.toString())
+    async execute(input: EmployeeMeInput): Promise<EmployeeMeOutput> {
+        const employee = await this.employeeRepo.getById(input.employee.id);
 
-        if (!user) {
-            throw new Error(EXCEPTION.USER.UNAUTHORIZED);
+        if (!employee) {
+            throw new Error(EXCEPTION.COMMON.UNAUTHORIZED);
         }
 
-        return new UserMeOutput(user.id.toString(), user.name.toString(), user.role, user.partnerId?.toString(), user.phone.toString(), user.permissions);
+        return EmployeeMeOutput.of(
+            employee.id,
+            employee.name,
+            employee.role,
+            employee.companyId,
+            employee.phone,
+            employee.email
+        );
     }
 }

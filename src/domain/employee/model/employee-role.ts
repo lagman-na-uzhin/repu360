@@ -1,44 +1,35 @@
-import {UniqueEntityID} from "@domain/common/unique-id";
-import {EMPLOYEE_TYPE} from "@domain/employee/types/employee-type.types";
-import {
-    EmployeePermissions,
-    PermissionAction,
-    PermissionResource
-} from "@domain/employee/repositories/employee-permissions.types";
+import {UniqueID} from "@domain/common/unique-id";
+import {EmployeeType} from "@domain/employee/value-object/employee-role/employee-type.vo";
+import {EmployeePermissions} from "@domain/employee/model/employee-permissions";
 
 
-export class EmployeeRoleId extends UniqueEntityID {}
+export class EmployeeRoleId extends UniqueID {}
 
 export class EmployeeRole {
     private constructor(
        private readonly _id: EmployeeRoleId,
-       private _name: string,
-       private _type: EMPLOYEE_TYPE,
+       private _name: string | null,
+       private _type: EmployeeType,
        private _permissions: EmployeePermissions
     ) {}
 
-    static create(type: EMPLOYEE_TYPE, permissions: EmployeePermissions[], name?: string) {
-        return new EmployeeRole(new EmployeeRoleId(), name || type, type, permissions);
+    static create(type: EmployeeType, permissions: EmployeePermissions, name?: string) {
+        return new EmployeeRole(new EmployeeRoleId(), name || null, type, permissions);
     }
 
-    static fromPersistence(id: string, name: string, type: EMPLOYEE_TYPE, permissions: EmployeePermission[]) {
+    static fromPersistence(id: string, name: string, type: EmployeeType, permissions: EmployeePermissions) {
         return new EmployeeRole(new EmployeeRoleId(id), name, type, permissions);
     }
 
-    addPermission<T extends PermissionResource>(
-        resource: T,
-        action: PermissionAction<T>
-    ) {
-        const actions = EmployeePermissions[resource];
-        if (!actions.includes(action)) {
-            actions.push(action);
-        }
+    get id() {
+        return this._id
     }
-
+    get permissions() {
+        return this._permissions;
+    }
     get name() {
         return this._name
     }
-
     get type() {
         return this._type
     }

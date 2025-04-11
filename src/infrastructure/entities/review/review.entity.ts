@@ -1,6 +1,6 @@
 import {
     Column,
-    Entity, ManyToOne, OneToMany, OneToOne,
+    Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn,
     PrimaryGeneratedColumn,
 } from 'typeorm';
 import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
@@ -14,7 +14,7 @@ import {ReviewComplaintEntity} from "@infrastructure/entities/review/complaint/r
 
 @Entity('review')
 export class ReviewEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn("uuid")
     public id: string;
 
     @Column({ type: 'text' })
@@ -27,31 +27,32 @@ export class ReviewEntity {
     profileId: string;
 
     @Column()
-    organizationPlacementId: string;
+    placementId: string;
 
     @Column({ type: 'enum', enum: Platform })
     platform: Platform;
 
-    @ManyToOne(() => OrganizationPlacementEntity, (orgPlacement) => orgPlacement.reviews, {
-        onDelete: 'CASCADE'
-    })
-    organizationPlacement: OrganizationPlacementEntity;
+    @ManyToOne(() => OrganizationPlacementEntity, (orgPlacement) => orgPlacement.reviews)
+    placement: OrganizationPlacementEntity;
 
-    @ManyToOne(() => ProfileEntity, (profile) => profile.reviews, {
-        onDelete: 'CASCADE'
-    })
+    @ManyToOne(() => ProfileEntity, (profile) => profile.reviews)
+    @JoinColumn({ name: 'profile_id' })
     profile: ProfileEntity;
 
-    @OneToOne(() => TwogisReviewPlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove']})
+    @ManyToOne(() => OrganizationPlacementEntity, placement => placement.reviews)
+    @JoinColumn({ name: "placement_id" })
+    placement: OrganizationPlacementEntity;
+
+    @OneToOne(() => TwogisReviewPlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true})
     twogisDetail?: TwogisReviewPlacementDetailEntity
 
-    @OneToOne(() => YandexReviewPlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove']})
+    @OneToOne(() => YandexReviewPlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true})
     yandexDetail?: YandexReviewPlacementDetailEntity
 
-    @OneToMany(() => ReviewMediaEntity, media => media.reviewId, { cascade: ['insert', 'update', 'soft-remove']})
+    @OneToMany(() => ReviewMediaEntity, media => media.review, { cascade: ['insert', 'update', 'soft-remove'], eager: true})
     media: ReviewMediaEntity[];
 
-    @OneToMany(() => ReviewComplaintEntity, complaint => complaint.review, { cascade: ['insert', 'update', 'soft-remove'], eager: true} )
-    complaints: ReviewComplaintEntity[]; //TODO перенести возможно в placement detail
+    // @OneToMany(() => ReviewComplaintEntity, complaint => complaint.review, { cascade: ['insert', 'update', 'soft-remove'], eager: true} )
+    // complaints: ReviewComplaintEntity[]; //TODO перенести возможно в placement detail
 }
 

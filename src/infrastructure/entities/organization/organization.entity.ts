@@ -1,23 +1,42 @@
 import { OrganizationPlacementEntity } from '../placement/organization-placement.entity';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { PartnerEntity } from '@infrastructure/entities/ partner/partner.entity';
+import {
+    Column,
+    CreateDateColumn, DeleteDateColumn,
+    Entity, JoinColumn,
+    ManyToOne,
+    OneToMany,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from 'typeorm';
+import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 
 @Entity('organization')
 export class OrganizationEntity {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryColumn("uuid")
+    public id: string;
 
     @Column()
-    name: string;
+    public name: string;
 
     @Column()
-    partnerId: string;
+    public companyId: string;
 
-    @OneToMany(() => OrganizationPlacementEntity, orgPlacement => orgPlacement.organization)
+    @CreateDateColumn({ type: "timestamptz" })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ type: "timestamptz", nullable: true })
+    public updatedAt: Date | null;
+
+    @DeleteDateColumn({ type: "timestamptz", nullable: true })
+    public deletedAt: Date | null;
+
+
+    @OneToMany(() => OrganizationPlacementEntity, orgPlacement => orgPlacement.organization, {cascade: ["soft-remove"]})
     placements: OrganizationPlacementEntity[];
 
-    @ManyToOne(() => PartnerEntity, {
-        onDelete: 'CASCADE',
-    })
-    partner: PartnerEntity;
+    @ManyToOne(() => CompanyEntity, (company) => company.id)
+    @JoinColumn({ name: "company_id"})
+    company: CompanyEntity;
+
 }

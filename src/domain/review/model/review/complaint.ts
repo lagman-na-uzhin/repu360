@@ -1,6 +1,6 @@
-import {UniqueEntityID} from "@domain/common/unique-id";
+import {UniqueID} from "@domain/common/unique-id";
 
-export class ComplaintId extends UniqueEntityID {}
+export class ComplaintId extends UniqueID {}
 
 export class Complaint {
     private constructor(

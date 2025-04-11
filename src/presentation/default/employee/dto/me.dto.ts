@@ -1,8 +1,3 @@
-import { IsString } from 'class-validator';
-import {Expose} from "class-transformer";
+import {EmployeeDto} from "@presentation/common/dto/employee-body-dto";
 
-export class UserMeDto {
-    @Expose()
-    @IsString()
-    authId: string;
-}
+export class EmployeeMeDto extends EmployeeDto {}

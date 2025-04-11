@@ -1,4 +1,4 @@
-import { UniqueEntityID } from '@domain/common/unique-id';
+import { UniqueID } from '@domain/common/unique-id';
 import { Platform } from "@domain/placement/types/platfoms.enum";
 import { ReviewMedia } from '@domain/review/model/review/review-media';
 import { PlacementId } from "@domain/placement/placement";
@@ -9,7 +9,7 @@ import { Complaint } from "@domain/review/model/review/complaint";
 
 type ReviewPlacementDetail = TwogisReviewPlacementDetail | YandexReviewPlacementDetail;
 
-export class ReviewId extends UniqueEntityID {}
+export class ReviewId extends UniqueID {}
 
 export class Review {
     private constructor(

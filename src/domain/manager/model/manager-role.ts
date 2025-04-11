@@ -1,4 +1,4 @@
-import {UniqueEntityID} from "@domain/common/unique-id";
+import {UniqueID} from "@domain/common/unique-id";
 import {ManagerPermission} from "@domain/manager/value-object/manager-permission";
 import {MANAGER_TYPE} from "@domain/manager/types/manager-role.types";
 
@@ -11,7 +11,7 @@ export enum MANAGER_PERMISSION_ACTION {
 }
 
 
-export class ManagerRoleId extends UniqueEntityID {}
+export class ManagerRoleId extends UniqueID {}
 
 export class ManagerRole {
     private constructor(

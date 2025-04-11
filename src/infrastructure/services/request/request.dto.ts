@@ -13,8 +13,8 @@ import {
   IRequestConfigDto,
   IRequestConfigHeaders,
   IRequestConfigLocalDto, IRequestDto
-} from "src/application/services/request/request.dto";
-import {REQUEST_METHOD, RESPONSE_TYPE} from "src/application/services/request/request.enum";
+} from "@application/interfaces/services/request/request.dto";
+import {REQUEST_METHOD, RESPONSE_TYPE} from "@application/interfaces/services/request/request.enum";
 
 class RequestConfigHeaders implements IRequestConfigHeaders {
   @Expose()

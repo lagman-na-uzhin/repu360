@@ -1,11 +1,11 @@
-import { UniqueEntityID } from "@domain/common/unique-id";
+import { UniqueID } from "@domain/common/unique-id";
 import { Platform } from "@domain/placement/types/platfoms.enum";
 import { TwogisProfilePlacementDetail } from "@domain/review/model/profile/twogis-profile-placement-detail";
 import { YandexProfilePlacementDetail } from "@domain/review/model/profile/yandex-profile-placement-detail";
 
 type ProfileDetail = TwogisProfilePlacementDetail | YandexProfilePlacementDetail;
 
-export class ProfileId extends UniqueEntityID {}
+export class ProfileId extends UniqueID {}
 
 export class Profile {
     private constructor(

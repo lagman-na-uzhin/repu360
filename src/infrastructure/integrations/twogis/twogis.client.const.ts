@@ -1,8 +1,8 @@
 import {RequestDto} from "src/infrastructure/services/request/request.dto";
 import {
     GetOrganizationReviewsInDto
-} from "src/application/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
-import {REQUEST_METHOD, RESPONSE_TYPE} from "src/application/services/request/request.enum";
+} from "@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
+import {REQUEST_METHOD, RESPONSE_TYPE} from "@application/interfaces/services/request/request.enum";
 
 export const GET_ORGANIZATION_REVIEWS_CONFIG = (
     id: string,

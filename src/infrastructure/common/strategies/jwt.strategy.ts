@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { IJwtServicePayload } from '@application/services/jwt/jwt-service.interface';
+import { IJwtServicePayload } from '@application/interfaces/services/jwt/jwt-service.interface';
 import { EnvConfigService } from '@infrastructure/config/env-config/env-config.service';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { RedisService } from '@liaoliaots/nestjs-redis';
-import { CACHE_KEY } from '@application/repositories/cache/cache-key.const';
+import { CACHE_KEY } from '@application/interfaces/repositories/cache/cache-key.const';
 import { FastifyRequest } from 'fastify';
 import {EmployeeRole} from "@domain/employee/model/employee-role";
 import {Employee} from "@domain/employee/employee";

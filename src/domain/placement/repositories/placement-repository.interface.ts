@@ -1,6 +1,7 @@
-import {Placement} from "@domain/placement/placement";
+import {Placement, PlacementId} from "@domain/placement/placement";
 
 export interface IPlacementRepository {
+    getById(id: PlacementId): Promise<Placement | null>
     save(placement: Placement): Promise<Placement>
-    getACtiveTwogisPlacements(): Promise<Placement[]>
+    getActiveTwogisPlacements(): Promise<Placement[]>
 }

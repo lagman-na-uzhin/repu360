@@ -1,15 +1,16 @@
-import { PrimaryGeneratedColumn, Column, ManyToOne, Entity } from 'typeorm';
-import {UserPermissionType} from "@domain/manager/value-object/manager-permission";
+import {PrimaryGeneratedColumn, Column, ManyToOne, Entity, PrimaryColumn} from 'typeorm';
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
-import {PartnerUserRole} from "@domain/employee/model/employee-role";
 
 @Entity('user_permission')
 export class UserPermissionEntity {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryColumn("uuid")
     public id: string;
 
-    @Column({type: "varchar"})
-    module: UserPermissionType;
+    @Column()
+    permission: string;
+
+    @Column({ nullable: true })
+    organizationId: string | null;
 
     @ManyToOne(() => UserRoleEntity, (role) => role.permissions, { onDelete: 'SET NULL' })
     role: UserRoleEntity;

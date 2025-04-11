@@ -2,8 +2,8 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { EnvConfigModule } from '../config/env-config/env-config.module';
 import { WinstonModule } from '../services/logger/winston.module';
 import { reviewProxyExports, reviewProxyProviders } from '@infrastructure/usecase-proxy/review/review.proxy';
-import { partnerProxyExports, partnerProxyProviders } from '@infrastructure/usecase-proxy/partner/partner.proxy';
-import {userProxyExports, userProxyProviders} from "@infrastructure/usecase-proxy/user/user.proxy";
+import { companyProxyExports, companyProxyProviders } from '@infrastructure/usecase-proxy/company/company.proxy';
+import {employeeProxyExports, employeeProxyProviders} from "@infrastructure/usecase-proxy/employee/employee.proxy";
 import { RepositoriesModule } from '@infrastructure/repositories/repositories.module';
 import { BcryptModule } from '@infrastructure/services/hash/bcrypt.module';
 import { JwtServiceModule } from '@infrastructure/services/jwt/jwt.module';
@@ -26,13 +26,13 @@ export class UsecaseProxyModule {
       module: UsecaseProxyModule,
       providers: [
         ...reviewProxyProviders,
-        ...partnerProxyProviders,
-        ...userProxyProviders,
+        ...companyProxyProviders,
+        ...employeeProxyProviders,
       ],
       exports: [
         ...reviewProxyExports,
-        ...partnerProxyExports,
-        ...userProxyExports,
+        ...companyProxyExports,
+        ...employeeProxyExports,
       ],
     };
   }

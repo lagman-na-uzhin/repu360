@@ -3,7 +3,7 @@ import { Profile, ProfileId } from '@domain/review/profile';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import {ProfileEntity} from "src/infrastructure/entities/profile/profile.entity";
-import {UniqueEntityID} from "src/domain/common/unique-id";
+import {UniqueID} from "src/domain/common/unique-id";
 import {TwogisProfilePlacementDetailEntity} from "@infrastructure/entities/profile/placement-details/twogis-profile.entity";
 import {YandexProfilePlacementDetailEntity} from "@infrastructure/entities/profile/placement-details/yandex-profile.entity";
 import {TwogisProfilePlacementDetail} from "@domain/review/model/profile/twogis-profile-placement-detail";

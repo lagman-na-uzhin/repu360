@@ -12,7 +12,7 @@ import {ReviewEntity} from "../review.entity";
 @Entity('yandex_review_placement_detail')
 @Unique(['externalId'])
 export class YandexReviewPlacementDetailEntity {
-    @PrimaryColumn()
+    @PrimaryColumn("uuid")
     reviewId: string;
 
     @Column()

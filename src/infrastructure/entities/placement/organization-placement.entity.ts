@@ -1,10 +1,9 @@
 import {
     Entity,
-    PrimaryGeneratedColumn,
     Column,
     ManyToOne,
     OneToMany,
-    OneToOne,
+    OneToOne, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, PrimaryColumn, JoinColumn,
 } from 'typeorm';
 import {OrganizationEntity} from "@infrastructure/entities/organization/organization.entity";
 import {ReviewEntity} from "@infrastructure/entities/review/review.entity";
@@ -14,27 +13,36 @@ import {Platform} from "@domain/placement/types/platfoms.enum";
 
 @Entity('organization_placement')
 export class OrganizationPlacementEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryColumn("uuid")
+    public id: string;
 
     @Column()
-    organizationId: string;
-
-    @ManyToOne(() => OrganizationEntity, org => org.placements, {
-        onDelete: 'CASCADE'
-    })
-    organization: OrganizationEntity;
+    public organizationId: string;
 
     @Column({ type: 'enum', enum: Platform })
-    platform: Platform;
+    public platform: Platform;
 
-    @OneToMany(() => ReviewEntity, (review) => review.organizationPlacement)
+    @CreateDateColumn({ type: "timestamptz" })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ type: "timestamptz", nullable: true })
+    public updatedAt: Date | null;
+
+    @DeleteDateColumn({ type: "timestamptz", nullable: true })
+    public deletedAt: Date | null;
+
+
+    @ManyToOne(() => OrganizationEntity, organization => organization.placements)
+    @JoinColumn({ name: "organization_id" })
+    organization: OrganizationEntity;
+
+    @OneToMany(() => ReviewEntity, (review) => review.placement, { cascade: ["soft-remove"] })
     reviews: ReviewEntity[];
 
-    @OneToOne(() => YandexPlacementDetailEntity, { cascade: ['update', 'insert', 'soft-remove'], nullable: true })
+    @OneToOne(() => YandexPlacementDetailEntity, { cascade: ['update', 'insert', 'soft-remove'], nullable: true, eager: true })
     yandexDetail?: YandexPlacementDetailEntity;
 
-    @OneToOne(() => TwogisPlacementDetailEntity, { cascade: ['update', 'insert', 'soft-remove'], nullable: true })
+    @OneToOne(() => TwogisPlacementDetailEntity, { cascade: ['update', 'insert', 'soft-remove'], nullable: true, eager: true })
     twogisDetail?: TwogisPlacementDetailEntity;
 
 }

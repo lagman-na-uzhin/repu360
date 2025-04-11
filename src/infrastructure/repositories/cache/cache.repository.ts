@@ -1,10 +1,10 @@
 import { Redis } from 'ioredis';
 import {Injectable} from "@nestjs/common";
-import {ICacheRepository} from "src/application/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
 import { RedisService} from "@liaoliaots/nestjs-redis";
 import {ManagerPermission} from "@domain/manager/value-object/manager-permission";
-import {CACHE_KEY} from "src/application/repositories/cache/cache-key.const";
-import {CACHE_TTL} from "src/application/repositories/cache/cache-ttl.const";
+import {CACHE_KEY} from "@application/interfaces/repositories/cache/cache-key.const";
+import {CACHE_TTL} from "@application/interfaces/repositories/cache/cache-ttl.const";
 
 
 @Injectable()
