@@ -1,21 +1,18 @@
-export interface IFilterDto {}
+export interface FilterParams {}
 
-export interface ISort {
+export interface SortParams {
     readonly sortBy: string;
-
     readonly isSortDesc: boolean;
 }
 
-export interface IPaginationDto {
-    readonly currentPage: number;
-
-    readonly perPage: number;
+export interface PaginationParams {
+    readonly page: number;
+    readonly limit: number;
 }
 
-export interface IGetListDto {
+export interface GetListParams<F extends FilterParams = FilterParams> {
     readonly search?: string;
-    readonly filter?: IFilterDto;
-    readonly pagination: IPaginationDto;
-    readonly sort?: ISort;
+    readonly filter?: F;
+    readonly pagination: PaginationParams;
+    readonly sort: SortParams;
 }
-

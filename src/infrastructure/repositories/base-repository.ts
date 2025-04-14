@@ -1,0 +1,51 @@
+import {Repository, SelectQueryBuilder} from "typeorm";
+import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
+import {PaginationParams, SortParams} from "@domain/common/interfaces/repositories/get-list.interface";
+
+export class BaseRepository<Entity> {
+  constructor(protected readonly repo: Repository<Entity>) {}
+
+  async getList<Domain>(
+      qb: SelectQueryBuilder<Entity>,
+      mapFn: (entity: Entity) => Domain,
+      pagination: PaginationParams,
+      sort: SortParams
+  ): Promise<PaginatedResult<Domain>> {
+    const { direction, sortField } = this.getSort(sort);
+    const { skip, take, page, limit } = this.getPagination(pagination);
+
+    qb.orderBy(`${qb.alias}.${sortField}`, direction);
+    qb.skip(skip).take(take);
+
+    const [entities, total] = await qb.getManyAndCount();
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      list: entities.map(mapFn),
+      meta: {
+        total,
+        totalPages,
+        currentPage: page,
+        limit,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    };
+  }
+
+
+  getSort(sort: SortParams) {
+    const direction = sort.isSortDesc ? 'DESC' : 'ASC' as 'DESC' | 'ASC';
+    const sortField = sort.sortBy.replace(/^-/, '');
+
+    return {direction, sortField}
+  }
+  getPagination(pagination: PaginationParams) {
+    const page = pagination.page ?? 1;
+    const limit = pagination.limit ?? 10;
+
+    const skip = (page - 1) * limit;
+
+    return { skip, take: limit };
+  }
+}

@@ -31,15 +31,19 @@ export class Company {
         );
     }
 
-    set companyName(name: CompanyName) {
-        this._name = name;
-    }
-
-    get id(): CompanyId {
+    get id() {
         return this._id;
     }
 
-    get name(): CompanyName {
+    get name() {
         return this._name;
+    }
+
+    get managerId() {
+        return this._managerId;
+    }
+
+    get subscriptionId() {
+        return this._subscriptionId;
     }
 }
