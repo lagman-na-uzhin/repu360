@@ -22,7 +22,7 @@ export class UserLoginUseCase {
         const passwordIsValid = await this.hashService.compare(input.password.toString(), employee.password.toString());
         if (!passwordIsValid) throw new Error(EXCEPTION.EMPLOYEE.INCORRECT_EMAIL_OR_PASSWORD);
 
-        await this.cacheRepo.setUserAuthToken(employee.id.toString(), employee.role);
+        await this.cacheRepo.setEmployeeAuth(employee.id, employee.role);
 
         return new LoginOutput(employee, this.getToken(employee), this.getTokenExpirationTime())
     }

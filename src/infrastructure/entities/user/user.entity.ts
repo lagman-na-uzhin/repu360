@@ -29,14 +29,11 @@ export class UserEntity {
   @Column({ nullable: true })
   public companyId: string;
 
-  @Column()
-  public roleId: string;
 
   @ManyToOne(() => CompanyEntity, (company) => company.employees )
   @JoinColumn({ name: "company_id" })
   company: CompanyEntity;
 
   @OneToOne(() => UserRoleEntity, {cascade: ['insert', 'soft-remove', 'update'], eager: true })
-  @JoinColumn({name: "role_id"})
   role: UserRoleEntity;
 }

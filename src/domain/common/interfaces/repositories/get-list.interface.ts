@@ -14,5 +14,5 @@ export interface GetListParams<F extends FilterParams = FilterParams> {
     readonly search?: string;
     readonly filter?: F;
     readonly pagination: PaginationParams;
-    readonly sort: SortParams;
+    readonly sort?: SortParams;
 }

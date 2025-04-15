@@ -1,4 +1,4 @@
-import {BaseManagerInput} from "@application/common/base-manager-input";
+import {BaseManagerInput} from "@application/common/base-command/base-manager-command";
 import {Manager} from "@domain/manager/manager";
 import {CompanyId} from "@domain/company/company";
 import {EmployeeName} from "@domain/employee/value-object/employee-name.vo";

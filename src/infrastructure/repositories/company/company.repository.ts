@@ -5,11 +5,8 @@ import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {Company, CompanyId} from '@domain/company/company';
 import {ICompanyRepository} from '@domain/company/repositories/company-repository.interface';
 import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
-import {FilterRequest, PaginationRequest, SortRequest} from "@domain/common/interfaces/repositories/get-list.interface";
-import {BaseRepository} from "@infrastructure/repositories/repositories.service";
-import {CompanyName} from "@domain/company/value-object/company-name.vo";
-import {ManagerId} from "@domain/manager/manager";
 import {GetCompanyListParams} from "@domain/company/repositories/types/get-company-list.params";
+import {BaseRepository} from "@infrastructure/repositories/base-repository";
 
 @Injectable()
 export class CompanyOrmRepository implements ICompanyRepository {
@@ -21,11 +18,11 @@ export class CompanyOrmRepository implements ICompanyRepository {
 
   async getById(id: CompanyId): Promise<Company | null> {
     const entity = await this.repo.findOne({where: { id: id.toString() }})
-    return entity ? this.toModel(entity) : null;
+    return entity ? this.toDomain(entity) : null;
   }
 
   async save(company: Company): Promise<void> {
-    await this.repo.save(this.toEntity(company))
+    await this.repo.save(this.toPersistence(company))
   }
 
   async getList(params: GetCompanyListParams): Promise<PaginatedResult<Company>> {
@@ -44,10 +41,16 @@ export class CompanyOrmRepository implements ICompanyRepository {
   private toDomain(entity: CompanyEntity): Company {
     return Company.fromPersistence(
         entity.id,
-        entity.ownerId,
         entity.managerId,
-
-
+        entity.name
     )
+  }
+
+  private toPersistence(company: Company): CompanyEntity {
+    return {
+      id: company.id.toString(),
+      name: company.name.toString(),
+      managerId: company.managerId.toString()
+    } as CompanyEntity
   }
 }

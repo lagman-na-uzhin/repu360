@@ -1,7 +1,10 @@
 import {Company} from '@domain/company/company';
 import {ICompanyRepository} from '@domain/company/repositories/company-repository.interface';
-import {CreateCompanyInput} from '@application/use-cases/control/company/create/create-company.input';
+import {CreateCompanyCommand} from '@application/use-cases/control/company/create/create-company.command';
 import {CreateCompanyOutput} from "@application/use-cases/control/company/create/create-company.output";
+import {ManagerId} from "@domain/manager/manager";
+import {CompanyPolicy} from "@domain/policy/policies/company-policy";
+import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 
 
 export class CreateCompanyUseCase {
@@ -9,14 +12,18 @@ export class CreateCompanyUseCase {
         private readonly companyRepo: ICompanyRepository,
     ) {}
 
-    async execute(input: CreateCompanyInput): Promise<CreateCompanyOutput> {
+    async execute(command: CreateCompanyCommand): Promise<CreateCompanyOutput> {
+        if (!CompanyPolicy.canCreateCompany(command.actor)) {
+            throw new Error(EXCEPTION.MANAGER.PERMISSION_DENIED);
+        }
+
         const company = Company.create(
-            input.manager.id,
-            null,
-            input.companyName,
-        )
+            new ManagerId(command.actor.id.toString()),
+            command.companyName,
+        );
         await this.companyRepo.save(company);
 
         return CreateCompanyOutput.of(company.id);
     }
+
 }

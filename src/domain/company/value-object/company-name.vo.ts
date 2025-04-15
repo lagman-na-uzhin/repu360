@@ -1,4 +1,3 @@
-CompanyName
 import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 
 export class CompanyName {

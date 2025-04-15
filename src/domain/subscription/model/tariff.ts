@@ -1,8 +1,6 @@
 import { UniqueID } from "@domain/common/unique-id";
 import { EXCEPTION } from "@domain/common/exceptions/exceptions.const";
-import { PartnerTariffFeatures } from "@domain/subscription/model/tariff-feature";
-import { CompanyId } from "@domain/company/company";
-import {TariffFeatures} from "@domain/company/types/tariff-features.types";
+import { TariffFeatures } from "@domain/subscription/model/tariff-feature";
 
 export class TariffId extends UniqueID {}
 
@@ -65,14 +63,6 @@ export class Tariff {
 
   get id(): TariffId {
     return this._id;
-  }
-
-  get partnerId(): CompanyId {
-    return this._companyId;
-  }
-
-  get startedAt(): Date {
-    return this._startedAt;
   }
 
   get price(): number {

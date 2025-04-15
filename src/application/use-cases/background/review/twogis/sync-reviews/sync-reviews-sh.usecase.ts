@@ -18,7 +18,7 @@ export class SyncTwogisReviewsScheduleUseCase {
 
   async execute() {
     const twogisPlacements =
-      await this.placementRepo.getACtiveTwogisPlacements();
+      await this.placementRepo.getActiveTwogisPlacements();
 
     const now = Date.now();
     for (let i = 0; i < twogisPlacements.length; i++) {

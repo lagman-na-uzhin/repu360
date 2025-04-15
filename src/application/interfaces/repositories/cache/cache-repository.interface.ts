@@ -1,5 +1,7 @@
-import {EmployeeRole} from "@domain/employee/model/employee-role";
+import {Employee} from "@domain/employee/employee";
+import {Manager} from "@domain/manager/manager";
 
 export interface ICacheRepository {
-    setUserAuthToken(userId: string, userPermissions: EmployeeRole | null): Promise<void>
+    setEmployeeAuth(employee: Employee): Promise<void>
+    setManagerAuth(manager: Manager): Promise<void>
 }

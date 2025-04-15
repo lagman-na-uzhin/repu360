@@ -4,13 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { OrganizationEntity } from '@infrastructure/entities/organization/organization.entity';
 import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
-import { UniqueID } from '@domain/common/unique-id';
 import { Organization, OrganizationId } from '@domain/organization/organization';
 import { TwogisPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
 import {Placement} from "@domain/placement/placement";
 import { Platform } from '@domain/placement/types/platfoms.enum';
-import { PartnerId } from '@domain/company/company';
 import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
 import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-detail';
 
@@ -27,30 +25,14 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     private readonly yandexRepo: Repository<YandexPlacementDetailEntity>,
   ) {}
 
-  async getById(id: string): Promise<Organization | null> {
-    const entity = await this.repo.findOne({
-      where: { id },
-      relations: ['platforms'],
-    });
+  async getById(id: OrganizationId): Promise<Organization | null> {
+    const entity = await this.repo.findOne({where: { id: id.toString() }});
     return entity ? this.toModel(entity) : null;
-  }
-
-  async getPlacementById(
-    placementId: string,
-  ): Promise<Placement | null> {
-    return null as Placement | null
   }
 
   async save(organization: Organization): Promise<void> {
     const entity = this.toEntity(organization);
     await this.repo.save(entity);
-  }
-
-  async getOrganizationPlatformById(
-    id: string,
-  ): Promise<Placement | null> {
-    const entity = await this.placementRepo.findOne({ where: { id } });
-    return entity ? this.platformToModel(entity) : null;
   }
 
   async getActiveList(): Promise<Organization[]> {
@@ -65,21 +47,6 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     return await Promise.all(entities.map(this.toModel));
   }
 
-  async getActiveTwogisPlatformList(): Promise<Placement[]> {
-    const entities: OrganizationPlacementEntity[] = await this.placementRepo
-      .createQueryBuilder('platforms')
-      .leftJoin('platforms.organization', 'organization')
-      .leftJoin('organization.company', 'company')
-      .leftJoin('company.tariff', 'tariff')
-      .where('tariff.isActive = :isActive', { isActive: true })
-      .andWhere('organization.isActive = :isActive', { isActive: true })
-      .andWhere('platforms.placement-details = :type', {
-        type: Platform.TWOGIS,
-      })
-      .execute();
-    return await Promise.all(entities.map(this.platformToModel));
-  }
-
   private async toModel(entity: OrganizationEntity): Promise<Organization> {
     const placements = await Promise.all(
       entity.placements.map((p) => this.platformToModel(p)),
@@ -87,7 +54,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
 
     return Organization.fromPersistence(
       entity.id,
-      entity.partnerId,
+      entity.companyId,
       entity.name,
     );
   }
@@ -132,7 +99,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     const entity = new OrganizationEntity();
     entity.id = organization.id.toString();
     entity.name = organization.name;
-    entity.partnerId = organization.partnerId.toString();
+    entity.companyId = organization.companyId.toString();
     return entity;
   }
 

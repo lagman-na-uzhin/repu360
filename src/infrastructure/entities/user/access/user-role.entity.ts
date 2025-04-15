@@ -1,20 +1,24 @@
-import {PrimaryGeneratedColumn, Column, Entity, OneToMany, OneToOne, PrimaryColumn} from 'typeorm';
-import {USER_TYPE} from "@domain/employee/model/employee-role";
+import {Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryColumn, Unique} from 'typeorm';
 import {UserPermissionEntity} from "@infrastructure/entities/user/access/user-permission.entity";
 import {UserEntity} from "@infrastructure/entities/user/user.entity";
 
 @Entity('user_role')
+@Unique(['userId'])
 export class UserRoleEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
     @Column()
-    name: string;
+    public name: string;
 
     @Column()
-    type: string;
+    public type: string;
+
+    @Column()
+    public userId: string;
 
     @OneToOne(() => UserEntity)
+    @JoinColumn({name: 'user_id'})
     user: UserEntity;
 
     @OneToMany(() => UserPermissionEntity, (permission) => permission.role, { eager: true })

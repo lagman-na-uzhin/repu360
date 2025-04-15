@@ -1,18 +1,15 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { UserRole } from "@domain/manager/value-object/manager-role.vo";
+import {ManagerRole} from "@domain/manager/model/manager-role";
+import {ManagerId} from "@domain/manager/manager";
 
 @Injectable()
 export class ManagerGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor() {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const user = context.switchToHttp().getRequest().user;
+    const {role}: { role: ManagerRole, userId: ManagerId}= context.switchToHttp().getRequest().user;
 
-    if (user.authRole === UserRole.MANAGER) return true;
-    if (user.authRole === UserRole.ADMIN) return true;
-    if (user.authRole === UserRole.PARTNER && user.ownerId !== 0) return true;
-
-    return false;
+    if (role.type.isManager()) return true;
+    return role.type.isAdmin();
   }
 }

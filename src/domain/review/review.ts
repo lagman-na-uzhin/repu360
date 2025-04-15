@@ -29,23 +29,23 @@ export class Review {
     ) {}
 
     static create(
-      organizationPlacementId: PlacementId,
-      profileId: ProfileId,
-      platform: Platform,
-      text: string,
-      rating: number,
-      media: ReviewMedia[],
-      placementDetail: ReviewPlacementDetail,
+        placementId: PlacementId,
+        profileId: ProfileId,
+        platform: Platform,
+        text: string,
+        rating: number,
+        media: ReviewMedia[],
+        placementDetail: ReviewPlacementDetail,
       // complaints: Complaint[]
     ): Review {
         Review.validatePlacementDetail(platform, placementDetail);
 
-        return new Review(new ReviewId(), organizationPlacementId, profileId, platform, text, rating, media, placementDetail,);
+        return new Review(new ReviewId(), placementId, profileId, platform, text, rating, media, placementDetail,);
     }
 
     static fromPersistence(
       reviewId: string,
-      organizationPlacementId: string,
+      placementId: string,
       profileId: string,
       platform: Platform,
       text: string,
@@ -56,7 +56,7 @@ export class Review {
     ): Review {
         return new Review(
           new ReviewId(reviewId),
-          new PlacementId(organizationPlacementId),
+          new PlacementId(placementId),
           new ProfileId(profileId),
           platform,
           text,

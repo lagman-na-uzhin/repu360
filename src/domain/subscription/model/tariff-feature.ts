@@ -1,4 +1,4 @@
-export class PartnerTariffFeatures {
+export class TariffFeatures {
     private constructor(
       private _companyDataSync: boolean,
 
@@ -20,47 +20,4 @@ export class PartnerTariffFeatures {
 
     ) {}
 
-    static create(
-        companyDataSync: boolean,
-        multiAccess: boolean,
-        registerPlacement: boolean,
-        analysisByRadius: boolean,
-        reviewAutoReply: boolean,
-        analysisReview: boolean,
-        reviewComplaint: boolean,
-        analysisCompetitor: boolean
-    ): PartnerTariffFeatures {
-        return new PartnerTariffFeatures(
-            companyDataSync,
-            multiAccess,
-            registerPlacement,
-            analysisByRadius,
-            reviewAutoReply,
-            analysisReview,
-            reviewComplaint,
-            analysisCompetitor
-        );
-    }
-
-    static fromPersistence(
-        companyDataSync: boolean,
-        multiAccess: boolean,
-        registerPlacement: boolean,
-        analysisByRadius: boolean,
-        reviewAutoReply: boolean,
-        analysisReview: boolean,
-        reviewComplaint: boolean,
-        analysisCompetitor: boolean
-    ): PartnerTariffFeatures {
-        return new PartnerTariffFeatures(
-            companyDataSync,
-            multiAccess,
-            registerPlacement,
-            analysisByRadius,
-            reviewAutoReply,
-            analysisReview,
-            reviewComplaint,
-            analysisCompetitor
-        );
-    }
 }

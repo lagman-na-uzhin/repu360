@@ -1,4 +1,4 @@
-import {PrimaryGeneratedColumn, Column, ManyToOne, Entity, PrimaryColumn} from 'typeorm';
+import {PrimaryGeneratedColumn, Column, ManyToOne, Entity, PrimaryColumn, JoinColumn} from 'typeorm';
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
 
 @Entity('user_permission')
@@ -7,12 +7,19 @@ export class UserPermissionEntity {
     public id: string;
 
     @Column()
+    userId: string;
+
+    @Column()
+    module: string;
+
+    @Column()
     permission: string;
 
     @Column({ nullable: true })
     organizationId: string | null;
 
     @ManyToOne(() => UserRoleEntity, (role) => role.permissions, { onDelete: 'SET NULL' })
+    @JoinColumn({name: "user_id"})
     role: UserRoleEntity;
 
 }

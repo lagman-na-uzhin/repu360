@@ -3,11 +3,11 @@ import { UseCaseProxy } from '@infrastructure/usecase-proxy/usecase-proxy';
 import { CompanyProxy } from '@infrastructure/usecase-proxy/company/company.proxy';
 import {CreateCompanyUseCase} from "@application/use-cases/control/company/create/create-company.usecase";
 import {CONTROL_ROUTES} from "@presentation/routes";
-import {CreateCompanyInput} from "@application/use-cases/control/company/create/create-company.input";
-import {ManagerBody, ManagerQuery} from "@infrastructure/common/decorators/user.decorator";
 import {CreateCompanyDto} from "@presentation/control/company/dto/create-company.dto";
 import {ByIdCompanyControlUseCase} from "@application/use-cases/control/company/get-by-id/by-id-company.usecase";
 import {CompanyId} from "@domain/company/company";
+import {ActorBody} from "@infrastructure/common/decorators/user.decorator";
+import {CreateCompanyCommand} from "@application/use-cases/control/company/create/create-company.command";
 
 @Controller(CONTROL_ROUTES.COMPANY.BASE)
 export class ControlCompanyController {
@@ -30,12 +30,12 @@ export class ControlCompanyController {
   };
 
   @Post(CONTROL_ROUTES.COMPANY.CREATE)
-  async create(@ManagerBody() dto: CreateCompanyDto) {
-    const input = CreateCompanyInput.of(dto.companyName, dto.manager)
+  async create(@ActorBody() dto: CreateCompanyDto) {
+    const command = CreateCompanyCommand.of(dto.companyName, dto.actor)
 
     return {
       statusCode: HttpStatus.CREATED,
-      data: await this.createCompanyUseCaseProxy.getInstance().execute(input),
+      data: await this.createCompanyUseCaseProxy.getInstance().execute(command),
     };
   }
 

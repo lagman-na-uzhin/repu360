@@ -1,15 +1,13 @@
 import { Transform } from 'class-transformer';
 import {
   IsEmail,
-  IsInt,
   IsNotEmpty,
-  IsOptional,
   IsString,
   Length,
 } from 'class-validator';
-import {ManagerDto} from "@presentation/common/dto/manager-body.dto";
+import {ActorDto} from "@presentation/common/dto/actor-body.dto";
 
-export class CreateCompanyDto extends ManagerDto {
+export class CreateCompanyDto extends ActorDto {
   @IsNotEmpty()
   @IsString()
   public name: string;

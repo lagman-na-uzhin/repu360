@@ -9,14 +9,15 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import {
-    IFilterDto,
-    IGetListDto,
-    IPaginationDto, ISort
+    FilterParams,
+    GetListParams,
+    PaginationParams,
+    SortParams
 } from "@domain/common/interfaces/repositories/get-list.interface";
 
-export class FilterDto implements IFilterDto {}
+export class FilterDto implements FilterParams {}
 
-class Sort implements ISort {
+class Sort implements SortParams {
     @IsString()
     readonly sortBy: string;
 
@@ -25,17 +26,17 @@ class Sort implements ISort {
     readonly isSortDesc: boolean;
 }
 
-export class PaginationDto implements IPaginationDto{
+export class PaginationDto implements PaginationParams {
     @IsInt()
     @Transform(({ value }) => parseInt(value))
-    readonly currentPage: number;
+    readonly page: number;
 
     @IsInt()
     @Transform(({ value }) => parseInt(value))
-    readonly perPage: number;
+    readonly limit: number;
 }
 
-export class GetListDto implements IGetListDto{
+export class GetListDto implements GetListParams {
     @IsString()
     @IsOptional()
     readonly search?: string;

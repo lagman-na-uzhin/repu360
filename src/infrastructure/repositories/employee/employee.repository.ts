@@ -1,16 +1,24 @@
 import { Injectable } from '@nestjs/common';
-import {FindOneOptions, Repository} from 'typeorm';
+import { Repository} from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from 'src/infrastructure/entities/user/user.entity';
-import { Manager } from '@domain/manager/manager';
 import {IEmployeeRepository} from "@domain/employee/repositories/employee-repository.interface";
-import {ManagerPermission} from "@domain/manager/value-object/manager-permission";
 import {UserPermissionEntity} from "@infrastructure/entities/user/access/user-permission.entity";
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
 import {EmployeeEmail} from "@domain/employee/value-object/employee-email.vo";
 import {Employee, EmployeeId} from "@domain/employee/employee";
+import {EmployeePhone} from "@domain/employee/value-object/employee-phone.vo";
 import {EmployeeRole} from "@domain/employee/model/employee-role";
-import {EmployeeType} from "@domain/employee/value-object/employee-role/employee-type.vo";
+import {ALL_ORGANIZATIONS, AllOrganizations, EmployeePermissions} from "@domain/employee/model/employee-permissions";
+import {
+  COMPANY_PERMISSIONS,
+  CompanyPermission
+} from "@domain/employee/value-object/employee-permissions/company-permissions.vo";
+import {OrganizationId} from "@domain/organization/organization";
+import {
+  REVIEW_PERMISSIONS,
+  ReviewPermission
+} from "@domain/employee/value-object/employee-permissions/review-permissions.vo";
 
 @Injectable()
 export class EmployeeOrmRepository implements IEmployeeRepository {
@@ -22,42 +30,72 @@ export class EmployeeOrmRepository implements IEmployeeRepository {
 
   async getByEmail(email: EmployeeEmail): Promise<Employee | null> {
     const entity = await this.repo.findOne({where: { email: email.toString() }});
-    return entity ? this.toUserModel(entity) : null;
+    return entity ? this.toDomain(entity) : null;
   }
 
   async getById(id: EmployeeId): Promise<Employee | null> {
     const entity = await this.repo.findOne({where: { id: id.toString() }});
-    return entity ? this.toUserModel(entity) : null;
+    return entity ? this.toDomain(entity) : null;
   }
 
-  async emailIsExist(email: string):  Promise<boolean> {
-    return this.repo.existsBy({ email });
+  async emailIsExist(email: EmployeeEmail):  Promise<boolean> {
+    return this.repo.existsBy({ email: email.toString() });
   }
 
-  async phoneIsExist(phone: string):  Promise<boolean> {
-    return this.repo.existsBy({ phone });
+  async phoneIsExist(phone: EmployeePhone):  Promise<boolean> {
+    return this.repo.existsBy({ phone: phone.toString() });
   }
 
-  private toEmployeeModel(entity: UserEntity): Manager {
-    const role = this.toEmployeeRoleModel(entity.role, permissions);
-
-    return Employee .fromPersistence(
-      entity.id,
-      entity.partnerId,
-      entity.email,
-      entity.name,
-      entity.phone,
-      entity.password,
-      role
-    );
+  async save(employee: Employee): Promise<void> {
+    return Promise.resolve(undefined);
   }
 
-  private toEmployeeRoleModel(entity: UserRoleEntity) {
-    const permissions = [];
-    return EmployeeRole.fromPersistence(entity.id, entity.name, new EmployeeType(entity.type), permissions)
+  private toDomain(entity: UserEntity): Employee {
+    const role = this.toDomainRole(entity.role);
+    return Employee.fromPersistence(
+        entity.id,
+        entity.companyId,
+        role,
+        entity.name,
+        entity.email,
+        entity.phone,
+        entity.password,
+        entity.avatar,
+    )
   }
 
-  private toUserPermissionModel(entity: UserPermissionEntity) {
-    return ManagerPermission.fromPersistence(entity.module);
+  private toDomainRole(entity: UserRoleEntity): EmployeeRole {
+    const permissions = this.toDomainPermissions(entity.permissions)
+    return EmployeeRole.fromPersistence(
+        entity.id,
+        entity.name,
+        entity.type,
+        permissions
+    )
   }
+
+  private toDomainPermissions(entities: UserPermissionEntity[]): EmployeePermissions {
+      const companyPermissions = new Set<CompanyPermission>();
+      const reviewPermissions = new Map<OrganizationId | AllOrganizations, Set<ReviewPermission>>();
+
+      for (const { organizationId, module, permission  } of entities) {
+        if (module === "COMPANY" && COMPANY_PERMISSIONS.includes(permission as CompanyPermission)) {
+          companyPermissions.add(permission as CompanyPermission);
+        }
+
+        if (module === "REVIEWS" && REVIEW_PERMISSIONS.includes(permission as ReviewPermission)) {
+          if (!organizationId) continue;
+
+          const orgKey: OrganizationId = new OrganizationId(organizationId);
+
+          if (!reviewPermissions.has(orgKey)) {
+            reviewPermissions.set(orgKey, new Set<ReviewPermission>());
+          }
+
+          reviewPermissions.get(orgKey)!.add(permission as ReviewPermission);
+        }
+      }
+
+      return new EmployeePermissions(companyPermissions, reviewPermissions);
+    }
 }

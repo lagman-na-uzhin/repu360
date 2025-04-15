@@ -6,9 +6,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { CACHE_KEY } from '@application/interfaces/repositories/cache/cache-key.const';
 import { FastifyRequest } from 'fastify';
-import {EmployeeRole} from "@domain/employee/model/employee-role";
-import {Employee} from "@domain/employee/employee";
-import {ManagerId} from "@domain/manager/manager";
+import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/types/employee-auth-data.type";
+import {Actor} from "@domain/policy/actor";
+import {Role} from "@domain/policy/model/role";
+import {RoleType} from "@domain/policy/value-object/role/type.vo";
+import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -28,23 +30,39 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: IJwtServicePayload) {
+    const { authId, ownerId, user } = payload;
+
     const redisClient = this.redisService.getOrThrow('default');
 
-    const userAuth = payload?.ownerId
-        ? await redisClient.get(CACHE_KEY.USER.MULTIPLE_AUTH_TOKEN(payload.ownerId, payload.authId))
-        : await redisClient.get(CACHE_KEY.USER.AUTH_TOKEN(payload.authId));
+    const rawUserData = ownerId
+        ? await redisClient.get(CACHE_KEY.COMMON.MULTIPLE_AUTH_TOKEN(ownerId, authId))
+        : await redisClient.get(CACHE_KEY.COMMON.AUTH_TOKEN(authId));
 
-    if (!userAuth) return false;
+    if (!rawUserData) return false;
 
-    const parsedData = JSON.parse(userAuth);
+    const actor = this.getActor(rawUserData)
 
-    const employeeRole = EmployeeRole.fromPersistence(
-        parsedData.id,
-        parsedData.name,
-        parsedData.type,
-        parsedData.permissions,
-    );
+    return {...actor}
+  }
 
-    return {ownerId: payload?.ownerId ? new ManagerId(payload.ownerId) : null, actor: employeeRole};
+  private getActor(raw: string) {
+    const persistence: EmployeeAuthDataType = JSON.parse(raw);
+
+    let permissions;
+    if (new RoleType(persistence.role.type).isStaff()) {
+      permissions = ManagerPermissions.fromPersistence(persistence.role.permissions.companies)
+    }
+
+    const role = Role.fromPersistence(
+        persistence.role.id,
+        persistence.role.name,
+        persistence.role.type,
+        permissions
+
+    )
+    return Actor.fromPersistence(
+        persistence.id,
+        role
+    )
   }
 }

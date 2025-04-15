@@ -4,7 +4,6 @@ import { UseCaseProxy } from '@infrastructure/usecase-proxy/usecase-proxy';
 import {LoginDto} from "@presentation/default/employee/dto/login.dto";
 import {UserLoginUseCase} from "@application/use-cases/default/employee/login/login.usecase";
 import {EmployeeProxy} from "@infrastructure/usecase-proxy/employee/employee.proxy";
-import {UserMeUseCase} from "@application/use-cases/default/employee/me/me.usecase";
 import {LoginInput} from "@application/use-cases/default/employee/login/login.input";
 import {DEFAULT_ROUTES} from "@presentation/routes";
 
@@ -13,8 +12,6 @@ export class AuthController {
     constructor(
         @Inject(EmployeeProxy.LOGIN_USE_CASE)
         private readonly userLoginUseCaseProxy: UseCaseProxy<UserLoginUseCase>,
-        @Inject(EmployeeProxy.ME_USE_CASE)
-        private readonly userMeUseCaseProxy: UseCaseProxy<UserMeUseCase>,
     ) {}
 
     @Post(DEFAULT_ROUTES.AUTH.LOGIN)

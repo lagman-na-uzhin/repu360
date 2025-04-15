@@ -32,9 +32,6 @@ export class ReviewEntity {
     @Column({ type: 'enum', enum: Platform })
     platform: Platform;
 
-    @ManyToOne(() => OrganizationPlacementEntity, (orgPlacement) => orgPlacement.reviews)
-    placement: OrganizationPlacementEntity;
-
     @ManyToOne(() => ProfileEntity, (profile) => profile.reviews)
     @JoinColumn({ name: 'profile_id' })
     profile: ProfileEntity;

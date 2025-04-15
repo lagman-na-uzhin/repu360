@@ -9,26 +9,29 @@ export class BaseRepository<Entity> {
       qb: SelectQueryBuilder<Entity>,
       mapFn: (entity: Entity) => Domain,
       pagination: PaginationParams,
-      sort: SortParams
+      sort?: SortParams
   ): Promise<PaginatedResult<Domain>> {
-    const { direction, sortField } = this.getSort(sort);
-    const { skip, take, page, limit } = this.getPagination(pagination);
+    if (sort) {
+      const { direction, sortField } = this.getSort(sort);
+      qb.orderBy(`${qb.alias}.${sortField}`, direction);
 
-    qb.orderBy(`${qb.alias}.${sortField}`, direction);
+    }
+
+    const { skip, take } = this.getPagination(pagination);
     qb.skip(skip).take(take);
 
     const [entities, total] = await qb.getManyAndCount();
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / pagination.limit);
 
     return {
       list: entities.map(mapFn),
       meta: {
         total,
         totalPages,
-        currentPage: page,
-        limit,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
+        currentPage: pagination.page,
+        limit: pagination.limit,
+        hasNext: pagination.page < totalPages,
+        hasPrev: pagination.page > 1,
       },
     };
   }

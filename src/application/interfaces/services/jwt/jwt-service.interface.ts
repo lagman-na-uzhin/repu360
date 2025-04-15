@@ -1,6 +1,7 @@
 export interface IJwtServicePayload {
   authId: string;
   ownerId?: string;
+  user: 'MANAGER' | 'EMPLOYEE'
 }
 
 export interface IJwtService {

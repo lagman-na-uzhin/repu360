@@ -3,7 +3,7 @@ import {EmployeeMeInput} from "@application/use-cases/default/employee/me/me.inp
 import {EmployeeMeOutput} from "@application/use-cases/default/employee/me/me.output";
 import {IEmployeeRepository} from "@domain/employee/repositories/employee-repository.interface";
 
-export class UserMeUseCase {
+export class MeUseCase {
     constructor(
         private readonly employeeRepo: IEmployeeRepository
     ) {

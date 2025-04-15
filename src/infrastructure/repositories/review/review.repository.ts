@@ -28,10 +28,10 @@ export class ReviewOrmRepository implements IReviewRepository {
   ) {}
 
   async getReviewsByOrganizationPlacementId(
-      organizationPlacementId: string,
+      placementId: PlacementId,
   ): Promise<Review[]> {
     const entities = await this.repo.find({
-      where: {organizationPlacementId}
+      where: {placementId: placementId.toString()}
     })
     return Promise.all(entities.map(this.toModel))
   }
@@ -48,7 +48,7 @@ export class ReviewOrmRepository implements IReviewRepository {
 
     return Review.fromPersistence(
         entity.id,
-        entity.organizationPlacementId,
+        entity.placementId,
         entity.profileId,
         entity.platform,
         entity.text,
@@ -84,6 +84,6 @@ export class ReviewOrmRepository implements IReviewRepository {
       reviewId: entity.id
       }})
 
-    return mediaEntities.map(e => ReviewMedia.fromPersistence(e.url, e.dateCreated))
+    return mediaEntities.map(e => ReviewMedia.fromPersistence(e.url, e.createdAt))
   }
 }

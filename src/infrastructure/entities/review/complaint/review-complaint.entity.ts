@@ -7,6 +7,6 @@ export class ReviewComplaintEntity {
     public id: string;
 
 
-    @ManyToOne(() => ReviewEntity, (review) => review.complaints, { onDelete: 'CASCADE' })
-    review: ReviewEntity
+    // @ManyToOne(() => ReviewEntity, (review) => review., { onDelete: 'CASCADE' })
+    // review: ReviewEntity
 }
