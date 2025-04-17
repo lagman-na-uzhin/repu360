@@ -1,16 +1,14 @@
 import {ICompanyRepository} from '@domain/company/repositories/company-repository.interface';
-import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
-import {Company, CompanyId} from "@domain/company/company";
-import {ByIdCompanyControlOutput} from "@application/use-cases/control/company/get-by-id/by-id-company.output";
+import {Company} from "@domain/company/company";
 import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
-
+import {GetListCompanyQuery} from "@application/use-cases/control/company/get-list/get-list-company.query";
 
 export class GetListCompanyUseCase {
     constructor(
         private readonly companyRepo: ICompanyRepository,
     ) {}
 
-    async execute(companyId: CompanyId): Promise<PaginatedResult<Company>> {
-        return this.companyRepo.getList()
+    async execute(query: GetListCompanyQuery): Promise<PaginatedResult<Company>> {
+        return this.companyRepo.getList(query);
     }
 }

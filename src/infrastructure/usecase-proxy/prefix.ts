@@ -1,5 +1,5 @@
 export enum PREFIX {
-  PARTNER_PROXY = 'PartnerProxy',
+  COMPANY_PROXY = 'CompanyProxy',
   USER_PROXY = 'UserProxy',
   ORGANIZATION_PROXY = 'OrganizationProxy',
   YANDEX_ORGANIZATION_PROXY = 'YandexOrganizationProxy',

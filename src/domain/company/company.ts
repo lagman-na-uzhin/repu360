@@ -1,7 +1,6 @@
 import {UniqueID} from '@domain/common/unique-id';
 import {ManagerId} from "@domain/manager/manager";
 import {CompanyName} from "@domain/company/value-object/company-name.vo";
-import {SubscriptionId} from "@domain/subscription/subscription";
 
 export class CompanyId extends UniqueID {}
 
@@ -13,7 +12,6 @@ export class Company {
 
       private readonly _createdAt: Date = new Date(),
       private _updatedAt: Date | null = null,
-      // private _deletedAt: Date | null = null
     ) {}
 
     static create(managerId: ManagerId, name: CompanyName): Company {

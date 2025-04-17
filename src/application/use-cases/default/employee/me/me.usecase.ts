@@ -1,5 +1,5 @@
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
-import {EmployeeMeInput} from "@application/use-cases/default/employee/me/me.input";
+import {EmployeeMeQuery} from "@application/use-cases/default/employee/me/me.input";
 import {EmployeeMeOutput} from "@application/use-cases/default/employee/me/me.output";
 import {IEmployeeRepository} from "@domain/employee/repositories/employee-repository.interface";
 
@@ -8,8 +8,8 @@ export class MeUseCase {
         private readonly employeeRepo: IEmployeeRepository
     ) {
     }
-    async execute(input: EmployeeMeInput): Promise<EmployeeMeOutput> {
-        const employee = await this.employeeRepo.getById(input.employee.id);
+    async execute(query: EmployeeMeQuery): Promise<EmployeeMeOutput> {
+        const employee = await this.employeeRepo.getById(query.actor.id);
 
         if (!employee) {
             throw new Error(EXCEPTION.COMMON.UNAUTHORIZED);
@@ -18,7 +18,7 @@ export class MeUseCase {
         return EmployeeMeOutput.of(
             employee.id,
             employee.name,
-            employee.role,
+            query.actor.role,
             employee.companyId,
             employee.phone,
             employee.email

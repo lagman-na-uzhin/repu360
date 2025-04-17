@@ -6,6 +6,7 @@ import {
   Length,
 } from 'class-validator';
 import {ActorDto} from "@presentation/common/dto/actor-body.dto";
+import {CreateCompanyCommand} from "@application/use-cases/control/company/create/create-company.command";
 
 export class CreateCompanyDto extends ActorDto {
   @IsNotEmpty()

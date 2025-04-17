@@ -1,7 +1,7 @@
 import { createParamDecorator } from '@nestjs/common';
 import {Actor} from "@domain/policy/actor";
 
-export const ActorBody = createParamDecorator((data, req) => {
+export const RequestBody = createParamDecorator((data, req) => {
   const actor: Actor = req
     .switchToHttp()
     .getRequest().user;
@@ -15,7 +15,7 @@ export const ActorBody = createParamDecorator((data, req) => {
   };
 });
 
-export const ActorInitQuery = createParamDecorator((data, req) => {
+export const RequestInitQuery = createParamDecorator((data, req) => {
   const actor: Actor = req
       .switchToHttp()
       .getRequest().user;
@@ -28,7 +28,7 @@ export const ActorInitQuery = createParamDecorator((data, req) => {
   };
 });
 
-export const ActorQuery = createParamDecorator((data, req) => {
+export const RequestQuery = createParamDecorator((data, req) => {
   const actor: Actor = req
       .switchToHttp()
       .getRequest().user;

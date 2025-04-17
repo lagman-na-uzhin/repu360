@@ -1,13 +1,12 @@
-import {BaseInput} from "@application/common/base-command/base-command";
-import {Employee, EmployeeId} from "@domain/employee/employee";
-import {EmployeeRole} from "@domain/employee/model/employee-role";
+import {Actor} from "@domain/policy/actor";
+import {BaseQuery} from "@application/common/base-query/base-query";
 
-export class EmployeeMeInput extends BaseInput {
-    private constructor(employeeRole: EmployeeRole, employeeId: EmployeeId) {
-        super(employeeRole, employeeId);
-    }
+export class EmployeeMeQuery extends BaseQuery {
+    private constructor(
+        actor: Actor
+    ) {super(actor);}
 
-    static of(role: EmployeeRole, employeeId: EmployeeId) {
-        return new EmployeeMeInput(role,  employeeId);
+    static of(actor: Actor) {
+        return new EmployeeMeQuery(actor);
     }
 }

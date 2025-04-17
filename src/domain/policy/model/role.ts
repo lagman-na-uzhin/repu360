@@ -35,4 +35,21 @@ export class Role {
     get type() {
         return this._type
     }
+
+    public isManager(): boolean {
+        return this._type.equals(RoleType.type.MANAGER);
+    }
+
+    public isAdmin(): boolean {
+        return this._type.equals(RoleType.type.ADMIN);
+    }
+
+    public isOwner(): boolean {
+        return this._type.equals(RoleType.type.OWNER);
+    }
+
+    public isEmployee(): boolean {
+        return this._type.equals(RoleType.type.EMPLOYEE);
+    }
+
 }

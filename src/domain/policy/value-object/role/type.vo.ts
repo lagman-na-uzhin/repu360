@@ -1,54 +1,44 @@
 export class RoleType {
-private static readonly type = {
-        OWNER: "OWNER",
-        EMPLOYEE: "EMPLOYEE",
+    private static readonly _values = [
+        "OWNER",
+        "EMPLOYEE",
+        "MANAGER",
+        "ADMIN",
+    ] as const;
 
-        MANAGER: "MANAGER",
-        ADMIN: "ADMIN"
-    } as const;
+    public static readonly Values = RoleType._values;
+    public static type = {
+        OWNER: "OWNER" as const,
+        EMPLOYEE: "EMPLOYEE" as const,
+        MANAGER: "MANAGER" as const,
+        ADMIN: "ADMIN" as const,
+    };
 
-    private readonly _value: keyof typeof RoleType['type'];
+    private readonly _value: typeof RoleType._values[number];
 
-    constructor(value: keyof typeof RoleType['type'] | string) {
+    constructor(value: string) {
         if (!RoleType.isValid(value)) {
-            throw new Error(`Invalid value for EmployeeType: ${value}`);
+            throw new Error(`Invalid Role Type: ${value}`);
         }
-        this._value = value;
+        this._value = value as typeof RoleType._values[number];
     }
 
-    static fromPersistence(value: string): RoleType {
-        if (!RoleType.isValid(value)) {
-            throw new Error(`Invalid value for EmployeeType: ${value}`);
-        }
-        return new RoleType(value as keyof typeof RoleType['type']);
+    static isValid(
+        value: unknown
+    ): value is typeof RoleType._values[number] {
+        return (
+            typeof value === "string" &&
+            (RoleType._values as readonly string[]).includes(value)
+        );
     }
 
-
-    private static isValid(value: string): value is keyof typeof RoleType['type'] {
-        return value === RoleType.type.OWNER || value === RoleType.type.EMPLOYEE;
+    toString(): string {
+        return this._value;
     }
 
-    public toString() {
-        return this._value.toString();
-    }
-
-    public isStaff() {
-        return this._value === RoleType.type.ADMIN || this._value === RoleType.type.MANAGER;
-    }
-
-    public isCompanyOwner() {
-        return this._value === RoleType.type.OWNER;
-    }
-
-    public isCompanyEmployee() {
-        return this._value === RoleType.type.EMPLOYEE;
-    }
-
-    public isManager() {
-        return this._value === RoleType.type.MANAGER;
-    }
-
-    public isAdmin() {
-        return this._value === RoleType.type.ADMIN;
+    public equals(other: RoleType | typeof RoleType._values[number]): boolean {
+        const otherValue =
+            other instanceof RoleType ? other._value : other;
+        return this._value === otherValue;
     }
 }

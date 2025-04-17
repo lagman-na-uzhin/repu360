@@ -1,5 +1,5 @@
 import { ICompanyRepository } from '@domain/company/repositories/company-repository.interface';
-import {CreateSubscriptionInput} from "@application/use-cases/control/subscription/create/create-subscription.input";
+import {CreateSubscriptionCommand} from "@application/use-cases/control/subscription/create/create-subscription.input";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
 import {Subscription} from "@domain/subscription/subscription";
@@ -12,14 +12,14 @@ export class CreateSubscriptionUseCase {
         private readonly subscriptionRepo: ISubscriptionRepository
     ) {}
 
-    async execute(input: CreateSubscriptionInput): Promise<void> {
-        const company = await this.companyRepo.getById(input.companyId.toString());
+    async execute(command: CreateSubscriptionCommand): Promise<void> {
+        const company = await this.companyRepo.getById(command.companyId);
         if (!company) throw new Error(EXCEPTION.COMPANY.NOT_FOUND);
 
-        const tariff = await this.tariffRepo.getById(input.tariffId.toString());
+        const tariff = await this.tariffRepo.getById(command.tariffId);
         if (!tariff) throw new Error(EXCEPTION.TARIFF.NOT_FOUND);
 
-        const subscription = Subscription.create(company.id, tariff, input.period);
+        const subscription = Subscription.create(company.id, tariff, command.period);
 
         await this.subscriptionRepo.save(subscription);
     }

@@ -1,3 +1,3 @@
-import {EmployeeDto} from "@presentation/common/dto/employee-body-dto";
+import {ActorDto} from "@presentation/common/dto/actor-body.dto";
 
-export class EmployeeMeDto extends EmployeeDto {}
+export class EmployeeMeDto extends ActorDto {}

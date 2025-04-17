@@ -1,19 +1,10 @@
-import {EmployeePermissions} from "@domain/employee/model/employee-permissions";
 import {EmployeeId} from "@domain/employee/employee";
 import {EmployeeName} from "@domain/employee/value-object/employee-name.vo";
-import {EmployeeRole} from "@domain/employee/model/employee-role";
 import {CompanyId} from "@domain/company/company";
 import {EmployeePhone} from "@domain/employee/value-object/employee-phone.vo";
 import {EmployeeEmail} from "@domain/employee/value-object/employee-email.vo";
+import {Role} from "@domain/policy/model/role";
 
-class Role {
-    constructor(
-        public readonly id: string,
-        public readonly name: string | null,
-        public readonly type: string,
-        public readonly permissions: EmployeePermissions,
-    ) {}
-}
 export class EmployeeMeOutput {
     private constructor(
         public readonly id: string,
@@ -27,7 +18,7 @@ export class EmployeeMeOutput {
     static of(
         id: EmployeeId,
         name: EmployeeName,
-        role: EmployeeRole,
+        role: Role,
         companyId: CompanyId,
         phone: EmployeePhone,
         email: EmployeeEmail,
@@ -35,7 +26,7 @@ export class EmployeeMeOutput {
         return new EmployeeMeOutput(
             id.toString(),
             name.toString(),
-            new Role(role.id.toString(), role.name?.toString() || null, role.type.toString(), role.permissions),
+            role,
             companyId.toString(),
             phone.toString(),
             email.toString(),

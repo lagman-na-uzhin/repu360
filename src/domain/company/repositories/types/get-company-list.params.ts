@@ -1,7 +1,7 @@
-import {GetListParams} from "@domain/common/interfaces/repositories/get-list.interface";
+import {FilterParams, GetListParams} from "@domain/common/interfaces/repositories/get-list.interface";
 import {ManagerId} from "@domain/manager/manager";
 
-interface Filter {
+export interface GetCompanyListFilter extends FilterParams{
     readonly managerId: ManagerId
 }
-export interface GetCompanyListParams extends GetListParams<Filter> {}
+export interface GetCompanyListParams extends GetListParams<GetCompanyListFilter> {}

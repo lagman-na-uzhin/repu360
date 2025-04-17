@@ -7,6 +7,7 @@ import {CACHE_TTL} from "@application/interfaces/repositories/cache/cache-ttl.co
 import {Employee} from "@domain/employee/employee";
 import {Manager} from "@domain/manager/manager";
 import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/types/employee-auth-data.type";
+import {Role} from "@domain/policy/model/role";
 
 
 @Injectable()
@@ -17,7 +18,7 @@ export class CacheRepository implements ICacheRepository {
     this.client = this.redisService.getOrThrow('default');
   }
 
-  async setEmployeeAuth(employee: Employee): Promise<void> {
+  async setEmployeeAuth(employee: Employee, role: Role): Promise<void> {
     const key = CACHE_KEY.COMMON.AUTH_TOKEN(employee.id.toString());
 
     const reviewPermissions = [];
@@ -41,8 +42,8 @@ export class CacheRepository implements ICacheRepository {
     const data: EmployeeAuthDataType = {
       id: employee.id.toString(),
       role: {
-        name: employee.role.name?.toString() ?? null,
-        type: employee.role.type.toString(),
+        name: role.name?.toString() ?? null,
+        type: role.type.toString(),
         permissions: {
           reviews: reviewPermissions,
           company: companyPermissions,
