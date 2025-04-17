@@ -1,18 +1,12 @@
 import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
 import {Review} from "@domain/review/review";
-import {UniqueID} from "@domain/common/unique-id";
-import {
-  IOrganizationRepository
-} from "@domain/organization/repositories/organization-repository.interface";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import { IReviewRepository } from '@domain/review/repositories/review-repository.interface';
 import { IProfileRepository } from '@domain/review/repositories/profile-repository.interface';
 import { Profile } from '@domain/review/profile';
-import {
-  SyncReviewsPcInput
-} from "@application/use-cases/background/review/twogis/sync-reviews/sync-reviews-pc.input";
 import {Placement, PlacementId} from "@domain/placement/placement";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
+import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-work.interface";
 
 export class SyncTwogisReviewsProcessUseCase {
   constructor(
@@ -20,15 +14,16 @@ export class SyncTwogisReviewsProcessUseCase {
       private readonly twogisRepo: ITwogisRepository,
       private readonly reviewRepo: IReviewRepository,
       private readonly profileRepo: IProfileRepository,
+      private readonly uow: IUnitOfWork,
   ) {}
 
-  async execute(input: SyncReviewsPcInput) {
-    const placement = await this.getPlacementOrFail(input.organizationPlacement);
+  async execute(placementId: PlacementId) {
+    const placement = await this.getPlacementOrFail(placementId);
     const unSyncedObj = await this.getUnSyncedReviewObj(placement);
 
     if (!unSyncedObj) return;
 
-    const { reviewsToSave, profilesToSave } = await this.processUnSyncedReviews(unSyncedObj)
+    const { reviewsToSave, profilesToSave } = await this.handleUnSyncedReviews(unSyncedObj)
 
     await this.saveEntities(reviewsToSave, profilesToSave);
   }
@@ -44,20 +39,30 @@ export class SyncTwogisReviewsProcessUseCase {
     return this.twogisRepo.getOrganizationReviews(placement.id, twogisDetail.externalId, {type: twogisDetail.type})
   }
 
-  private async processUnSyncedReviews(unSyncedObj: { profile: Profile; review: Review }[]) {
-    const reviewsToSave: Review[] = [];
-    const profilesToSave: Profile[] = [];
+  private async handleUnSyncedReviews(unSyncedObj: { profile: Profile; review: Review }[]) {
+    const reviewIds: string[]  = unSyncedObj.map(x => x.review.getTwogisReviewPlacementDetail().externalId);
+    const profileIds: string[] = unSyncedObj.map(x => x.profile.getTwogisProfilePlacementDetail().externalId);
 
-    for (const { review: unSyncReview, profile: unSyncProfile } of unSyncedObj) {
-      const existingReview = await this.reviewRepo.getByExternalId(unSyncReview.getTwogisReviewPlacementDetail().externalId);
-      const existingProfile = await this.profileRepo.getByExternalId(unSyncProfile.getTwogisProfilePlacementDetail().externalId);
+    const existingReviews  = await this.reviewRepo.getByExternalIds(reviewIds);
+    const existingProfiles = await this.profileRepo.getByExternalIds(profileIds);
 
-      reviewsToSave.push(this.getUpdatedOrNewReview(existingReview, unSyncReview));
-      profilesToSave.push(this.getUpdatedOrNewProfile(existingProfile, unSyncProfile));
-    }
+    const reviewMap: Map<string, Review>  = new Map(existingReviews.map(r  => [r.getTwogisReviewPlacementDetail().externalId, r]));
+    const profileMap: Map<string, Profile> = new Map(existingProfiles.map(p => [p.getTwogisProfilePlacementDetail().externalId, p]));
+
+    const reviewsToSave = unSyncedObj.map(({ review }) =>
+            this.getUpdatedOrNewReview(reviewMap.get(review.getTwogisReviewPlacementDetail().externalId) || null,
+            review
+            )
+    );
+    const profilesToSave = unSyncedObj.map(({ profile }) =>
+            this.getUpdatedOrNewProfile(profileMap.get(profile.getTwogisProfilePlacementDetail().externalId) || null,
+            profile
+            )
+    );
 
     return { reviewsToSave, profilesToSave };
   }
+
 
   private getUpdatedOrNewReview(existingReview: Review | null, newReview: Review): Review {
     if (existingReview) {
@@ -76,7 +81,9 @@ export class SyncTwogisReviewsProcessUseCase {
   }
 
   private async saveEntities(reviewsToSave: Review[], profilesToSave: Profile[]) {
-    if (reviewsToSave.length) await this.reviewRepo.saveAll(reviewsToSave);
-    if (profilesToSave.length) await this.profileRepo.saveAll(profilesToSave);
+    await this.uow.run(async (uow) => {
+      if (reviewsToSave.length) await uow.reviewRepo.saveAll(reviewsToSave);
+      if (profilesToSave.length) await uow.profileRepo.saveAll(profilesToSave);
+    })
   }
 }

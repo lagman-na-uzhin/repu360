@@ -1,7 +1,7 @@
 import {TariffId} from "@domain/subscription/model/tariff";
 import {CompanyId} from "@domain/company/company";
 import {SubscriptionPeriod} from "@domain/subscription/value-object/subscription-period.vo";
-import {BaseCommand} from "@application/common/base-command/base-command";
+import {BaseCommand} from "@application/common/base-command";
 
 export class CreateSubscriptionCommand extends BaseCommand{
     private constructor(

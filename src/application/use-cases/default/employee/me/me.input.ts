@@ -1,5 +1,5 @@
 import {Actor} from "@domain/policy/actor";
-import {BaseQuery} from "@application/common/base-query/base-query";
+import {BaseQuery} from "@application/common/base-query";
 
 export class EmployeeMeQuery extends BaseQuery {
     private constructor(

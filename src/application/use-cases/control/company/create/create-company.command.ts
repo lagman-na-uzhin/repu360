@@ -1,5 +1,5 @@
 import { CompanyName } from "@domain/company/value-object/company-name.vo";
-import {BaseCommand} from "@application/common/base-command/base-command";
+import {BaseCommand} from "@application/common/base-command";
 import {Actor} from "@domain/policy/actor";
 
 export class CreateCompanyCommand extends BaseCommand {

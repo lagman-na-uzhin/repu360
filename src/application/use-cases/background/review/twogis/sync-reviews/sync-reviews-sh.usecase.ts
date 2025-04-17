@@ -1,12 +1,9 @@
 import { MINUTE } from 'time-constants';
-import {IProxyService} from "@application/interfaces/services/proxy/proxy-service.interface";
 import {ITaskService, QUEUES} from "@application/interfaces/services/task/task-service.interface";
-import {
-  IOrganizationRepository
-} from "@domain/organization/repositories/organization-repository.interface";
 import {UniqueID} from "@domain/common/unique-id";
-import { SyncTwogisReviewsProcessDto } from '@presentation/background/platform/twogis/dto/sync-twogis-reviews.dto';
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
+import {PlacementId} from "@domain/placement/placement";
+
 
 export class SyncTwogisReviewsScheduleUseCase {
   constructor(
@@ -33,14 +30,13 @@ export class SyncTwogisReviewsScheduleUseCase {
     }
   }
 
-  private async initTask(organizationPlatformId: UniqueID):Promise<void>  {
-    const payload: SyncTwogisReviewsProcessDto = {organizationPlatformId};
+  private async initTask(placementId: PlacementId):Promise<void>  {
     await this.taskService.addTask({
       queue: QUEUES.SYNC_TWOGIS_REVIEWS,
-      jobId: `sync_twogis_reviews_${organizationPlatformId}`,
+      jobId: `sync_twogis_reviews_${placementId}`,
       attempts: 1,
       delay: 0,
-      payload,
+      payload: placementId,
     });
   }
 }
