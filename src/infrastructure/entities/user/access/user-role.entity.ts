@@ -3,7 +3,6 @@ import {UserPermissionEntity} from "@infrastructure/entities/user/access/user-pe
 import {UserEntity} from "@infrastructure/entities/user/user.entity";
 
 @Entity('user_role')
-@Unique(['userId'])
 export class UserRoleEntity {
     @PrimaryColumn("uuid")
     public id: string;
@@ -14,11 +13,7 @@ export class UserRoleEntity {
     @Column()
     public type: string;
 
-    @Column()
-    public userId: string;
-
     @OneToOne(() => UserEntity)
-    @JoinColumn({name: 'user_id'})
     user: UserEntity;
 
     @OneToMany(() => UserPermissionEntity, (permission) => permission.role, { eager: true })

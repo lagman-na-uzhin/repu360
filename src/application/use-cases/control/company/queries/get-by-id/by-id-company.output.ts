@@ -7,21 +7,20 @@ export class ByIdCompanyControlOutput {
     private constructor(
         public readonly id: string,
         public readonly managerId: string,
-        public readonly subscriptionId: string | null,
         public readonly name: string,
     ) {}
 
     static of(
-        id: CompanyId,
-        managerId: ManagerId,
-        subscriptionId: SubscriptionId | null,
-        name: CompanyName,
+        domain: {
+            id: CompanyId,
+            managerId: ManagerId,
+            name: CompanyName,
+        }
     ) {
         return new ByIdCompanyControlOutput(
-            id.toString(),
-            managerId.toString(),
-            subscriptionId ? subscriptionId.toString() : null,
-            name.toString()
+            domain.id.toString(),
+            domain.managerId.toString(),
+            domain.name.toString()
         )
     }
 }

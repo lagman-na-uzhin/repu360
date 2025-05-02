@@ -40,13 +40,31 @@ export class ReviewEntity {
     @JoinColumn({ name: "placement_id" })
     placement: OrganizationPlacementEntity;
 
-    @OneToOne(() => TwogisReviewPlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true})
-    twogisDetail?: TwogisReviewPlacementDetailEntity
+    @OneToOne(
+        () => TwogisReviewPlacementDetailEntity,
+        {
+            cascade: ['insert', 'update', 'soft-remove'],
+            eager: true,
+            nullable: true
+        })
+    twogisDetail?: TwogisReviewPlacementDetailEntity | null
 
-    @OneToOne(() => YandexReviewPlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true})
-    yandexDetail?: YandexReviewPlacementDetailEntity
+    @OneToOne(
+        () => YandexReviewPlacementDetailEntity,
+        {
+            cascade: ['insert', 'update', 'soft-remove'],
+            eager: true,
+            nullable: true
+        })
+    yandexDetail?: YandexReviewPlacementDetailEntity | null
 
-    @OneToMany(() => ReviewMediaEntity, media => media.review, { cascade: ['insert', 'update', 'soft-remove'], eager: true})
+    @OneToMany(
+        () => ReviewMediaEntity, media => media.review,
+        {
+            cascade: ['insert', 'update', 'soft-remove'],
+            eager: true,
+            nullable: true
+        })
     media: ReviewMediaEntity[];
 
     // @OneToMany(() => ReviewComplaintEntity, complaint => complaint.review, { cascade: ['insert', 'update', 'soft-remove'], eager: true} )

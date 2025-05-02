@@ -1,16 +1,21 @@
-import {Controller, Get, HttpStatus, Inject, Patch, Post} from '@nestjs/common';
+import {Controller, Get, HttpStatus, Inject, Patch, Post, UseGuards} from '@nestjs/common';
 import { UseCaseProxy } from '@infrastructure/usecase-proxy/usecase-proxy';
 import { CompanyProxy } from '@infrastructure/usecase-proxy/company/company.proxy';
-import {CreateCompanyUseCase} from "@application/use-cases/control/company/create/create-company.usecase";
+import {CreateCompanyUseCase} from "@application/use-cases/control/company/commands/create/create-company.usecase";
 import {CONTROL_ROUTES} from "@presentation/routes";
 import {CreateCompanyDto} from "@presentation/control/company/dto/create-company.dto";
-import {ByIdCompanyControlUseCase} from "@application/use-cases/control/company/get-by-id/by-id-company.usecase";
+import {ByIdCompanyControlUseCase} from "@application/use-cases/control/company/queries/get-by-id/by-id-company.usecase";
 import {CompanyId} from "@domain/company/company";
-import {RequestBody, RequestQuery} from "@infrastructure/common/decorators/user.decorator";
-import {CreateCompanyCommand} from "@application/use-cases/control/company/create/create-company.command";
-import {GetListCompanyUseCase} from "@application/use-cases/control/company/get-list/get-list-company.usecase";
+import { RequestQuery} from "@infrastructure/common/decorators/request-query.decorator";
+import {CreateCompanyCommand} from "@application/use-cases/control/company/commands/create/create-company.command";
+import {GetListCompanyUseCase} from "@application/use-cases/control/company/queries/get-list/get-list-company.usecase";
+import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
+import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
+import {Actor} from "@domain/policy/actor";
+import {RequestBody} from "@infrastructure/common/decorators/request-body.decorator";
 
 @Controller(CONTROL_ROUTES.COMPANY.BASE)
+@UseGuards(JwtAuthGuard)
 export class ControlCompanyController {
   constructor(
     @Inject(CompanyProxy.CREATE_COMPANY_USE_CASE)
@@ -32,8 +37,12 @@ export class ControlCompanyController {
   };
 
   @Post(CONTROL_ROUTES.COMPANY.CREATE)
-  async create(@RequestBody() dto: CreateCompanyDto) {
-    const command = CreateCompanyCommand.of(dto.companyName, dto.actor)
+  async create(
+      @RequestBody() dto: CreateCompanyDto,
+      @RequestActor() actor: any
+      ) {
+    console.log("controller actor: ", actor)
+    const command = CreateCompanyCommand.of(dto.companyName, actor)
 
     return {
       statusCode: HttpStatus.CREATED,

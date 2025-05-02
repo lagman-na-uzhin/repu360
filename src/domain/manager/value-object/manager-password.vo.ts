@@ -5,7 +5,7 @@ export class ManagerPassword {
 
   constructor(password: string) {
     if (!this.isValid(password)) {
-      throw new Error(EXCEPTION.USER.WEAK_PASSWORD); //'Пароль должен содержать минимум 8 символов, хотя бы одну букву и цифру'
+      throw new Error(EXCEPTION.MANAGER.WEAK_PASSWORD); //'Пароль должен содержать минимум 8 символов, хотя бы одну букву и цифру'
     }
     this.value = password;
   }

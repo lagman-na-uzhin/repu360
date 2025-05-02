@@ -19,6 +19,8 @@ import {
 import {ITaskService} from "@application/interfaces/services/task/task-service.interface";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {PlacementOrmRepository} from "@infrastructure/repositories/placement/placement.repository";
+import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-work.interface";
+import {UnitOfWork} from "@infrastructure/services/unit-of-work/unit-of-work.service";
 
 export enum ReviewProxy {
   SYNC_TWOGIS_REVIEWS_PROCESS_USE_CASE = `${PREFIX.REVIEW_PROXY}SyncReviewsProcessUseCaseProxy`,
@@ -27,10 +29,22 @@ export enum ReviewProxy {
 
 export const reviewProxyProviders = [
   {
-    inject: [PlacementOrmRepository, TwogisRepository, ReviewOrmRepository, ProfileOrmRepository],
+    inject: [PlacementOrmRepository, TwogisRepository, ReviewOrmRepository, ProfileOrmRepository, UnitOfWork],
     provide: ReviewProxy.SYNC_TWOGIS_REVIEWS_PROCESS_USE_CASE,
-    useFactory: (placementRepo: IPlacementRepository, twogisRepo: ITwogisRepository, reviewRepo: IReviewRepository, profileRepo: IProfileRepository) => {
-        return new UseCaseProxy(new SyncTwogisReviewsProcessUseCase(placementRepo, twogisRepo, reviewRepo, profileRepo))
+    useFactory: (
+        placementRepo: IPlacementRepository,
+        twogisRepo: ITwogisRepository,
+        reviewRepo: IReviewRepository,
+        profileRepo: IProfileRepository,
+        uow: IUnitOfWork
+    ) => {
+        return new UseCaseProxy(new SyncTwogisReviewsProcessUseCase(
+            placementRepo,
+            twogisRepo,
+            reviewRepo,
+            profileRepo,
+            uow
+            ))
     }
   },
   {

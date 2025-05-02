@@ -3,8 +3,8 @@ import { ManagerEmail } from '@domain/manager/value-object/manager-email.vo';
 import { ManagerName } from '@domain/manager/value-object/manager-name.vo';
 import { ManagerPhone } from '@domain/manager/value-object/manager-phone.vo';
 import { ManagerPassword } from '@domain/manager/value-object/manager-password.vo';
-import { ManagerRole } from "@domain/manager/model/manager-role";
 import {Lead} from "@domain/manager/model/lead/lead";
+import {RoleId} from "@domain/policy/model/role";
 
 export class ManagerId extends UniqueID {}
 
@@ -15,8 +15,8 @@ export class Manager {
       private _name: ManagerName,
       private _phone: ManagerPhone,
       private _password: ManagerPassword,
-      private _role: ManagerRole,
-      private _leads: Lead[],
+      private _roleId: RoleId,
+      // private _leads: Lead[],
 
       private readonly _createdAt: Date = new Date(),
       private _updatedAt: Date | null = null,
@@ -28,15 +28,16 @@ export class Manager {
       name: string,
       phone: string,
       password: string,
-      role: ManagerRole,
+      roleId: RoleId,
+
     ): Manager {
         return new Manager(
           new ManagerId(),
           new ManagerEmail(email),
           new ManagerName(name),
           new ManagerPhone(phone),
-          new ManagerPhone(password),
-          role,
+          new ManagerPassword(password),
+            roleId,
         );
     }
 
@@ -46,7 +47,7 @@ export class Manager {
       name: string,
       phone: string,
       password: string,
-      role: ManagerRole,
+      roleId: string,
     ): Manager {
         return new Manager(
             new ManagerId(id),
@@ -54,7 +55,7 @@ export class Manager {
             new ManagerName(name),
             new ManagerPhone(phone),
             new ManagerPassword(password),
-          role,
+            new RoleId(roleId),
         );
     }
 
@@ -94,11 +95,8 @@ export class Manager {
         this._password = new ManagerPassword(password);
     }
 
-    get role(): ManagerRole {
-        return this._role;
+    get roleId(): RoleId {
+        return this._roleId;
     }
 
-    set role(role: ManagerRole) {
-        this._role = role;
-    }
 }

@@ -1,10 +1,10 @@
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
-import {CreateCompanyUseCase} from "@application/use-cases/control/company/create/create-company.usecase";
+import {CreateCompanyUseCase} from "@application/use-cases/control/company/commands/create/create-company.usecase";
 import {CompanyOrmRepository} from "@infrastructure/repositories/company/company.repository";
 import {PREFIX} from "@infrastructure/usecase-proxy/prefix";
 import {UseCaseProxy} from "@infrastructure/usecase-proxy/usecase-proxy";
-import {ByIdCompanyControlUseCase} from "@application/use-cases/control/company/get-by-id/by-id-company.usecase";
-import {GetListCompanyUseCase} from "@application/use-cases/control/company/get-list/get-list-company.usecase";
+import {ByIdCompanyControlUseCase} from "@application/use-cases/control/company/queries/get-by-id/by-id-company.usecase";
+import {GetListCompanyUseCase} from "@application/use-cases/control/company/queries/get-list/get-list-company.usecase";
 
 export enum CompanyProxy {
   CREATE_COMPANY_USE_CASE = `${PREFIX.COMPANY_PROXY}CreateCompanyControlUseCaseProxy`,

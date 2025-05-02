@@ -81,9 +81,9 @@ export class SyncTwogisReviewsProcessUseCase {
   }
 
   private async saveEntities(reviewsToSave: Review[], profilesToSave: Profile[]) {
-    await this.uow.run(async (uow) => {
-      if (reviewsToSave.length) await uow.reviewRepo.saveAll(reviewsToSave);
-      if (profilesToSave.length) await uow.profileRepo.saveAll(profilesToSave);
+    await this.uow.run(async (ctx) => {
+      if (reviewsToSave.length) await ctx.reviewRepo.saveAll(reviewsToSave);
+      if (profilesToSave.length) await ctx.profileRepo.saveAll(profilesToSave);
     })
   }
 }

@@ -5,7 +5,7 @@ export class EmployeeName {
 
   constructor(name: string) {
     if (!this.isValid(name)) {
-      throw new Error(EXCEPTION.USER.INVALID_NAME);
+      throw new Error(EXCEPTION.EMPLOYEE.INVALID_NAME);
     }
     this.value = name;
   }

@@ -8,6 +8,7 @@ import {Employee} from "@domain/employee/employee";
 import {Manager} from "@domain/manager/manager";
 import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/types/employee-auth-data.type";
 import {Role} from "@domain/policy/model/role";
+import {ManagerAuthDataType} from "@application/interfaces/repositories/cache/types/manager-auth-data.type";
 
 
 @Injectable()
@@ -21,33 +22,24 @@ export class CacheRepository implements ICacheRepository {
   async setEmployeeAuth(employee: Employee, role: Role): Promise<void> {
     const key = CACHE_KEY.COMMON.AUTH_TOKEN(employee.id.toString());
 
-    const reviewPermissions = [];
-
-    for (const [orgId, permissions] of employee.role.permissions.reviews.entries()) {
-      for (const permission of permissions) {
-        reviewPermissions.push({
-          module: 'reviews',
-          permission,
-          organizationId: orgId.toString(),
-        });
-      }
+    const exist = await this.isExist(key);
+    if (exist) {
+      await this.client.del(key);
     }
 
-    const companyPermissions = Array.from(employee.role.permissions.company).map(permission => ({
-      module: 'company',
-      permission,
-      organizationId: null,
-    }));
-
-    const data: EmployeeAuthDataType = {
+    const data: EmployeeAuthDataType = <EmployeeAuthDataType>{
       id: employee.id.toString(),
       role: {
-        name: role.name?.toString() ?? null,
+        id: role.id.toString(),
+        name: role.name?.toString() || null,
         type: role.type.toString(),
         permissions: {
-          reviews: reviewPermissions,
-          company: companyPermissions,
-        }
+          reviews: Array.from(role.employeePermissions.reviews.entries()).map(([orgId, permissions]) => ({
+            organizationId: orgId.toString(),
+            permissions: Array.from(permissions),
+          })),
+          companies: Array.from(role.managerPermissions.companies)
+        },
       }
     };
 
@@ -55,8 +47,33 @@ export class CacheRepository implements ICacheRepository {
   }
 
 
-  async setManagerAuth(manager: Manager): Promise<void> {
+
+  async setManagerAuth(manager: Manager, role: Role): Promise<void> {
     const key = CACHE_KEY.COMMON.AUTH_TOKEN(manager.id.toString());
-    await this.client.set(key, JSON.stringify(manager), 'EX',  CACHE_TTL.ONE_DAY)
+
+    const exist = await this.isExist(key);
+    if (exist) {
+      await this.client.del(key);
+    }
+
+    const data: ManagerAuthDataType = <ManagerAuthDataType>{
+      id: manager.id.toString(),
+      role: {
+        id: role.id.toString(),
+        name: role.name?.toString() || null,
+        type: role.type.toString(),
+        permissions: {
+          companies: Array.from(role.managerPermissions.companies)
+        },
+      }
+    };
+    console.log(data, "cache data")
+
+    await this.client.set(key, JSON.stringify(data), 'EX', CACHE_TTL.ONE_DAY);
+  }
+
+  async isExist(key: string): Promise<boolean> {
+    const exist = await this.client.get(key);
+    return !!exist;
   }
 }

@@ -113,4 +113,8 @@ export class Employee {
     get phone() {
         return this._phone;
     }
+
+    get roleId() {
+        return this._roleId;
+    }
 }

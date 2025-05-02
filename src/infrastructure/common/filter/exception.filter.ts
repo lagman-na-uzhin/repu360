@@ -17,34 +17,39 @@ export class AllExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: WinstonService) {}
 
   catch(exception: any, host: ArgumentsHost) {
-    console.log(exception, 'exception');
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
-    const request: any = ctx.getRequest();
+    const request = ctx.getRequest();
 
-    const ownerId =
-      response.req && response.req.user ? response.req.user.ownerId : '';
-    const combinedData = { ...response.req.body, ...response.req.query };
-
-    const mappedToHTTPError: {code: number, status: string} = ERROR_HTTP_STATUS_MAP[exception.message] || {
-      code: HttpStatus.INTERNAL_SERVER_ERROR,
-      status: "SERVER_ERROR",
+    const actor = request.actor ?? '';
+    console.log(exception, 'exception')
+    const combinedData = {
+      ...request.body,
+      ...request.query,
     };
 
+    const mappedToHTTPError: { code: number; status: string } =
+        ERROR_HTTP_STATUS_MAP[exception.message] || {
+          code: HttpStatus.INTERNAL_SERVER_ERROR,
+          status: 'SERVER_ERROR',
+          message: exception.message
+        };
+
     this.logMessage(
-      ownerId,
-      combinedData,
-      request,
-      mappedToHTTPError,
-      mappedToHTTPError.status,
-      exception,
+        actor,
+        combinedData,
+        request,
+        mappedToHTTPError,
+        mappedToHTTPError.status,
+        exception,
     );
 
-    response.status(mappedToHTTPError.code).json(mappedToHTTPError);
+    response.status(mappedToHTTPError.code).send(mappedToHTTPError);
   }
 
+
   private logMessage(
-    userId: number,
+      actor: any,
     combinedData: any,
     request: any,
     responseData: IError,
@@ -55,7 +60,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       time: new Date().toISOString(),
       level: 'ERROR',
       method: request.method,
-      userId,
+      actor,
       payload: { ...combinedData },
       status: status,
       exception: exception,
@@ -65,7 +70,7 @@ export class AllExceptionFilter implements ExceptionFilter {
 
     if (logData.payload && logData.payload.payload) {
       const payload = logData.payload.payload;
-      logData.userId = payload.ownerId;
+      logData.actor = payload.ownerId;
     }
 
     this.logger.logTest(logData, logData.payload.reqId);

@@ -1,7 +1,7 @@
 import {Controller, Get, Inject, UseGuards} from '@nestjs/common';
 import {DEFAULT_ROUTES} from "@presentation/routes";
 import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
-import {RequestInitQuery} from "@infrastructure/common/decorators/user.decorator";
+import {RequestInitQuery} from "@infrastructure/common/decorators/request-query.decorator";
 import {EmployeeMeDto} from "@presentation/default/employee/dto/me.dto";
 import {EmployeeMeQuery} from "@application/use-cases/default/employee/me/me.input";
 import {EmployeeProxy} from "@infrastructure/usecase-proxy/employee/employee.proxy";

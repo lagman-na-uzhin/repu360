@@ -19,7 +19,7 @@ export class JwtTokenService implements IJwtService {
     secret: string,
     expiresIn: string,
   ): string {
-    return this.jwtService.sign(JSON.stringify(payload), {
+    return this.jwtService.sign(payload, {
       secret: secret,
       expiresIn: expiresIn,
     });

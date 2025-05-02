@@ -1,51 +1,92 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { IReviewRepository } from '@domain/review/repositories/review-repository.interface';
 import { ReviewEntity } from 'src/infrastructure/entities/review/review.entity';
-import { Review, ReviewId } from '@domain/review/review';
-import {TwogisReviewPlacementDetailEntity} from "@infrastructure/entities/review/placement-details/twogis-review.entity";
-import {YandexReviewPlacementDetailEntity} from "@infrastructure/entities/review/placement-details/yandex-review.entity";
-import { PlacementId } from '@domain/placement/placement';
-import { ProfileId } from '@domain/review/profile';
-import { Platform } from '@domain/placement/types/platfoms.enum';
-import { TwogisReviewPlacementDetail } from '@domain/review/model/review/twogis-review-placement-detail';
-import { YandexReviewPlacementDetail } from '@domain/review/model/review/yandex-review-placement-detail';
-import { ReviewMedia } from '@domain/review/model/review/review-media';
+import {Review, ReviewId, ReviewPlacementDetail} from '@domain/review/review';
+import { TwogisReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/twogis-review.entity';
+import { YandexReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/yandex-review.entity';
 import { ReviewMediaEntity } from '@infrastructure/entities/review/review-media.entity';
+import {PlacementId} from "@domain/placement/placement";
+import {TwogisReviewPlacementDetail} from "@domain/review/model/review/twogis-review-placement-detail";
+import {YandexReviewPlacementDetail} from "@domain/review/model/review/yandex-review-placement-detail";
+import {InjectEntityManager} from "@nestjs/typeorm";
 
 @Injectable()
 export class ReviewOrmRepository implements IReviewRepository {
   constructor(
-    @InjectRepository(ReviewEntity)
-    private readonly repo: Repository<ReviewEntity>,
-    @InjectRepository(TwogisReviewPlacementDetailEntity)
-    private readonly twogisDetailsRepo: Repository<TwogisReviewPlacementDetailEntity>,
-    @InjectRepository(YandexReviewPlacementDetailEntity)
-    private readonly yandexDetailsRepo: Repository<YandexReviewPlacementDetailEntity>,
-    @InjectRepository(ReviewMediaEntity)
-    private readonly reviewMediaRepo: Repository<ReviewMediaEntity>,
+      @InjectEntityManager() private readonly manager: EntityManager,
   ) {}
 
-  async getReviewsByOrganizationPlacementId(
-      placementId: PlacementId,
-  ): Promise<Review[]> {
-    const entities = await this.repo.find({
-      where: {placementId: placementId.toString()}
-    })
-    return Promise.all(entities.map(this.toModel))
+  async getReviewsByOrganizationPlacementId(placementId: PlacementId): Promise<Review[]> {
+    const entities = await this.manager.find(ReviewEntity, {
+      where: { placementId: placementId.toString() },
+    });
+
+    return Promise.all(entities.map(this.toDomain));
   }
 
-  async getByExternalId(externalId: string): Promise<Review | null> {
-    return null
+  async saveAll(reviews: Review[]): Promise<void> {
+    const reviewEntities = reviews.map((review) => this.fromDomain(review));
+    await this.manager.save(ReviewEntity, reviewEntities);
   }
 
-  async saveAll(reviews: Review[]): Promise<void> {}
+  private fromDomain(review: Review): ReviewEntity {
+    const { twogisDetailEntity, yandexDetailEntity } = this.fromDomainPlacementDetail(review);
 
-  private async toModel(entity: ReviewEntity): Promise<Review> {
-    const detail = await this.getDetailModel(entity);
-    const media = await this.getMediaModel(entity);
+    const entity = new ReviewEntity();
+    entity.id = review.id.toString();
+    entity.placementId = review.placementId.toString();
+    entity.profileId = review.profileId.toString();
+    entity.platform = review.platform;
+    entity.text = review.text;
+    entity.rating = review.rating;
+    entity.twogisDetail = twogisDetailEntity;
+    entity.yandexDetail = yandexDetailEntity;
 
+    return entity;
+  }
+
+  private fromDomainPlacementDetail(review: Review) {
+    const twogisDetail = review.getTwogisReviewPlacementDetail();
+    const yandexDetail = review.getYandexReviewPlacementDetail();
+
+    const twogisDetailEntity = twogisDetail
+        ? {
+            reviewId: review.id.toString(),
+            externalId: twogisDetail.externalId,
+          } as TwogisReviewPlacementDetailEntity
+        : null;
+
+    const yandexDetailEntity = yandexDetail
+        ? {
+          reviewId: review.id.toString(),
+          externalId: yandexDetail.externalId,
+        } as YandexReviewPlacementDetailEntity
+        : null;
+
+    return { twogisDetailEntity, yandexDetailEntity };
+  }
+
+
+
+  async getByTwogisExternalId(externalId: string): Promise<Review | null> {
+    const entity = await this.manager.findOne(ReviewEntity, {
+      where: {
+        twogisDetail: { externalId }
+      }
+    });
+
+    return entity ? this.toDomain(entity) : null;
+  }
+
+
+
+  async getByExternalIds(externalIds: string[]): Promise<Review[]> {
+    return Promise.resolve([]);
+  }
+
+  private async toDomain(entity: ReviewEntity): Promise<Review> {
+    const placementDetail = this.toDomainPlacementDetail(entity)
     return Review.fromPersistence(
         entity.id,
         entity.placementId,
@@ -53,37 +94,16 @@ export class ReviewOrmRepository implements IReviewRepository {
         entity.platform,
         entity.text,
         entity.rating,
-        media,
-        detail,
-
-    )
-  }
-  private async getDetailModel(entity: ReviewEntity): Promise<TwogisReviewPlacementDetail | YandexReviewPlacementDetail> {
-    const repoMap = {
-      [Platform.TWOGIS]: {
-        repo: this.twogisDetailsRepo,
-        create: (data: TwogisReviewPlacementDetailEntity) =>
-            TwogisReviewPlacementDetail.fromPersistence(data.externalId),
-      },
-      [Platform.YANDEX]: {
-        repo: this.yandexDetailsRepo,
-        create: (data: YandexReviewPlacementDetailEntity) =>
-             YandexReviewPlacementDetail.fromPersistence(data.externalId),
-      },
-    } as const;
-
-    const placementData = repoMap[entity.platform];
-    const detailEntity = await placementData.repo.findOne({
-      where: { reviewId: entity.id },
-    });
-    return placementData.create(detailEntity!);
+        [],
+        placementDetail
+    );
   }
 
-  async getMediaModel(entity: ReviewEntity): Promise<ReviewMedia[]> {
-    const mediaEntities = await this.reviewMediaRepo.find({where: {
-      reviewId: entity.id
-      }})
-
-    return mediaEntities.map(e => ReviewMedia.fromPersistence(e.url, e.createdAt))
+  private toDomainPlacementDetail(entity: ReviewEntity): ReviewPlacementDetail {
+    if (entity.twogisDetail) {
+      return TwogisReviewPlacementDetail.fromPersistence(entity.twogisDetail.externalId);
+    } else {
+      return YandexReviewPlacementDetail.fromPersistence(entity.yandexDetail!.externalId);
+    }
   }
 }

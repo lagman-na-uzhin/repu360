@@ -1,7 +1,8 @@
 export const DEFAULT_ROUTES = {
   AUTH: {
     BASE: 'auth',
-    LOGIN: 'login', //POST
+    EMPLOYEE_LOGIN: 'employee/login', //POST
+    MANAGER_LOGIN: 'manager/login', //POST
   },
 
   COMPANY: {
@@ -9,6 +10,12 @@ export const DEFAULT_ROUTES = {
 
     MY: ':companyId', //GET
     UPDATE: ':companyId', //PATCH
+  },
+
+  ORGANIZATION: {
+    BASE: 'organizations',
+
+    GET_LIST_BY_COMPANY: ':companyId'
   },
 
   EMPLOYEE: {
@@ -50,5 +57,6 @@ export const CONTROL_ROUTES = {
     LIST: '', //GET
     BY_ID: ':companyId', //GET
     UPDATE: ':companyId', //PATCH
+    DELETE: ':companyId', //DELETE
   }
 } as const;

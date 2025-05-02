@@ -8,7 +8,7 @@ import { COMPANY_ENTITIES } from 'src/infrastructure/entities/company';
 import { REVIEW_ENTITIES } from 'src/infrastructure/entities/review';
 import { RequestModule } from 'src/infrastructure/services/request/request.module';
 import { USER_ENTITIES } from '@infrastructure/entities/user';
-import {BaseRepository} from "@infrastructure/repositories/base-repository";
+import { BaseRepository } from '@infrastructure/repositories/base-repository';
 
 @Module({
   imports: [
@@ -22,7 +22,10 @@ import {BaseRepository} from "@infrastructure/repositories/base-repository";
     forwardRef(() => RequestModule),
     EnvConfigModule,
   ],
-  providers: [BaseRepository, ...REPOSITORIES],
+  providers: [
+    BaseRepository,
+    ...REPOSITORIES,
+  ],
   exports: [BaseRepository, ...REPOSITORIES],
 })
 export class RepositoriesModule {}

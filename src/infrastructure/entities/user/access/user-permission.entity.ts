@@ -7,19 +7,19 @@ export class UserPermissionEntity {
     public id: string;
 
     @Column()
-    userId: string;
+    roleId: string;
 
     @Column()
-    module: string;
+    module: "COMPANIES" | "REVIEWS";
 
     @Column()
     permission: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: "varchar" })
     organizationId: string | null;
 
     @ManyToOne(() => UserRoleEntity, (role) => role.permissions, { onDelete: 'SET NULL' })
-    @JoinColumn({name: "user_id"})
+    @JoinColumn({name: "role_id"})
     role: UserRoleEntity;
 
 }

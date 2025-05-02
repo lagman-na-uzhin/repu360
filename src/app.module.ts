@@ -13,6 +13,7 @@ import { EnvConfigService } from '@infrastructure/config/env-config/env-config.s
 import { UsecaseProxyModule } from '@infrastructure/usecase-proxy/usecase-proxy.module';
 import {BackgroundModule} from "@presentation/background/background.module";
 import { DefaultModule } from '@presentation/default/default.module';
+import {ControlModule} from "@presentation/control/control.module";
 
 @Module({
   imports: [
@@ -83,7 +84,8 @@ import { DefaultModule } from '@presentation/default/default.module';
       },
     }),
       BackgroundModule,
-      DefaultModule
+      DefaultModule,
+      ControlModule
   ],
   controllers: [],
   providers: [

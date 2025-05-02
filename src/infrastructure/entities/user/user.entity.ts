@@ -1,4 +1,4 @@
-import {PrimaryGeneratedColumn, Column, ManyToOne, Entity, OneToOne, JoinColumn, PrimaryColumn} from 'typeorm';
+import { Column, ManyToOne, Entity, OneToOne, JoinColumn, PrimaryColumn} from 'typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
 
@@ -26,8 +26,13 @@ export class UserEntity {
   @Column({ nullable: true, type: 'text' })
   public avatar: string | null;
 
-  @Column({ nullable: true })
-  public companyId: string;
+  @Column({ nullable: true, type: "uuid"})
+  public companyId: string | null;
+
+  @Column({
+    unique: true,
+  })
+  public roleId: string;
 
 
   @ManyToOne(() => CompanyEntity, (company) => company.employees )
@@ -35,5 +40,6 @@ export class UserEntity {
   company: CompanyEntity;
 
   @OneToOne(() => UserRoleEntity, {cascade: ['insert', 'soft-remove', 'update'], eager: true })
+  @JoinColumn({name: "role_id"})
   role: UserRoleEntity;
 }

@@ -37,8 +37,4 @@ export class Company {
     get managerId() {
         return this._managerId;
     }
-
-    get subscriptionId() {
-        return this._subscriptionId;
-    }
 }

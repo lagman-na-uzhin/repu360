@@ -7,14 +7,14 @@ import { YandexReviewPlacementDetail } from "@domain/review/model/review/yandex-
 import { ProfileId } from "@domain/review/profile";
 import { Complaint } from "@domain/review/model/review/complaint";
 
-type ReviewPlacementDetail = TwogisReviewPlacementDetail | YandexReviewPlacementDetail;
+export type ReviewPlacementDetail = TwogisReviewPlacementDetail | YandexReviewPlacementDetail;
 
 export class ReviewId extends UniqueID {}
 
 export class Review {
     private constructor(
       private readonly _id: ReviewId,
-      private readonly _organizationPlacementId: PlacementId,
+      private readonly _placementId: PlacementId,
       private readonly _profileId: ProfileId,
       private readonly _platform: Platform,
       private _text: string,
@@ -103,8 +103,8 @@ export class Review {
         return this._id;
     }
 
-    get organizationPlacementId(): PlacementId {
-        return this._organizationPlacementId;
+    get placementId(): PlacementId {
+        return this._placementId;
     }
 
     get profileId(): ProfileId {
@@ -153,5 +153,6 @@ export class Review {
         Review.validatePlacementDetail(this._platform, value);
         this._placementDetail = value;
     }
+
 }
 

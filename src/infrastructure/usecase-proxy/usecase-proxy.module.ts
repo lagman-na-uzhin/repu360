@@ -8,6 +8,11 @@ import { RepositoriesModule } from '@infrastructure/repositories/repositories.mo
 import { BcryptModule } from '@infrastructure/services/hash/bcrypt.module';
 import { JwtServiceModule } from '@infrastructure/services/jwt/jwt.module';
 import { RequestModule } from '@infrastructure/services/request/request.module';
+import {managerProxyExports, managerProxyProviders} from "@infrastructure/usecase-proxy/manager/manager.proxy";
+import {
+  organizationProxyExports,
+  organizationProxyProviders
+} from "@infrastructure/usecase-proxy/organization/organization.proxy";
 
 
 @Module({
@@ -28,11 +33,15 @@ export class UsecaseProxyModule {
         ...reviewProxyProviders,
         ...companyProxyProviders,
         ...employeeProxyProviders,
+          ...managerProxyProviders,
+          ...organizationProxyProviders
       ],
       exports: [
         ...reviewProxyExports,
         ...companyProxyExports,
         ...employeeProxyExports,
+          ...managerProxyExports,
+          ...organizationProxyExports
       ],
     };
   }

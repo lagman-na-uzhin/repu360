@@ -3,8 +3,8 @@ import {PlacementId} from "@domain/placement/placement";
 
 
 export interface IReviewRepository {
-  getByExternalId(externalId: string): Promise<Review | null>;
+  getByTwogisExternalId(externalId: string): Promise<Review | null>;
   getByExternalIds(externalIds: string[]): Promise<Review[]>;
-  getReviewsByOrganizationPlacementId(organizationPlacementId: PlacementId): Promise<Review[]>;
+  getReviewsByOrganizationPlacementId(placementId: PlacementId): Promise<Review[]>;
   saveAll(reviews: Review[]): Promise<void>;
 }

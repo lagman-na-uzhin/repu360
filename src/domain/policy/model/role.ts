@@ -26,9 +26,32 @@ export class Role {
     get id() {
         return this._id
     }
-    get permissions() {
-        return this._permissions;
+
+    get employeePermissions(): EmployeePermissions {
+        if (this.isAdmin() && this.isManager()) {
+            throw new Error("Error: The role must be either Owner or Employee to retrieve permissions.");
+        }
+
+        if (this._permissions instanceof EmployeePermissions) {
+            return this._permissions;
+        }
+
+        throw new Error("Error: Permissions are not of type EmployeePermissions.");
     }
+
+    get managerPermissions(): ManagerPermissions {
+        if (this.isEmployee() && this.isOwner()) {
+            throw new Error("Error: Cannot retrieve manager permissions when both Employee and Owner roles are present.");
+        }
+
+        if (this._permissions instanceof ManagerPermissions) {
+            return this._permissions;
+        }
+
+        throw new Error("Error: Permissions are not of type ManagerPermissions.");
+    }
+
+
     get name() {
         return this._name
     }

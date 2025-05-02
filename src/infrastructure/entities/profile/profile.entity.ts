@@ -17,11 +17,11 @@ export class ProfileEntity {
   @Column({ nullable: true })
   public surname: string;
 
-  @Column({ nullable: true })
-  public avatar: string;
+  @Column({ nullable: true, type: "text" })
+  public avatar: string | null;
 
   @Column({ type: 'enum', enum: Platform })
-  public platform: Platform
+  public placement: Platform
 
   @OneToMany(() => ReviewEntity, (review) => review.profile)
   reviews: ReviewEntity[];

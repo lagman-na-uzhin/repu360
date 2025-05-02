@@ -18,7 +18,7 @@ export class AddTwogisPlacementUseCase {
 
     @LogMethod(AddTwogisPlacementUseCase.name)
     async execute(command: TwogisAddPlacementCommand): Promise<Placement> {
-        const organization = await this.organizationRepo.getById(command.organizationId.toString());
+        const organization = await this.organizationRepo.getById(command.organizationId);
         if (!organization) throw new Error(EXCEPTION.ORGANIZATION.NOT_FOUND);
 
         const placement = Placement.create(

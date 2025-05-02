@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
+import {EntityManager, Repository} from 'typeorm';
+import {InjectEntityManager, InjectRepository} from '@nestjs/typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {Company, CompanyId} from '@domain/company/company';
 import {ICompanyRepository} from '@domain/company/repositories/company-repository.interface';
@@ -11,24 +11,23 @@ import {BaseRepository} from "@infrastructure/repositories/base-repository";
 @Injectable()
 export class CompanyOrmRepository implements ICompanyRepository {
   constructor(
-    @InjectRepository(CompanyEntity)
-    private readonly repo: Repository<CompanyEntity>,
-    private readonly base: BaseRepository<CompanyEntity>
+      @InjectEntityManager() private readonly manager: EntityManager,
+      private readonly base: BaseRepository<CompanyEntity>
   ) {}
 
   async getById(id: CompanyId): Promise<Company | null> {
-    const entity = await this.repo.findOne({where: { id: id.toString() }})
+    const entity = await this.manager.getRepository(CompanyEntity).findOne({where: { id: id.toString() }})
     return entity ? this.toDomain(entity) : null;
   }
 
   async save(company: Company): Promise<void> {
-    await this.repo.save(this.toPersistence(company))
+    await this.manager.getRepository(CompanyEntity).save(this.toPersistence(company))
   }
 
   async getList(params: GetCompanyListParams): Promise<PaginatedResult<Company>> {
     const { filter } = params;
 
-    const qb = this.repo.createQueryBuilder('company');
+    const qb = this.manager.getRepository(CompanyEntity).createQueryBuilder('company');
 
     if (filter?.managerId) {
       qb.andWhere('company.city = :city', { city: filter.managerId });

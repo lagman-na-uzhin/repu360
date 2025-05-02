@@ -1,8 +1,8 @@
-import {Repository, SelectQueryBuilder} from "typeorm";
+import {ObjectLiteral, Repository, SelectQueryBuilder} from "typeorm";
 import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
 import {PaginationParams, SortParams} from "@domain/common/interfaces/repositories/get-list.interface";
 
-export class BaseRepository<Entity> {
+export class BaseRepository<Entity extends ObjectLiteral> {
   constructor(protected readonly repo: Repository<Entity>) {}
 
   async getList<Domain>(

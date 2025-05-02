@@ -25,5 +25,9 @@ export const ERROR_HTTP_STATUS_MAP: Record<string, { code: number; status: strin
   'EMPLOYEE_PHONE_ALREADY_EXIST': {
     status: EXCEPTION.EMPLOYEE.PHONE_ALREADY_EXIST,
     code: HttpStatus.CONFLICT
+  },
+  'PERMISSION_DENIED': {
+    status: EXCEPTION.ROLE.PERMISSION_DENIED,
+    code: HttpStatus.FORBIDDEN
   }
 };

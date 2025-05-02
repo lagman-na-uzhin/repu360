@@ -5,7 +5,7 @@ export class EmployeeEmail {
 
   constructor(email: string) {
     if (!this.isValid(email)) {
-      throw new Error(EXCEPTION.USER.INVALID_EMAIL);
+      throw new Error(EXCEPTION.EMPLOYEE.INVALID_EMAIL);
     }
     this.value = email;
   }

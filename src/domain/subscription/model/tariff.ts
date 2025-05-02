@@ -57,7 +57,7 @@ export class Tariff {
     this._isActive = status;
   }
 
-  set features(newFeatures: PartnerTariffFeatures) {
+  set features(newFeatures: TariffFeatures) {
     this._features = newFeatures;
   }
 
@@ -73,7 +73,7 @@ export class Tariff {
     return this._isActive;
   }
 
-  get features(): PartnerTariffFeatures {
+  get features(): TariffFeatures {
     return this._features;
   }
 }

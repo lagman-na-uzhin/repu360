@@ -6,7 +6,6 @@ export class RoleType {
         "ADMIN",
     ] as const;
 
-    public static readonly Values = RoleType._values;
     public static type = {
         OWNER: "OWNER" as const,
         EMPLOYEE: "EMPLOYEE" as const,

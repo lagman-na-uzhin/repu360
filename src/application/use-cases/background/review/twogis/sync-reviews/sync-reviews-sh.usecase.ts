@@ -1,6 +1,5 @@
 import { MINUTE } from 'time-constants';
 import {ITaskService, QUEUES} from "@application/interfaces/services/task/task-service.interface";
-import {UniqueID} from "@domain/common/unique-id";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {PlacementId} from "@domain/placement/placement";
 
@@ -11,7 +10,7 @@ export class SyncTwogisReviewsScheduleUseCase {
     private readonly taskService: ITaskService,
   ) {}
 
-  private readonly timeMap = new Map<UniqueID, number>();
+  private readonly timeMap = new Map<PlacementId, number>();
 
   async execute() {
     const twogisPlacements =
