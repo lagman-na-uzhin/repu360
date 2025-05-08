@@ -1,10 +1,4 @@
 export const DEFAULT_ROUTES = {
-  AUTH: {
-    BASE: 'auth',
-    EMPLOYEE_LOGIN: 'employee/login', //POST
-    MANAGER_LOGIN: 'manager/login', //POST
-  },
-
   COMPANY: {
     BASE: 'company',
 
@@ -21,7 +15,6 @@ export const DEFAULT_ROUTES = {
   EMPLOYEE: {
     BASE: 'employees',
 
-    ME: 'me', //GET
     CREATE: '', //POST
     LIST: ':companyId', //GET
     BY_ID: ':employeeId', //GET
@@ -45,11 +38,6 @@ export const DEFAULT_ROUTES = {
 } as const;
 
 export const CONTROL_ROUTES = {
-  AUTH: {
-    BASE: 'control/auth',
-    LOGIN: 'login', //POST
-  },
-
   COMPANY: {
     BASE: 'control/companies',
 
@@ -59,4 +47,13 @@ export const CONTROL_ROUTES = {
     UPDATE: ':companyId', //PATCH
     DELETE: ':companyId', //DELETE
   }
+} as const;
+
+export const GENERAl_ROUTES = {
+  AUTH: {
+    BASE: 'auth',
+    EMPLOYEE_LOGIN: 'employee/login', //POST
+    MANAGER_LOGIN: 'manager/login', //POST
+    ME: 'me', //GET
+  },
 } as const;

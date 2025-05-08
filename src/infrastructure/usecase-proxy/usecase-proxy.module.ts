@@ -13,7 +13,7 @@ import {
   organizationProxyExports,
   organizationProxyProviders
 } from "@infrastructure/usecase-proxy/organization/organization.proxy";
-
+import {authProxyExports, authProxyProviders} from "@infrastructure/usecase-proxy/auth/auth.proxy";
 
 @Module({
   imports: [
@@ -34,14 +34,16 @@ export class UsecaseProxyModule {
         ...companyProxyProviders,
         ...employeeProxyProviders,
           ...managerProxyProviders,
-          ...organizationProxyProviders
+          ...organizationProxyProviders,
+              ...authProxyProviders
       ],
       exports: [
         ...reviewProxyExports,
         ...companyProxyExports,
         ...employeeProxyExports,
           ...managerProxyExports,
-          ...organizationProxyExports
+          ...organizationProxyExports,
+          ...authProxyExports
       ],
     };
   }

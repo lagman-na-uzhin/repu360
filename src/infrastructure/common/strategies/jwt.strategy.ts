@@ -43,7 +43,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     if (!rawUserData) return false;
 
-    console.log(this.getActor(rawUserData), "this.getActor(rawUserData)")
     return this.getActor(rawUserData)
   }
 

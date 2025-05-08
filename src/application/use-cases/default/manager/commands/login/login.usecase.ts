@@ -5,8 +5,8 @@ import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";
 import {Manager} from "@domain/manager/manager";
-import {ManagerLoginCommand} from "@application/use-cases/default/manager/login/login.input";
-import {ManagerLoginOutput} from "@application/use-cases/default/manager/login/login.output";
+import {ManagerLoginCommand} from "@application/use-cases/default/manager/commands/login/login.command";
+import {ManagerLoginOutput} from "@application/use-cases/default/manager/commands/login/login.output";
 
 export class ManagerLoginUseCase {
     constructor(
@@ -29,19 +29,10 @@ export class ManagerLoginUseCase {
 
         await this.cacheRepo.setManagerAuth(manager, role);
 
-        return new ManagerLoginOutput(manager, this.getToken(manager), this.getTokenExpirationTime())
+        return new ManagerLoginOutput(
+            manager,
+            this.jwtService.generateUserToken(manager.id.toString()),
+            this.jwtService.getJwtExpirationTime()
+        )
     }
-
-    private getToken(manager: Manager) {
-        const secret = this.jwtService.getJwtSecret();
-        const expiresIn = `${this.jwtService.getJwtRefreshExpirationTime()}s`;
-
-        const payload: IJwtServicePayload = {authId: manager.id.toString()};
-        return this.jwtService.createToken(payload, secret, expiresIn);
-    }
-
-    private getTokenExpirationTime() {
-        return this.jwtService.getJwtExpirationTime()
-    }
-
 }

@@ -4,6 +4,6 @@ import {GetCompanyListParams} from "@domain/company/repositories/types/get-compa
 
 export interface ICompanyRepository {
     getById(id: CompanyId): Promise<Company | null>;
-    save(partner: Company): Promise<void>;
+    save(company: Company): Promise<void>;
     getList(params: GetCompanyListParams): Promise<PaginatedResult<Company>>;
 }

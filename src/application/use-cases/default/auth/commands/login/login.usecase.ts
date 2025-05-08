@@ -1,13 +1,12 @@
 import {IHashService} from "@application/interfaces/services/hash/hash-service.interface";
-import {EmployeeLoginCommand} from "@application/use-cases/default/employee/login/login.input";
+import {EmployeeLoginCommand} from "@application/use-cases/default/auth/commands/login/login.command";
 import {IJwtService, IJwtServicePayload} from "@application/interfaces/services/jwt/jwt-service.interface";
 import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
-import {LoginOutput} from "@application/use-cases/default/employee/login/login.output";
+import {LoginOutput} from "@application/use-cases/default/auth/commands/login/login.output";
 import {Employee} from "@domain/employee/employee";
 import {IEmployeeRepository} from "@domain/employee/repositories/employee-repository.interface";
 import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
-import {UniqueID} from "@domain/common/unique-id";
 
 export class EmployeeLoginUseCase {
     constructor(
@@ -30,19 +29,10 @@ export class EmployeeLoginUseCase {
 
         await this.cacheRepo.setEmployeeAuth(employee, role);
 
-        return new LoginOutput(employee, this.getToken(employee), this.getTokenExpirationTime())
+        return new LoginOutput(
+            employee,
+            this.jwtService.generateUserToken(employee.id.toString()),
+            this.jwtService.getJwtExpirationTime()
+        )
     }
-
-    private getToken(employee: Employee) {
-        const secret = this.jwtService.getJwtSecret();
-        const expiresIn = `${this.jwtService.getJwtRefreshExpirationTime()}s`;
-
-        const payload: IJwtServicePayload = {authId: employee.id.toString()};
-        return this.jwtService.createToken(payload, secret, expiresIn);
-    }
-
-    private getTokenExpirationTime() {
-        return this.jwtService.getJwtExpirationTime()
-    }
-
 }

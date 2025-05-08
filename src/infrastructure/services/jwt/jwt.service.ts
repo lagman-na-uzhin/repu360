@@ -25,6 +25,14 @@ export class JwtTokenService implements IJwtService {
     });
   }
 
+  generateUserToken(userId: string) {
+      const secret = this.getJwtSecret();
+      const expiresIn = `${this.getJwtRefreshExpirationTime()}s`;
+
+      const payload: IJwtServicePayload = {authId: userId};
+      return this.createToken(payload, secret, expiresIn);
+  }
+
   getJwtSecret(): string {
     return this.envConfigService.getJwtSecret();
   }

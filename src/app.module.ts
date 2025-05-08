@@ -14,6 +14,7 @@ import { UsecaseProxyModule } from '@infrastructure/usecase-proxy/usecase-proxy.
 import {BackgroundModule} from "@presentation/background/background.module";
 import { DefaultModule } from '@presentation/default/default.module';
 import {ControlModule} from "@presentation/control/control.module";
+import {GeneralModule} from "@presentation/general/general.module";
 
 @Module({
   imports: [
@@ -85,7 +86,8 @@ import {ControlModule} from "@presentation/control/control.module";
     }),
       BackgroundModule,
       DefaultModule,
-      ControlModule
+      ControlModule,
+      GeneralModule
   ],
   controllers: [],
   providers: [

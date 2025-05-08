@@ -1,12 +1,12 @@
 import {Actor} from "@domain/policy/actor";
 import {BaseQuery} from "@application/common/base-query";
 
-export class EmployeeMeQuery extends BaseQuery {
+export class UserMeQuery extends BaseQuery {
     private constructor(
         actor: Actor
     ) {super(actor);}
 
     static of(actor: Actor) {
-        return new EmployeeMeQuery(actor);
+        return new UserMeQuery(actor);
     }
 }

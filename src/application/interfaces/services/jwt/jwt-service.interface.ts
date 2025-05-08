@@ -10,6 +10,7 @@ export interface IJwtService {
       secret: string,
       expiresIn: string,
   ): string;
+  generateUserToken(userId: string)
 
   //CONFIG
   getJwtSecret(): string
