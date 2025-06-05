@@ -1,10 +1,9 @@
 import {IHashService} from "@application/interfaces/services/hash/hash-service.interface";
-import {IJwtService, IJwtServicePayload} from "@application/interfaces/services/jwt/jwt-service.interface";
+import {IJwtService} from "@application/interfaces/services/jwt/jwt-service.interface";
 import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";
-import {Manager} from "@domain/manager/manager";
 import {ManagerLoginCommand} from "@application/use-cases/default/manager/commands/login/login.command";
 import {ManagerLoginOutput} from "@application/use-cases/default/manager/commands/login/login.output";
 
@@ -21,16 +20,17 @@ export class ManagerLoginUseCase {
         const manager = await this.managerRepo.getByEmail(cmd.email);
         if (!manager) throw new Error(EXCEPTION.MANAGER.INCORRECT_EMAIL_OR_PASSWORD);
 
-        const role = await this.roleRepo.getById(manager.roleId);
-        if (!role) throw new Error(EXCEPTION.ROLE.NOT_FOUND);
-
         const passwordIsValid = await this.hashService.compare(cmd.password.toString(), manager.password.toString());
         if (!passwordIsValid) throw new Error(EXCEPTION.MANAGER.INCORRECT_EMAIL_OR_PASSWORD);
 
+        const role = await this.roleRepo.getById(manager.roleId);
+        if (!role) throw new Error(EXCEPTION.ROLE.NOT_FOUND);
+
         await this.cacheRepo.setManagerAuth(manager, role);
 
-        return new ManagerLoginOutput(
+        return ManagerLoginOutput.of(
             manager,
+            role,
             this.jwtService.generateUserToken(manager.id.toString()),
             this.jwtService.getJwtExpirationTime()
         )

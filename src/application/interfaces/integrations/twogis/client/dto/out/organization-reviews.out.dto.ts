@@ -18,6 +18,14 @@ export interface ITwogisReviewPhoto {
     date_created: string;
     preview_urls: ITwogisPreviewUrls[];
 }
+
+export interface ITwogisReviewOfficialAnswer {
+    id: string;
+    text: string;
+    org_name: string;
+    date_created: string;
+    logo_preview_urls: Object;
+}
 interface ITwogisReviewUser {
     id: string;
     name: string;
@@ -39,6 +47,7 @@ export interface ITwogisReview {
     // official_answer: any;
     is_rated: boolean;
     is_verified: boolean;
+    official_answer: ITwogisReviewOfficialAnswer;
 
 }
 export interface IOrganizationReviewsOutDto {

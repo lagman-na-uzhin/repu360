@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UsecaseProxyModule } from '@infrastructure/usecase-proxy/usecase-proxy.module';
+import { UsecaseProxyModule } from '@infrastructure/providers/usecase-proxy.module';
 import { EmployeeController } from '@presentation/default/employee/employee.controller';
 import {OrganizationController} from "@presentation/default/organization/organization.controller";
 

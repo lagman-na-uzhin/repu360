@@ -5,13 +5,14 @@ import {ManagerLoginCommand} from "@application/use-cases/default/manager/comman
 import {ManagerLoginUseCase} from "@application/use-cases/default/manager/commands/login/login.usecase";
 import {EmployeeLoginCommand} from "@application/use-cases/default/auth/commands/login/login.command";
 import {EmployeeLoginUseCase} from "@application/use-cases/default/auth/commands/login/login.usecase";
-import {UseCaseProxy} from '@infrastructure/usecase-proxy/usecase-proxy';
 import {GENERAl_ROUTES} from "@presentation/routes";
 import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
 import {UserMeQuery} from "@application/use-cases/default/auth/queries/me/me.query";
 import {MeUseCase} from "@application/use-cases/default/auth/queries/me/me.usecase";
-import {AuthProxy} from "@infrastructure/usecase-proxy/auth/auth.proxy";
+import {AuthProxy} from "@infrastructure/providers/auth/auth.proxy";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
+import {Actor} from "@domain/policy/actor";
+import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 
 @Controller(GENERAl_ROUTES.AUTH.BASE)
 export class AuthController {
@@ -53,8 +54,7 @@ export class AuthController {
         @Body() dto: ManagerLoginDto,
         @Req() request: FastifyRequest,
         @Res() reply: FastifyReply
-    ) {
-        console.log("manager login")
+    ) {        console.log("manager login")
         const cmd = ManagerLoginCommand.of(dto)
         const { manager, token, expireTime } = await this.managerLoginUseCaseProxy
             .getInstance()

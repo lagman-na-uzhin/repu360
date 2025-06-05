@@ -1,16 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import {EntityManager, Repository} from 'typeorm';
+import {EntityManager, Equal, Repository} from 'typeorm';
 import {InjectEntityManager, InjectRepository} from '@nestjs/typeorm';
 import { OrganizationEntity } from '@infrastructure/entities/organization/organization.entity';
 import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
 import { Organization, OrganizationId } from '@domain/organization/organization';
-import { TwogisPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
-import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
-import {Placement} from "@domain/placement/placement";
-import { Platform } from '@domain/placement/types/platfoms.enum';
-import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
-import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-detail';
 import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
@@ -23,7 +17,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
   ) {}
 
   async getById(id: OrganizationId): Promise<Organization | null> {
-    const entity = await this.manager.getRepository(OrganizationEntity).findOne({where: { id: id.toString() }});
+    const entity = await this.manager.getRepository(OrganizationEntity).findOneBy({id: Equal(id.toString())});
     return entity ? this.toDomain(entity) : null;
   }
 
@@ -53,7 +47,6 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
 
     return this.base.getList<Organization>(qb, this.toDomain, params.pagination,  params.sort);
   }
-
 
   private toDomain(entity: OrganizationEntity): Organization {
     return Organization.fromPersistence(

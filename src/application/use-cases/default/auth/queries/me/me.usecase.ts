@@ -23,7 +23,7 @@ export class MeUseCase {
             throw new Error(EXCEPTION.COMMON.UNAUTHORIZED);
         }
 
-        const res = UserMeOutput.of(
+        return UserMeOutput.of(
             user.id,
             user.name,
             query.actor.role,
@@ -31,7 +31,5 @@ export class MeUseCase {
             user.phone,
             user.email
         );
-        console.log(res, "res")
-        return res;
     }
 }

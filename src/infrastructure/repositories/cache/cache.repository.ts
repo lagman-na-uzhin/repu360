@@ -9,6 +9,7 @@ import {Manager} from "@domain/manager/manager";
 import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/types/employee-auth-data.type";
 import {Role} from "@domain/policy/model/role";
 import {ManagerAuthDataType} from "@application/interfaces/repositories/cache/types/manager-auth-data.type";
+import {PlacementId} from "@domain/placement/placement";
 
 
 @Injectable()
@@ -75,5 +76,29 @@ export class CacheRepository implements ICacheRepository {
   async isExist(key: string): Promise<boolean> {
     const exist = await this.client.get(key);
     return !!exist;
+  }
+
+  deleteTwogisCabinetAuth(placementId: PlacementId): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  getTwogisCabinetAuth(placementId: PlacementId): Promise<{ accessToken: string }> {
+    return Promise.resolve({accessToken: ""});
+  }
+
+  hasTwogisReplyCooldown(placementId: PlacementId): Promise<boolean> {
+    return Promise.resolve(false);
+  }
+
+  setTwogisCabinetAuth(placementId: PlacementId): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  setTwogisReplyCooldown(placementId: PlacementId): Promise<void> {
+    return Promise.resolve(undefined);
+  }
+
+  setProxyCooldown(proxyId: string): Promise<void> {
+    return Promise.resolve(undefined);
   }
 }

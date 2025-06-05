@@ -152,7 +152,7 @@ class RequestConfigLocalDto implements IRequestConfigLocalDto{
   public responseType?: RESPONSE_TYPE;
 }
 
-export class RequestDto implements IRequestDto{
+export class RequestDto implements IRequestDto {
   @Expose()
   @IsObject()
   @ValidateNested()

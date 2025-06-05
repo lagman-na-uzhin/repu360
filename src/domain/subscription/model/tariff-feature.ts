@@ -2,8 +2,6 @@ export class TariffFeatures {
     private constructor(
       private _companyDataSync: boolean,
 
-      private _reviewSync: boolean,
-
       private _multiAccess: boolean,
 
       private _registerPlacement: boolean,

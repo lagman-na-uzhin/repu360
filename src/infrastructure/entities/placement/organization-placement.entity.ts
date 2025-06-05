@@ -10,6 +10,7 @@ import {ReviewEntity} from "@infrastructure/entities/review/review.entity";
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
 import { TwogisPlacementDetailEntity, } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
 import {Platform} from "@domain/placement/types/platfoms.enum";
+import {AutoReplyEntity} from "@infrastructure/entities/autoreply/autoreply.entity";
 
 @Entity('organization_placement')
 export class OrganizationPlacementEntity {
@@ -44,5 +45,8 @@ export class OrganizationPlacementEntity {
 
     @OneToOne(() => TwogisPlacementDetailEntity, { cascade: ['update', 'insert', 'soft-remove'], nullable: true, eager: true })
     twogisDetail?: TwogisPlacementDetailEntity;
+
+    @OneToOne(() => AutoReplyEntity, autoReply => autoReply.placement)
+    autoReply: AutoReplyEntity;
 
 }

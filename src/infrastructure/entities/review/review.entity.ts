@@ -1,7 +1,7 @@
 import {
-    Column,
+    Column, CreateDateColumn, DeleteDateColumn,
     Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
 import { ProfileEntity } from 'src/infrastructure/entities/profile/profile.entity';
@@ -10,6 +10,7 @@ import { YandexReviewPlacementDetailEntity } from '@infrastructure/entities/revi
 import {Platform} from "@domain/placement/types/platfoms.enum";
 import { ReviewMediaEntity } from '@infrastructure/entities/review/review-media.entity';
 import {ReviewComplaintEntity} from "@infrastructure/entities/review/complaint/review-complaint.entity";
+import {ReviewReplyEntity} from "@infrastructure/entities/review/review-reply.entity";
 
 
 @Entity('review')
@@ -18,19 +19,19 @@ export class ReviewEntity {
     public id: string;
 
     @Column({ type: 'text' })
-    text: string;
+    public text: string;
 
     @Column()
-    rating: number;
+    public rating: number;
 
     @Column()
-    profileId: string;
+    public profileId: string;
 
     @Column()
-    placementId: string;
+    public placementId: string;
 
     @Column({ type: 'enum', enum: Platform })
-    platform: Platform;
+    public platform: Platform;
 
     @ManyToOne(() => ProfileEntity, (profile) => profile.reviews)
     @JoinColumn({ name: 'profile_id' })
@@ -66,6 +67,24 @@ export class ReviewEntity {
             nullable: true
         })
     media: ReviewMediaEntity[];
+
+    @OneToMany(
+        () => ReviewReplyEntity, reply => reply.review,
+        {
+            cascade: ['insert', 'update', 'soft-remove'],
+            eager: true,
+            nullable: true
+        })
+    replies: ReviewReplyEntity[];
+
+    @CreateDateColumn({ type: "timestamptz" })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ type: "timestamptz", nullable: true })
+    public updatedAt: Date | null;
+
+    @DeleteDateColumn({ type: "timestamptz", nullable: true })
+    public deletedAt: Date | null;
 
     // @OneToMany(() => ReviewComplaintEntity, complaint => complaint.review, { cascade: ['insert', 'update', 'soft-remove'], eager: true} )
     // complaints: ReviewComplaintEntity[]; //TODO перенести возможно в placement detail

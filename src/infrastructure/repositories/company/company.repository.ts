@@ -7,6 +7,7 @@ import {ICompanyRepository} from '@domain/company/repositories/company-repositor
 import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
 import {GetCompanyListParams} from "@domain/company/repositories/types/get-company-list.params";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
+import {PlacementId} from "@domain/placement/placement";
 
 @Injectable()
 export class CompanyOrmRepository implements ICompanyRepository {
@@ -34,6 +35,18 @@ export class CompanyOrmRepository implements ICompanyRepository {
     }
 
     return this.base.getList<Company>(qb, this.toDomain, params.pagination,  params.sort);
+  }
+
+  async getCompanyByPlacementId(placementId: PlacementId): Promise<Company | null> {
+    const entity = await this.manager
+        .getRepository(CompanyEntity)
+        .createQueryBuilder('company')
+        .leftJoin('company.organizations', 'organizations')
+        .leftJoin('organizations.placements', 'placements')
+        .where('placements.id = :id', {id: placementId.toString()})
+        .getOne();
+
+    return entity ? this.toDomain(entity) : null;
   }
 
 

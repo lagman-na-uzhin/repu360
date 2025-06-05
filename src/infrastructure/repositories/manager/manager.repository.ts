@@ -11,11 +11,14 @@ import {RoleId} from "@domain/policy/model/role";
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";
 import {Manager, ManagerId} from "@domain/manager/manager";
 import {ManagerEmail} from "@domain/manager/value-object/manager-email.vo";
+import {BaseRepository} from "@infrastructure/repositories/base-repository";
+import {CompanyEntity} from "@infrastructure/entities/company/company.entity";
 
 @Injectable()
 export class ManagerOrmRepository implements IManagerRepository {
   constructor(
       @InjectEntityManager() private readonly manager: EntityManager,
+      private readonly base: BaseRepository<CompanyEntity>
   ) {}
 
   async getByEmail(email: ManagerEmail): Promise<Manager | null> {

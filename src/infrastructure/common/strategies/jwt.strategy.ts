@@ -48,7 +48,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   private getActor(raw: string) {
     const persistence: ManagerAuthDataType | EmployeeAuthDataType = JSON.parse(raw);
-    let permissions;
+    let permissions
     const roleType = new RoleType(persistence.role.type)
     if (
         roleType.equals(RoleType.type.MANAGER)

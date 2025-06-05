@@ -10,7 +10,7 @@ import { ResponseInterceptor } from '@infrastructure/common/interceptors/respons
 import { JwtStrategy } from '@infrastructure/common/strategies/jwt.strategy';
 import { EnvConfigModule } from '@infrastructure/config/env-config/env-config.module';
 import { EnvConfigService } from '@infrastructure/config/env-config/env-config.service';
-import { UsecaseProxyModule } from '@infrastructure/usecase-proxy/usecase-proxy.module';
+import { UsecaseProxyModule } from '@infrastructure/providers/usecase-proxy.module';
 import {BackgroundModule} from "@presentation/background/background.module";
 import { DefaultModule } from '@presentation/default/default.module';
 import {ControlModule} from "@presentation/control/control.module";
@@ -51,7 +51,7 @@ import {GeneralModule} from "@presentation/general/general.module";
                     bot
                         .sendMessage(
                             chatId,
-                            `Default Redis error (leaders backend), env:${process.env.NODE_ENV}, hostname: ${os.hostname()}`,
+                            `Default Redis error (repu backend), env:${process.env.NODE_ENV}, hostname: ${os.hostname()}`,
                         )
                         .catch(console.error);
                   }
@@ -73,7 +73,7 @@ import {GeneralModule} from "@presentation/general/general.module";
                     bot
                         .sendMessage(
                             chatId,
-                            `Bull Redis error (leaders backend), env:${process.env.NODE_ENV}, hostname: ${os.hostname()}`,
+                            `Bull Redis error (repu backend), env:${process.env.NODE_ENV}, hostname: ${os.hostname()}`,
                         )
                         .catch(console.error);
                   }

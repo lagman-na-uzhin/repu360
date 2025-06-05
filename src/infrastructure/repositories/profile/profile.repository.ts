@@ -14,6 +14,11 @@ export class ProfileOrmRepository implements IProfileRepository {
         @InjectEntityManager() private readonly manager: EntityManager,
     ) {}
 
+    async getById(id: ProfileId): Promise<Profile | null> {
+        const entity = await this.manager.getRepository(ProfileEntity).findOne({where: {id: id.toString()}});
+        return entity ? this.toDomain(entity) : null;
+    }
+
     async saveAll(profiles: Profile[]): Promise<void> {
         const profileEntities = profiles.map(profile => this.fromDomain(profile));
         await this.manager.save(ProfileEntity, profileEntities);
@@ -31,13 +36,13 @@ export class ProfileOrmRepository implements IProfileRepository {
             .createQueryBuilder(ProfileEntity, 'profile')
             .leftJoinAndSelect('profile.twogisDetails', 'twogis')
             .leftJoinAndSelect('profile.yandexDetails', 'yandex')
-            .where('twogis.profileId = :externalId OR yandex.profileId = :externalId', { externalId })
+            .where('proxy-session.profileId = :externalId OR yandex.profileId = :externalId', { externalId })
             .getOne();
 
-        return entity ? this.toModel(entity) : null;
+        return entity ? this.toDomain(entity) : null;
     }
 
-    private async toModel(entity: ProfileEntity): Promise<Profile> {
+    private async toDomain(entity: ProfileEntity): Promise<Profile> {
         const detail = await this.toDetail(entity);
         return Profile.fromPersistence(
             entity.id,

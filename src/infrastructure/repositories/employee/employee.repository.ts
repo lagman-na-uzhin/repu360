@@ -8,6 +8,8 @@ import {EmployeePhone} from "@domain/employee/value-object/employee-phone.vo";
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {CompanyId} from "@domain/company/company";
 import {RoleId} from "@domain/policy/model/role";
+import {BaseRepository} from "@infrastructure/repositories/base-repository";
+import {CompanyEntity} from "@infrastructure/entities/company/company.entity";
 
 @Injectable()
 export class EmployeeOrmRepository implements IEmployeeRepository {

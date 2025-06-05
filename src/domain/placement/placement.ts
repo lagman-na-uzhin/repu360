@@ -4,19 +4,19 @@ import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-
 import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
 import { Platform } from '@domain/placement/types/platfoms.enum';
 import { PlacementDetail } from "@domain/placement/types/placement-detail.types";
+import {AutoReplyId} from "@domain/autoreply/autoreply";
 
 export class PlacementId extends UniqueID {}
 
 export class Placement {
     private constructor(
       private readonly _id: PlacementId,
-      private _organizationId: OrganizationId,
+      private readonly _organizationId: OrganizationId,
       private _platform: Platform,
       private _placementDetail: PlacementDetail,
-
-      private readonly _createdAt: Date = new Date(),
-      private _updatedAt: Date | null = null,
-      private _deletedAt: Date | null = null
+      // private readonly _createdAt: Date = new Date(),
+      // private _updatedAt: Date | null = null,
+      // private _deletedAt: Date | null = null
     ) {}
 
     static create(
@@ -55,10 +55,6 @@ export class Placement {
 
     get organizationId(): OrganizationId {
         return this._organizationId;
-    }
-
-    set organizationId(value: OrganizationId) {
-        this._organizationId = value;
     }
 
     get platform(): Platform {

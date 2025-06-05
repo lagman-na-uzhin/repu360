@@ -29,5 +29,9 @@ export const ERROR_HTTP_STATUS_MAP: Record<string, { code: number; status: strin
   'PERMISSION_DENIED': {
     status: EXCEPTION.ROLE.PERMISSION_DENIED,
     code: HttpStatus.FORBIDDEN
+  },
+  'MANAGER_INCORRECT_EMAIL_OR_PASSWORD': {
+    status: EXCEPTION.ROLE.PERMISSION_DENIED,
+    code: HttpStatus.UNAUTHORIZED
   }
 };

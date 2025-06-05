@@ -25,7 +25,6 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   }
 
   return(data: any) {
-    if (data?.id) return this.entity(data);
     if (data?.statusCode || data?.message) return this.custom(data);
     if (data?.list) return this.list(data);
     if (data?.generatedMaps?.length >= 0) return this.update(data);

@@ -15,6 +15,13 @@ export class TwogisPlacementDetailEntity {
     @Column()
     placementId: string
 
+    @Column({ nullable: true })
+    cabinetLogin: string;
+
+    @Column({ nullable: true })
+    cabinetPassword: string;
+
+
     @OneToOne(() => OrganizationPlacementEntity)
     @JoinColumn({ name: 'placement_id'})
     platform: OrganizationPlacementEntity;

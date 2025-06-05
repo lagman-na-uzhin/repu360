@@ -3,7 +3,6 @@ import {DEFAULT_ROUTES} from "@presentation/routes";
 import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
 import {RequestQuery} from "@infrastructure/common/decorators/request-query.decorator";
 import {GetListByCompanyDto} from "@presentation/default/organization/dto/get-list-by-company.dto";
-import {UseCaseProxy} from "@infrastructure/usecase-proxy/usecase-proxy";
 import {
     GetOrganizationListUseCase
 } from "@application/use-cases/default/organization/queries/get-list-by-company/get-list-by-company.usecase";
@@ -12,7 +11,8 @@ import {
 } from "@application/use-cases/default/organization/queries/get-list-by-company/get-list-by-company.query";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
 import {Actor} from "@domain/policy/actor";
-import {OrganizationProxy} from "@infrastructure/usecase-proxy/organization/organization.proxy";
+import {OrganizationProxy} from "@infrastructure/providers/organization/organization.proxy";
+import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 
 @UseGuards(JwtAuthGuard)
 @Controller(DEFAULT_ROUTES.ORGANIZATION.BASE)

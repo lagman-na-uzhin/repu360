@@ -1,6 +1,6 @@
 
 export interface IProxy {
-    id: number;
+    id: string;
     ip: string;
     port: number;
     login: string;
@@ -8,5 +8,6 @@ export interface IProxy {
     type: any; //TODO
 }
 export interface IProxyRepository {
-    getById(id: number): Promise<IProxy | null>
+    getById(id: number): Promise<IProxy | null>;
+    getActiveList(type: "reply" | "sync"): Promise<IProxy[]>
 }

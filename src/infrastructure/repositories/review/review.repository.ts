@@ -10,6 +10,9 @@ import {PlacementId} from "@domain/placement/placement";
 import {TwogisReviewPlacementDetail} from "@domain/review/model/review/twogis-review-placement-detail";
 import {YandexReviewPlacementDetail} from "@domain/review/model/review/yandex-review-placement-detail";
 import {InjectEntityManager} from "@nestjs/typeorm";
+import {Reply} from "@domain/review/model/review/reply/reply";
+import {AutoReplyEntity} from "@infrastructure/entities/autoreply/autoreply.entity";
+import {ReviewReplyEntity} from "@infrastructure/entities/review/review-reply.entity";
 
 @Injectable()
 export class ReviewOrmRepository implements IReviewRepository {
@@ -82,28 +85,58 @@ export class ReviewOrmRepository implements IReviewRepository {
 
 
   async getByExternalIds(externalIds: string[]): Promise<Review[]> {
-    return Promise.resolve([]);
+    const entities = await this.manager.getRepository(ReviewEntity).findByIds(externalIds);
+    return Promise.all(entities.map(this.toDomain));
+  }
+
+  async delete(id: ReviewId): Promise<void> {
+    await this.manager.getRepository(ReviewEntity).softDelete(id.toString())
+  }
+
+  async getById(id: ReviewId): Promise<Review | null> {
+    const entity = await this.manager.getRepository(ReviewEntity).findOne({where: {id: id.toString()}})
+    return entity ? this.toDomain(entity) : null;
+  }
+
+  async getTwogisReviewForReply(placementId: PlacementId): Promise<Review | null> {
+    const entity = await this.manager
+        .getRepository(ReviewEntity)
+        .createQueryBuilder("review")
+        .leftJoin('review.placement', 'placement')
+        .leftJoin('placement.autoReply', 'autoReply')
+        .where('autoReply IS NOT NULL')
+        .andWhere('autoReply.isEnabled = true')
+        .orderBy('review.createdAt', "DESC")
+        .getOne()
+
+    return entity ? this.toDomain(entity) : null;
   }
 
   private async toDomain(entity: ReviewEntity): Promise<Review> {
-    const placementDetail = this.toDomainPlacementDetail(entity)
-    return Review.fromPersistence(
-        entity.id,
-        entity.placementId,
-        entity.profileId,
-        entity.platform,
-        entity.text,
-        entity.rating,
-        [],
-        placementDetail
-    );
-  }
+      const placementDetail = this.toDomainPlacementDetail(entity);
+      const replies = entity.replies.map(this.toDomainReply);
+      return Review.fromPersistence(
+          entity.id,
+          entity.placementId,
+          entity.profileId,
+          entity.platform,
+          entity.text,
+          entity.rating,
+          [],
+          placementDetail,
+          replies
+      );
+    }
+
+    private toDomainReply(entity: ReviewReplyEntity): Reply {
+      return Reply.fromPersistence(entity.id, entity.externalId, entity.text, entity.isOfficial, entity.profileId, entity.type);
+    }
 
   private toDomainPlacementDetail(entity: ReviewEntity): ReviewPlacementDetail {
-    if (entity.twogisDetail) {
-      return TwogisReviewPlacementDetail.fromPersistence(entity.twogisDetail.externalId);
-    } else {
-      return YandexReviewPlacementDetail.fromPersistence(entity.yandexDetail!.externalId);
+      if (entity.twogisDetail) {
+        return TwogisReviewPlacementDetail.fromPersistence(entity.twogisDetail.externalId);
+      } else {
+        return YandexReviewPlacementDetail.fromPersistence(entity.yandexDetail!.externalId);
+      }
     }
-  }
 }

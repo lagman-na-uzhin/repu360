@@ -1,4 +1,4 @@
-import {Role} from "@domain/policy/model/role";
+import type {Role} from "@domain/policy/model/role";
 import {UniqueID} from "@domain/common/unique-id";
 
 class ActorId extends UniqueID {}

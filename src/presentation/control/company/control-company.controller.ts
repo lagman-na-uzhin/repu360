@@ -1,6 +1,5 @@
 import {Controller, Get, HttpStatus, Inject, Patch, Post, UseGuards} from '@nestjs/common';
-import { UseCaseProxy } from '@infrastructure/usecase-proxy/usecase-proxy';
-import { CompanyProxy } from '@infrastructure/usecase-proxy/company/company.proxy';
+import { CompanyProxy } from '@infrastructure/providers/company/company.proxy';
 import {CreateCompanyUseCase} from "@application/use-cases/control/company/commands/create/create-company.usecase";
 import {CONTROL_ROUTES} from "@presentation/routes";
 import {CreateCompanyDto} from "@presentation/control/company/dto/create-company.dto";
@@ -13,6 +12,7 @@ import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
 import {Actor} from "@domain/policy/actor";
 import {RequestBody} from "@infrastructure/common/decorators/request-body.decorator";
+import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 
 @Controller(CONTROL_ROUTES.COMPANY.BASE)
 @UseGuards(JwtAuthGuard)

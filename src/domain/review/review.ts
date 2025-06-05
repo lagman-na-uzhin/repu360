@@ -5,7 +5,9 @@ import { PlacementId } from "@domain/placement/placement";
 import { TwogisReviewPlacementDetail } from "@domain/review/model/review/twogis-review-placement-detail";
 import { YandexReviewPlacementDetail } from "@domain/review/model/review/yandex-review-placement-detail";
 import { ProfileId } from "@domain/review/profile";
-import { Complaint } from "@domain/review/model/review/complaint";
+import { Complaint } from "@domain/review/model/review/complaint/complaint";
+import {Reply} from "@domain/review/model/review/reply/reply";
+import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 
 export type ReviewPlacementDetail = TwogisReviewPlacementDetail | YandexReviewPlacementDetail;
 
@@ -21,11 +23,8 @@ export class Review {
       private _rating: number,
       private _media: ReviewMedia[],
       private _placementDetail: ReviewPlacementDetail,
+      private _replies: Reply[],
       // private _complaints: Complaint[]
-
-      private readonly _createdAt: Date = new Date(),
-      private _updatedAt: Date | null = null,
-      private _deletedAt: Date | null = null
     ) {}
 
     static create(
@@ -36,11 +35,12 @@ export class Review {
         rating: number,
         media: ReviewMedia[],
         placementDetail: ReviewPlacementDetail,
+        replies: Reply[]
       // complaints: Complaint[]
     ): Review {
         Review.validatePlacementDetail(platform, placementDetail);
 
-        return new Review(new ReviewId(), placementId, profileId, platform, text, rating, media, placementDetail,);
+        return new Review(new ReviewId(), placementId, profileId, platform, text, rating, media, placementDetail, replies);
     }
 
     static fromPersistence(
@@ -52,6 +52,7 @@ export class Review {
       rating: number,
       media: ReviewMedia[],
       placementDetail: ReviewPlacementDetail,
+      replies: Reply[]
       // complaints: Complaint[]
     ): Review {
         return new Review(
@@ -63,6 +64,7 @@ export class Review {
           rating,
           media,
           placementDetail,
+          replies
           // complaints
         );
     }
@@ -88,6 +90,10 @@ export class Review {
             return this._placementDetail;
         }
         throw new Error('Invalid detail access: Expected YANDEX placement detail');
+    }
+
+    hasOfficialReply() {
+        return this._replies.find(reply => reply.isOfficial)
     }
 
     private static validatePlacementDetail(platform: Platform, detail: ReviewPlacementDetail): void {
@@ -153,6 +159,13 @@ export class Review {
         Review.validatePlacementDetail(this._platform, value);
         this._placementDetail = value;
     }
+
+    setOfficialReply(replyExternalId: string, text: string, type: ReplyType) {
+        this._replies.push(
+            Reply.create(replyExternalId, text, type, true, null)
+        )
+    }
+
 
 }
 
