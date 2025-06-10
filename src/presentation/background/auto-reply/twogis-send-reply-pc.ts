@@ -7,12 +7,12 @@ import {
 } from '@nestjs/bull';
 import { Inject, Injectable } from '@nestjs/common';
 import { Job } from 'bull';
-import { QUEUES } from 'src/infrastructure/services/bull/bull.const';
 import {ReviewProxy} from "@application/use-case-proxies/review/review.proxy";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 import {
     TwogisSendReplyProcessUseCase
 } from "@application/use-cases/background/review/twogis/reply/send-reply-pc.usecase";
+import {QUEUES} from "@application/interfaces/services/task/task-service.interface";
 
 @Injectable()
 @Processor(QUEUES.SEND_REPLY_QUEUE)
@@ -24,6 +24,7 @@ export class TwogisSendReplyPc {
 
     @Process({ concurrency: 1 })
     private async process(job: Job) {
+        console.log("process")
         return this.twogisSendReplyUseCaseProxy.getInstance().execute(job.data);
     }
 

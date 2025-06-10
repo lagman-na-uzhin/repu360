@@ -15,6 +15,9 @@ import {BackgroundModule} from "@presentation/background/background.module";
 import { DefaultModule } from '@presentation/default/default.module';
 import {ControlModule} from "@presentation/control/control.module";
 import {GeneralModule} from "@presentation/general/general.module";
+import {LanguageDetectorServiceModule} from "@infrastructure/services/language-detector/language-detector.module";
+import {TemplateServiceModule} from "@infrastructure/services/template/template.module";
+import {UnitOfWorkModule} from "@infrastructure/services/unit-of-work/unit-of-work.module";
 
 @Module({
   imports: [
@@ -58,28 +61,6 @@ import {GeneralModule} from "@presentation/general/general.module";
                 });
               },
             },
-            {
-              namespace: 'bullQueue',
-              host: config.getBullCacheHost(),
-              port: config.getBullCachePort(),
-              password: config.getBullCachePassword(),
-              db: 1,
-              onClientCreated(client) {
-                console.log('Bull Redis connected successfully');
-                client.on('error', (error) => {
-                  console.error('Bull Redis error:', error);
-                  attempts++;
-                  if (attempts === 1 || attempts % 30 === 0) {
-                    bot
-                        .sendMessage(
-                            chatId,
-                            `Bull Redis error (repu backend), env:${process.env.NODE_ENV}, hostname: ${os.hostname()}`,
-                        )
-                        .catch(console.error);
-                  }
-                });
-              },
-            },
           ],
         };
       },
@@ -87,7 +68,10 @@ import {GeneralModule} from "@presentation/general/general.module";
       BackgroundModule,
       DefaultModule,
       ControlModule,
-      GeneralModule
+      GeneralModule,
+    LanguageDetectorServiceModule,
+    TemplateServiceModule,
+    UnitOfWorkModule
   ],
   controllers: [],
   providers: [

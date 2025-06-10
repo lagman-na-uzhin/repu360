@@ -17,7 +17,7 @@ export class OrganizationPlacementEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
-    @Column()
+    @Column({type: 'uuid'})
     public organizationId: string;
 
     @Column({ type: 'enum', enum: Platform })
@@ -34,19 +34,27 @@ export class OrganizationPlacementEntity {
 
 
     @ManyToOne(() => OrganizationEntity, organization => organization.placements)
-    @JoinColumn({ name: "organization_id" })
     organization: OrganizationEntity;
 
     @OneToMany(() => ReviewEntity, (review) => review.placement, { cascade: ["soft-remove"] })
     reviews: ReviewEntity[];
 
-    @OneToOne(() => YandexPlacementDetailEntity, { cascade: ['update', 'insert', 'soft-remove'], nullable: true, eager: true })
+    @OneToOne(() => YandexPlacementDetailEntity, yandexDetail => yandexDetail.placement, {
+        cascade: ['update', 'insert', 'soft-remove'],
+        nullable: true
+    })
     yandexDetail?: YandexPlacementDetailEntity;
 
-    @OneToOne(() => TwogisPlacementDetailEntity, { cascade: ['update', 'insert', 'soft-remove'], nullable: true, eager: true })
+    @OneToOne(() => TwogisPlacementDetailEntity, twogisDetail => twogisDetail.placement, {
+        cascade: ['update', 'insert', 'soft-remove'],
+        nullable: true
+    })
     twogisDetail?: TwogisPlacementDetailEntity;
 
-    @OneToOne(() => AutoReplyEntity, autoReply => autoReply.placement)
-    autoReply: AutoReplyEntity;
+    @OneToOne(() => AutoReplyEntity, autoReply => autoReply.placement, {
+        cascade: ['update', 'insert', 'soft-remove'],
+        nullable: true
+    })
+    autoReply?: AutoReplyEntity;
 
 }

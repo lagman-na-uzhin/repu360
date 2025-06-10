@@ -1,10 +1,10 @@
-import {Entity, Column, OneToOne, PrimaryGeneratedColumn, JoinColumn} from 'typeorm';
+import {Entity, Column, OneToOne, JoinColumn, PrimaryColumn} from 'typeorm';
 import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/organization-placement.entity";
 
 @Entity('twogis_placement_detail')
 export class TwogisPlacementDetailEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: number
+    @PrimaryColumn('uuid')
+    id: string
 
     @Column({ type: 'varchar', unique: true })
     externalId: string;
@@ -12,7 +12,7 @@ export class TwogisPlacementDetailEntity {
     @Column()
     type: string;
 
-    @Column()
+    @Column({type: "uuid"})
     placementId: string
 
     @Column({ nullable: true })
@@ -21,8 +21,7 @@ export class TwogisPlacementDetailEntity {
     @Column({ nullable: true })
     cabinetPassword: string;
 
-
-    @OneToOne(() => OrganizationPlacementEntity)
-    @JoinColumn({ name: 'placement_id'})
-    platform: OrganizationPlacementEntity;
+    @OneToOne(() => OrganizationPlacementEntity, placement => placement.twogisDetail)
+    @JoinColumn({ name: 'placement_id' })
+    placement: OrganizationPlacementEntity;
 }

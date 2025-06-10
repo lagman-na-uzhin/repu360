@@ -30,12 +30,13 @@ export class SyncTwogisReviewsScheduleUseCase {
   }
 
   private async initTask(placementId: PlacementId):Promise<void>  {
+
     await this.taskService.addTask({
       queue: QUEUES.SYNC_TWOGIS_REVIEWS,
       jobId: `sync_twogis_reviews_${placementId}`,
       attempts: 1,
       delay: 0,
-      payload: placementId,
+      payload: {placementId: placementId.toString()},
     });
   }
 }

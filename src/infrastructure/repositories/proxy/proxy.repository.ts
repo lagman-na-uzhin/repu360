@@ -1,22 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import {IProxy, IProxyRepository} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
 import {InjectEntityManager} from "@nestjs/typeorm";
-import {EntityManager} from "typeorm";
-import {BaseRepository} from "@infrastructure/repositories/base-repository";
-import {CompanyEntity} from "@infrastructure/entities/company/company.entity";
+import {EntityManager, Equal} from "typeorm";
+import {ProxyEntity} from "@infrastructure/entities/proxy/proxy.entity";
+import {CompanyId} from "@domain/company/company";
 
 @Injectable()
 export class ProxyOrmRepository implements IProxyRepository {
     constructor(
         @InjectEntityManager() private readonly manager: EntityManager,
-        private readonly base: BaseRepository<CompanyEntity>
     ) {}
 
-    async getActiveList(type: "reply" | "sync"): Promise<IProxy[]> {
+    async getById(id: string): Promise<IProxy | null> {
+        return this.manager.getRepository(ProxyEntity).findOneBy({id: Equal(id)})
     }
 
-    getById(id: number): Promise<IProxy | null> {
-        return Promise.resolve(undefined);
+    async getActiveList(): Promise<IProxy[]> {
+        return this.manager.getRepository(ProxyEntity).find({
+            where: {
+                isBlocked: false
+            }
+        })
     }
 
+    async getCompanyProxies(companyId: CompanyId): Promise<IProxy[]> {
+        console.log(companyId, "companyid getCompanyProxies")
+        return this.manager
+            .getRepository(ProxyEntity)
+            .createQueryBuilder('proxy')
+            .where('proxy.isBlocked = false')
+            .andWhere('proxy.companyId = :companyId', { companyId: companyId.toString() })
+            .orderBy('proxy.id', 'ASC')
+            .getMany();
+    }
+
+    async getRandomOneShared(): Promise<IProxy | null> {
+        return this.manager
+            .getRepository(ProxyEntity)
+            .createQueryBuilder('proxy')
+            .where('proxy.isBlocked = false')
+            .andWhere('proxy.companyId IS NULL')
+            .orderBy('RANDOM()')
+            .getOne();
+    }
 }

@@ -1,10 +1,8 @@
 import {
   SyncTwogisReviewsProcessUseCase
 } from "@application/use-cases/background/review/twogis/sync/sync-reviews-pc.usecase";
-import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
 import {IReviewRepository} from "@domain/review/repositories/review-repository.interface";
 import {IProfileRepository} from "@domain/review/repositories/profile-repository.interface";
-import {TwogisRepository} from "@infrastructure/integrations/twogis/twogis.repository";
 import {ReviewOrmRepository} from "@infrastructure/repositories/review/review.repository";
 import {ProfileOrmRepository} from "@infrastructure/repositories/profile/profile.repository";
 import {
@@ -36,21 +34,26 @@ import {ProxyService} from "@infrastructure/services/request/proxy.service";
 import {TemplateService} from "@infrastructure/services/template/template.service";
 import {LanguageDetectorService} from "@infrastructure/services/language-detector/language-detector.service";
 import {ReplyTemplateOrmRepository} from "@infrastructure/repositories/auto-reply/reply-template.repository";
+import {TwogisSession} from "@infrastructure/integrations/twogis/twogis.session";
+import {ProxySessionProxy} from "@infrastructure/providers/proxy-session/proxy-session.providers";
+import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
+import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
+import {CompanyOrmRepository} from "@infrastructure/repositories/company/company.repository";
 
 export const reviewProxyProviders = [
   {
-    inject: [PlacementOrmRepository, TwogisRepository, ReviewOrmRepository, ProfileOrmRepository, UnitOfWork],
+    inject: [PlacementOrmRepository, ProxySessionProxy.TWOGIS_SESSION, ReviewOrmRepository, ProfileOrmRepository, UnitOfWork],
     provide: ReviewProxy.TWOGIS_SYNC_REVIEWS_PROCESS_USE_CASE,
     useFactory: (
         placementRepo: IPlacementRepository,
-        twogisRepo: ITwogisRepository,
+        twogisSession: ITwogisSession,
         reviewRepo: IReviewRepository,
         profileRepo: IProfileRepository,
         uow: IUnitOfWork
     ) => {
         return new UseCaseProxy(new SyncTwogisReviewsProcessUseCase(
             placementRepo,
-            twogisRepo,
+            twogisSession,
             reviewRepo,
             profileRepo,
             uow
@@ -58,7 +61,7 @@ export const reviewProxyProviders = [
     }
   },
   {
-    inject: [PlacementOrmRepository, ],
+    inject: [PlacementOrmRepository, BullService],
     provide: ReviewProxy.TWOGIS_SYNC_REVIEWS_SCHEDULE_USE_CASE,
     useFactory: (placementRepo: IPlacementRepository, taskService: ITaskService) => {
       return new UseCaseProxy(new SyncTwogisReviewsScheduleUseCase(placementRepo, taskService))
@@ -66,43 +69,58 @@ export const reviewProxyProviders = [
   },
 
   {
-    inject: [ReviewOrmRepository, PlacementOrmRepository, BullService, CacheRepository],
+    inject: [
+        ReviewOrmRepository,
+        PlacementOrmRepository,
+        BullService,
+        CacheRepository,
+        CompanyOrmRepository
+    ],
     provide: ReviewProxy.TWOGIS_CREATE_SEND_REPLY_TASK_SH_USE_CASE,
-    useFactory: (reviewRepo: IReviewRepository, placementRepo: IPlacementRepository, taskService: ITaskService, cacheRepo: ICacheRepository) => {
-      return new UseCaseProxy(new TwogisCreateSendReplyTaskScheduleUseCase(reviewRepo, placementRepo, taskService, cacheRepo))
+    useFactory: (
+        reviewRepo: IReviewRepository,
+        placementRepo: IPlacementRepository,
+        taskService: ITaskService,
+        cacheRepo: ICacheRepository,
+        companyRepo: ICompanyRepository
+        ) => {
+      return new UseCaseProxy(new TwogisCreateSendReplyTaskScheduleUseCase(
+          reviewRepo,
+          placementRepo,
+          taskService,
+          cacheRepo,
+          companyRepo
+      ))
     }
   },
 
   {
     inject: [
-      TwogisRepository,
+      ProxySessionProxy.TWOGIS_SESSION,
       CacheRepository,
       ReviewOrmRepository,
       PlacementOrmRepository,
-      ProxyService,
       ProfileOrmRepository,
       ReplyTemplateOrmRepository,
       LanguageDetectorService,
       TemplateService
     ],
-    provide: ReviewProxy.TWOGIS_CREATE_SEND_REPLY_TASK_SH_USE_CASE,
+    provide: ReviewProxy.TWOGIS_SEND_REPLY_PC_USE_CASE,
     useFactory: (
-        twogisRepo: ITwogisRepository,
+        twogisSession: ITwogisSession,
         cacheRepo: ICacheRepository,
         reviewRepo: IReviewRepository,
         placementRepo: IPlacementRepository,
-        proxyService: IProxyService,
         profileRepo: IProfileRepository,
         replyTemplateRepo: IReplyTemplateRepository,
         languageDetectorService: ILanguageDetectorService,
         templateService: ITemplateService
     ) => {
       return new UseCaseProxy(new TwogisSendReplyProcessUseCase(
-          twogisRepo,
+          twogisSession,
           cacheRepo,
           reviewRepo,
           placementRepo,
-          proxyService,
           profileRepo,
           replyTemplateRepo,
           languageDetectorService,

@@ -1,26 +1,32 @@
 import { Injectable } from '@nestjs/common';
-import { Interval } from '@nestjs/schedule';
 import {IProxyService} from "@application/interfaces/services/proxy/proxy-service.interface";
 import {IProxy, IProxyRepository} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
-import {MINUTE} from 'time-constants'
 import {CompanyId} from "@domain/company/company";
+import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ProxyOrmRepository} from "@infrastructure/repositories/proxy/proxy.repository";
+import {CacheRepository} from "@infrastructure/repositories/cache/cache.repository";
 
 @Injectable()
 export class ProxyService implements IProxyService {
-  private proxies: IProxy[] = [];
+  constructor(
+      private readonly proxyRepo: ProxyOrmRepository,
+      private readonly cacheRepo: CacheRepository
+      ) {}
 
-  constructor(private readonly proxyRepo: IProxyRepository) {}
+  async getCompanyIndividualProxy(companyId: CompanyId): Promise<IProxy | null> {
+    const companyProxies = await this.proxyRepo.getCompanyProxies(companyId);
+    console.log(companyProxies, "companyProxies")
 
-  @Interval(15 * MINUTE)
-  private async updateProxiesList() {
-    this.proxies = await this.proxyRepo.getActiveList();
+    for (const proxy of companyProxies) {
+      const hasCooldown = await this.cacheRepo.hasProxyCooldown(proxy.id);
+      if (!hasCooldown) return proxy;
+    }
+
+    return null;
   }
 
-  async getCompanyIndividualProxy(companyId: CompanyId): Promise<IProxy> {
 
-  }
-
-  async getSharedProxy(): Promise<IProxy> {
-
+  async getSharedProxy(): Promise<IProxy | null> {
+    return this.proxyRepo.getRandomOneShared();
   }
 }

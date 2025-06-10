@@ -7,14 +7,18 @@ import {
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 
 @Injectable()
-export class SyncTwogisReviewsSchedule {
+export class SyncReviewsSchedule {
   constructor(
     @Inject(ReviewProxy.TWOGIS_SYNC_REVIEWS_SCHEDULE_USE_CASE)
     private readonly syncTwogisReviewScheduleUseCaseProxy: UseCaseProxy<SyncTwogisReviewsScheduleUseCase>,
   ) {}
 
-  @Interval(10_000)
-  async scheduleOrganizationReview() {
+  @Interval(10000)
+  async syncTwogisReviews() {
     return this.syncTwogisReviewScheduleUseCaseProxy.getInstance().execute();
   }
+
+  // @Interval(10_000)
+  // async syncYandexReviews() {
+  // }
 }

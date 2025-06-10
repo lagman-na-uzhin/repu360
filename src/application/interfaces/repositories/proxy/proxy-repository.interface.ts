@@ -1,3 +1,4 @@
+import {CompanyId} from "@domain/company/company";
 
 export interface IProxy {
     id: string;
@@ -5,9 +6,11 @@ export interface IProxy {
     port: number;
     login: string;
     password: string;
-    type: any; //TODO
+    companyId: string | null
 }
 export interface IProxyRepository {
-    getById(id: number): Promise<IProxy | null>;
-    getActiveList(type: "reply" | "sync"): Promise<IProxy[]>
+    getById(id: string): Promise<IProxy | null>;
+    getActiveList(): Promise<IProxy[]>;
+    getCompanyProxies(companyId: CompanyId): Promise<IProxy[]>;
+    getRandomOneShared(): Promise<IProxy | null>;
 }

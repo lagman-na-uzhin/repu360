@@ -14,10 +14,21 @@ export class CompanyPolicy {
         return false;
     }
 
-    static canAddOrganizationToCompany(actor: Actor) {
-        const isManager = actor.role.isManager() || actor.role.isAdmin();
+    static canUpdateCompany(actor: Actor): boolean {
+        if (this.#isActorManagerOrAdmin(actor)) {
+            return true;
+        }
+        return actor.role.employeePermissions.companies?.has(EmployeeCompanyPermission.CAN_EDIT_COMPANY_DATA) || false;
+    }
 
-        if (isManager) return true;
-        else return actor.role.employeePermissions.companies?.has(EmployeeCompanyPermission.CAN_ADD_ORGANIZATION_TO_COMPANY)
+    static canAddOrganizationToCompany(actor: Actor): boolean {
+        if (this.#isActorManagerOrAdmin(actor)) {
+            return true;
+        }
+        return actor.role.employeePermissions.companies?.has(EmployeeCompanyPermission.CAN_ADD_ORGANIZATION_TO_COMPANY) || false;
+    }
+
+    static #isActorManagerOrAdmin(actor: Actor): boolean {
+        return actor.role.isManager() || actor.role.isAdmin();
     }
 }

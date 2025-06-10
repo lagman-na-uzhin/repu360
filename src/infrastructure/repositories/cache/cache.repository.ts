@@ -10,6 +10,10 @@ import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/t
 import {Role} from "@domain/policy/model/role";
 import {ManagerAuthDataType} from "@application/interfaces/repositories/cache/types/manager-auth-data.type";
 import {PlacementId} from "@domain/placement/placement";
+import {
+  ILoginTwogisCabinetResult
+} from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
+import * as console from "node:console";
 
 
 @Injectable()
@@ -90,7 +94,7 @@ export class CacheRepository implements ICacheRepository {
     return Promise.resolve(false);
   }
 
-  setTwogisCabinetAuth(placementId: PlacementId): Promise<void> {
+  setTwogisCabinetAuth(authData: ILoginTwogisCabinetResult, ttl: number): Promise<void> {
     return Promise.resolve(undefined);
   }
 
@@ -100,5 +104,9 @@ export class CacheRepository implements ICacheRepository {
 
   setProxyCooldown(proxyId: string): Promise<void> {
     return Promise.resolve(undefined);
+  }
+
+  hasProxyCooldown(proxyId: string): Promise<boolean> {
+    return Promise.resolve(false);
   }
 }

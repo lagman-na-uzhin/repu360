@@ -11,7 +11,7 @@ export class CompanyEntity {
     @Column()
     public name: string;
 
-    @Column()
+    @Column({type: 'uuid'})
     public managerId: string;
 
     @CreateDateColumn({ type: "timestamptz" })

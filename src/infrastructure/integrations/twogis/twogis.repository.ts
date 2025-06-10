@@ -20,14 +20,17 @@ import {Reply} from "@domain/review/model/review/reply/reply";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 import {ProxyService} from "@infrastructure/services/request/proxy.service";
 import {
+  ACCOUNT_2GIS_AUTH,
+  GENERATE_REVIEW_REPLY_CONFIG,
+  GET_ORGANIZATION_REVIEWS_CONFIG, GET_ORGANIZATION_REVIEWS_NEXT_CONFIG, GET_REVIEW_CONFIG, SEND_REVIEW_REPLY_CONFIG
+} from "@infrastructure/integrations/twogis/twogis.client.const";
+import {
   IReviewFromCabinet
 } from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
 import {ISendReply} from "@application/interfaces/integrations/twogis/client/dto/out/send-reply-response.out.dto";
 import {
-  ACCOUNT_2GIS_AUTH,
-  GENERATE_REVIEW_REPLY_CONFIG,
-  GET_ORGANIZATION_REVIEWS_CONFIG, GET_ORGANIZATION_REVIEWS_NEXT_CONFIG
-} from "@infrastructure/integrations/twogis/twogis.client.const";
+  ILoginTwogisCabinetResponse
+} from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
 
 export class TwogisRepository implements ITwogisRepository {
   constructor(
@@ -36,7 +39,7 @@ export class TwogisRepository implements ITwogisRepository {
   ) {}
 
 
-  async getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials, proxy: IProxy): Promise<string> {
+  async getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials, proxy: IProxy): Promise<ILoginTwogisCabinetResponse> {
     return this.requestService.request(
         ACCOUNT_2GIS_AUTH(cabinetCredentials.login, cabinetCredentials.password),
         proxy,
@@ -128,23 +131,35 @@ export class TwogisRepository implements ITwogisRepository {
 
   private createReviewModel(
     contract: ITwogisReview,
-    organizationPlacementId: PlacementId,
+    placementId: PlacementId,
     profileId: ProfileId,
   ): Review {
-    const officialAnswer = Reply.create(contract.official_answer.id, contract.official_answer.text, ReplyType.EXTERNAL, true, profileId)
+
+    const officialAnswer = contract.official_answer
+        ? Reply.create(
+            contract.official_answer.id,
+            contract.official_answer.text,
+            ReplyType.EXTERNAL,
+            true,
+            profileId
+        )
+        : null;
+
     return Review.create(
-      organizationPlacementId,
-      profileId,
-      Platform.TWOGIS,
-      contract.text,
-      contract.rating,
-      contract.photos.flatMap((i) =>
-        i.preview_urls.map((photo) =>
-          ReviewMedia.create(photo.url, new Date(i.date_created)),
+        placementId,
+        profileId,
+        Platform.TWOGIS,
+        contract.text,
+        contract.rating,
+        contract.photos.flatMap((i) =>
+            Array.isArray(i.preview_urls)
+                ? i.preview_urls.map((photo) =>
+                    ReviewMedia.create(photo.url, new Date(i.date_created)),
+                )
+                : []
         ),
-      ),
-      TwogisReviewPlacementDetail.create(contract.id),
-        [officialAnswer]
+        TwogisReviewPlacementDetail.create(contract.id),
+        officialAnswer ? [officialAnswer] : []
     );
   }
 
@@ -154,10 +169,27 @@ export class TwogisRepository implements ITwogisRepository {
     twogisPreviewUrls: ITwogisPreviewUrls,
   ): Profile {
     return Profile.create(Platform.TWOGIS, name, name, twogisPreviewUrls.url, TwogisProfilePlacementDetail.create(id))
-
   }
 
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async getReviewFromCabinet(reviewExternalId: string, accessToken: string, proxy: IProxy): Promise<IReviewFromCabinet> {
+    console.log(accessToken, "accessToken repo")
+    console.log(reviewExternalId, "reviewExternalId repo")
+    return this.requestService.request(
+        GET_REVIEW_CONFIG(reviewExternalId, accessToken),
+        proxy,
+        1,
+    );
+  }
+
+  async sendOfficialReply(accessToken: string, text: string, reviewExternalId: string, proxy: IProxy): Promise<ISendReply> {
+    return this.requestService.request(
+        SEND_REVIEW_REPLY_CONFIG(accessToken, text, reviewExternalId),
+        proxy,
+        1,
+    );
   }
 }

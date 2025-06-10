@@ -3,7 +3,7 @@ import { ProxyPrefix } from '@application/use-case-proxies/proxy-prefix';
 export enum ReviewProxy {
   // SYNC
   TWOGIS_SYNC_REVIEWS_PROCESS_USE_CASE = `${ProxyPrefix.REVIEW_PROXY}SyncReviewsProcessUseCaseProxy`,
-  TWOGIS_SYNC_REVIEWS_SCHEDULE_USE_CASE = `${ProxyPrefix.REVIEW_PROXY}SyncReviewsProcessUseCaseProxy`,
+  TWOGIS_SYNC_REVIEWS_SCHEDULE_USE_CASE = `${ProxyPrefix.REVIEW_PROXY}SyncReviewsScheduleUseCaseProxy`,
 
 
   //AUTO-REPLY

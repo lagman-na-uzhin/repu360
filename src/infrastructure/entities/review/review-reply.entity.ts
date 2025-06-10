@@ -10,7 +10,7 @@ export class ReviewReplyEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
-    @PrimaryColumn()
+    @Column()
     public externalId: string;
 
     @Column()
@@ -19,10 +19,10 @@ export class ReviewReplyEntity {
     @Column()
     public isOfficial: boolean;
 
-    @Column()
+    @Column({type: "uuid"})
     public profileId: string;
 
-    @Column()
+    @Column({type: "uuid"})
     public reviewId: string;
 
     @Column()

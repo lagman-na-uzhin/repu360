@@ -24,6 +24,7 @@ export class TwogisCreateSendReplyTaskScheduleUseCase {
 
     async execute() {
         const placements = await this.placementRepo.getActiveTwogisListOfAutoReply();
+        console.log(placements, "placements TwogisCreateSendReplyTaskScheduleUseCase")
         if (!placements.length) return;
 
         const now = Date.now();
@@ -37,10 +38,13 @@ export class TwogisCreateSendReplyTaskScheduleUseCase {
     }
 
     private async initTask(placement: Placement) {
+        console.log("init task")
         const hasCooldown = await this.cacheRepo.hasTwogisReplyCooldown(placement.id);
+        console.log(hasCooldown, 'has cooldown')
         if (hasCooldown) return;
 
         const review = await this.reviewRepo.getTwogisReviewForReply(placement.id);
+        console.log(review, 'has review')
         if (!review || review.hasOfficialReply()) return;
 
         const company = await this.companyRepo.getCompanyByPlacementId(placement.id);
@@ -62,7 +66,7 @@ export class TwogisCreateSendReplyTaskScheduleUseCase {
         );
 
         if (!isJobExists) {
-            const command = TwogisSendReplyCommand.of(placement.id, review.id, companyId);
+            const command = TwogisSendReplyCommand.of(placement.id.toString(), review.id.toString(), companyId.toString());
 
             await this.taskService.addTask({
                 queue: QUEUES.SEND_REPLY_QUEUE,

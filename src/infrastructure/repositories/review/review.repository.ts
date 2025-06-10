@@ -25,12 +25,14 @@ export class ReviewOrmRepository implements IReviewRepository {
       where: { placementId: placementId.toString() },
     });
 
-    return Promise.all(entities.map(this.toDomain));
+    return Promise.all(entities.map(entity => this.toDomain(entity)));
   }
 
   async saveAll(reviews: Review[]): Promise<void> {
     const reviewEntities = reviews.map((review) => this.fromDomain(review));
-    await this.manager.save(ReviewEntity, reviewEntities);
+    console.log(reviewEntities[0], 'review entities')
+    await this.manager.getRepository(ReviewEntity).save(reviewEntities);
+    console.log("AFTER PROG SAVE")
   }
 
   private fromDomain(review: Review): ReviewEntity {
@@ -50,8 +52,13 @@ export class ReviewOrmRepository implements IReviewRepository {
   }
 
   private fromDomainPlacementDetail(review: Review) {
-    const twogisDetail = review.getTwogisReviewPlacementDetail();
-    const yandexDetail = review.getYandexReviewPlacementDetail();
+    let twogisDetail: TwogisReviewPlacementDetail | null = null;
+    let yandexDetail: YandexReviewPlacementDetail | null = null;
+    
+    try {
+      twogisDetail = review.getTwogisReviewPlacementDetail();
+      yandexDetail = review.getYandexReviewPlacementDetail();
+    } catch {}
 
     const twogisDetailEntity = twogisDetail
         ? {
@@ -84,9 +91,17 @@ export class ReviewOrmRepository implements IReviewRepository {
 
 
 
-  async getByExternalIds(externalIds: string[]): Promise<Review[]> {
-    const entities = await this.manager.getRepository(ReviewEntity).findByIds(externalIds);
-    return Promise.all(entities.map(this.toDomain));
+  async getByTwogisExternalIds(externalIds: string[]): Promise<Review[]> {
+    if (!externalIds.length) return [];
+
+    const entities = await this.manager
+        .getRepository(ReviewEntity)
+        .createQueryBuilder('review')
+        .innerJoinAndSelect('review.twogisDetail', 'twogisDetail')
+        .where('twogisDetail.externalId IN (:...externalIds)', { externalIds })
+        .getMany();
+
+    return Promise.all(entities.map(entity => this.toDomain(entity)));
   }
 
   async delete(id: ReviewId): Promise<void> {
@@ -102,37 +117,53 @@ export class ReviewOrmRepository implements IReviewRepository {
     const entity = await this.manager
         .getRepository(ReviewEntity)
         .createQueryBuilder("review")
-        .leftJoin('review.placement', 'placement')
-        .leftJoin('placement.autoReply', 'autoReply')
-        .where('autoReply IS NOT NULL')
-        .andWhere('autoReply.isEnabled = true')
-        .orderBy('review.createdAt', "DESC")
-        .getOne()
+        .leftJoinAndSelect('review.twogisDetail', 'twogisDetail')
+        .leftJoinAndSelect('review.replies', 'replies') // Все еще нужен, чтобы загрузить ответы для toDomain
+        .where('review.placementId = :placementId', { placementId: placementId.toString() }) // Добавляем фильтр по placementId
+        .andWhere(qb => { // Используем subQuery для NOT EXISTS
+          const subQuery = qb.subQuery()
+              .select('reviewReply.reviewId') // Выбираем reviewId из таблицы ответов
+              .from(ReviewReplyEntity, 'reviewReply') // Из сущности ответов
+              .where('reviewReply.reviewId = review.id') // Связываем с id отзыва из основного запроса
+              .andWhere('reviewReply.isOfficial = true') // Ищем официальные ответы
+              .getQuery(); // Получаем SQL строку подзапроса
+          return 'NOT EXISTS ' + subQuery; // Условие: не существует ни одного официального ответа для этого отзыва
+        })
+        .orderBy('review.createdAt', "DESC") // Сортируем по дате создания отзыва
+        .getOne(); // Получаем один результат
 
     return entity ? this.toDomain(entity) : null;
   }
 
+  async save(review: Review): Promise<void> {
+    const entity = this.fromDomain(review);
+    await this.manager.getRepository(ReviewEntity).save(entity);
+  }
+
   private async toDomain(entity: ReviewEntity): Promise<Review> {
-      const placementDetail = this.toDomainPlacementDetail(entity);
-      const replies = entity.replies.map(this.toDomainReply);
-      return Review.fromPersistence(
-          entity.id,
-          entity.placementId,
-          entity.profileId,
-          entity.platform,
-          entity.text,
-          entity.rating,
-          [],
-          placementDetail,
-          replies
-      );
-    }
+    const placementDetail = this.toDomainPlacementDetail(entity);
+    const replies = entity.replies?.length > 0
+        ? entity.replies.map(replyEntity => this.toDomainReply(replyEntity))
+        : [];
+    return Review.fromPersistence(
+        entity.id,
+        entity.placementId,
+        entity.profileId,
+        entity.platform,
+        entity.text,
+        entity.rating,
+        [],
+        placementDetail,
+        replies
+    );
+  }
 
     private toDomainReply(entity: ReviewReplyEntity): Reply {
       return Reply.fromPersistence(entity.id, entity.externalId, entity.text, entity.isOfficial, entity.profileId, entity.type);
     }
 
   private toDomainPlacementDetail(entity: ReviewEntity): ReviewPlacementDetail {
+    console.log(entity.twogisDetail, "toDomainPlacementDetail")
       if (entity.twogisDetail) {
         return TwogisReviewPlacementDetail.fromPersistence(entity.twogisDetail.externalId);
       } else {

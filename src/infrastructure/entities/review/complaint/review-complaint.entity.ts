@@ -1,9 +1,8 @@
-import {Entity, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
-import {ReviewEntity} from "@infrastructure/entities/review/review.entity";
+import {Entity, PrimaryColumn} from "typeorm";
 
 @Entity('review_complaint')
 export class ReviewComplaintEntity {
-    @PrimaryGeneratedColumn("uuid")
+    @PrimaryColumn("uuid")
     public id: string;
 
 

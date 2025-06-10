@@ -23,12 +23,20 @@ export class ProfileEntity {
   @Column({ type: 'enum', enum: Platform })
   public placement: Platform
 
-  @OneToMany(() => ReviewEntity, (review) => review.profile)
+  @OneToMany(() => ReviewEntity, (review) => review.profile, {cascade: ['soft-remove']})
   reviews: ReviewEntity[];
 
-  @OneToOne(() => TwogisProfilePlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true })
-  twogisDetail?: TwogisProfilePlacementDetailEntity;
+  @OneToOne(() => TwogisProfilePlacementDetailEntity, twogisDetail => twogisDetail.profile,
+      {
+        cascade: ['insert', 'update', 'soft-remove'],
+        eager: true
+      })
+  twogisDetail?: TwogisProfilePlacementDetailEntity | null;
 
-  @OneToOne(() => YandexProfilePlacementDetailEntity, { cascade: ['insert', 'update', 'soft-remove'], eager: true })
-  yandexDetail?: YandexProfilePlacementDetailEntity;
+  @OneToOne(() => YandexProfilePlacementDetailEntity, yandexDetail => yandexDetail.profile,
+      {
+        cascade: ['insert', 'update', 'soft-remove'],
+        eager: true
+      })
+  yandexDetail?: YandexProfilePlacementDetailEntity | null;
 }

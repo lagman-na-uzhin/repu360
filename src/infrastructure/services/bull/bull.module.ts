@@ -1,22 +1,25 @@
-// bull.module.ts
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
-import { RedisModule, RedisService } from '@liaoliaots/nestjs-redis';
+import { EnvConfigService } from '@infrastructure/config/env-config/env-config.service';
+import { EnvConfigModule } from '@infrastructure/config/env-config/env-config.module';
 import { queueInjectionList } from './bull.const';
 import { BullService } from './bull.service';
 
 @Module({
   imports: [
-    RedisModule,
     BullModule.forRootAsync({
-      imports: [RedisModule],
-      inject: [RedisService],
-      useFactory: async (redisService: RedisService) => {
-        const redisClient = redisService.getOrThrow("bullQueue");
+      imports: [EnvConfigModule],
+      inject: [EnvConfigService],
+      useFactory: async (config: EnvConfigService) => {
         return {
-          createClient: () => redisClient,
-          removeOnFail: true,
-          removeOnComplete: true,
+          redis: {
+            host: config.getBullCacheHost(),
+            port: config.getBullCachePort(),
+            password: config.getBullCachePassword(),
+            db: 1,
+            maxRetriesPerRequest: null,
+            enableReadyCheck: false,
+          },
         };
       },
     }),

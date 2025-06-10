@@ -1,7 +1,6 @@
 import {
     Column,
     Entity,
-    Index,
     JoinColumn,
     OneToOne,
     PrimaryColumn,
@@ -16,7 +15,7 @@ export class AutoReplyEntity {
     @Column()
     public isEnabled: boolean;
 
-    @Column()
+    @Column({type: 'uuid'})
     public placementId: string;
 
     @Column({ nullable: true, type: 'time' })
@@ -25,11 +24,7 @@ export class AutoReplyEntity {
     @Column({ nullable: true, type: 'time' })
     public endTime: string;
 
-    @Index()
-    @OneToOne(() => OrganizationPlacementEntity, (placement) => placement.autoReply, {
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-    })
+    @OneToOne(() => OrganizationPlacementEntity, placement => placement.autoReply)
     @JoinColumn({name: 'placement_id'})
     placement: OrganizationPlacementEntity;
 }

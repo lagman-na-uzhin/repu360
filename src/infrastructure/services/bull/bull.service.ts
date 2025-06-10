@@ -1,38 +1,18 @@
 import { InjectQueue } from '@nestjs/bull';
 import { HttpException, Injectable } from '@nestjs/common';
-import { QUEUES, QueueValueType } from './bull.const';
-import { Job, Queue } from 'bull';
-import {ITaskPayload, ITaskService} from "@application/interfaces/services/task/task-service.interface";
+import { QueueValueType } from './bull.const';
+import { Queue } from 'bull';
+import {ITaskPayload, ITaskService, QUEUES} from "@application/interfaces/services/task/task-service.interface";
 
 @Injectable()
 export class BullService implements ITaskService {
   constructor(
-    @InjectQueue(QUEUES.SYNC_ORGANIZATION_REVIEWS_QUEUE)
-    private SYNC_ORGANIZATION_REVIEWS_QUEUE: Queue,
-    @InjectQueue(QUEUES.SYNC_YANDEX_ORGANIZATION_REVIEWS_QUEUE)
-    private SYNC_YANDEX_ORGANIZATION_REVIEWS_QUEUE: Queue,
-    @InjectQueue(QUEUES.SEND_REVIEW_QUEUE)
-    private SEND_REVIEW_QUEUE: Queue,
-    @InjectQueue(QUEUES.SEND_YANDEX_REVIEW_QUEUE)
-    private SEND_YANDEX_REVIEW_QUEUE: Queue,
-    @InjectQueue(QUEUES.GPT_GENERATE_REVIEWS_QUEUE)
-    private GPT_GENERATE_REVIEWS_QUEUE: Queue,
-    @InjectQueue(QUEUES.SEND_MAIL_QUEUE)
-    private SEND_MAIL_QUEUE: Queue,
-    @InjectQueue(QUEUES.SEND_AMO_CRM_QUEUE)
-    private SEND_AMO_CRM_QUEUE,
+    @InjectQueue(QUEUES.SYNC_TWOGIS_REVIEWS)
+    private SYNC_TWOGIS_REVIEWS: Queue,
+
     @InjectQueue(QUEUES.SEND_REPLY_QUEUE)
-    private SEND_REPLY_QUEUE,
-    @InjectQueue(QUEUES.CREATE_SNAPSHOT_QUEUE)
-    private CREATE_SNAPSHOT_QUEUE,
-    @InjectQueue(QUEUES.WHATSAPP_INSTANCE_ID_QUEUE)
-    private WHATSAPP_INSTANCE_ID_QUEUE: Queue,
-    @InjectQueue(QUEUES.SEND_COMPLAINT_CLARIFICATION_QUEUE)
-    private SEND_COMPLAINT_CLARIFICATION_QUEUE: Queue,
-    @InjectQueue(QUEUES.SEND_COMPLAINT_FORMAL_QUEUE)
-    private SEND_COMPLAINT_FORMAL_QUEUE: Queue,
-    @InjectQueue(QUEUES.SYNC_ORGANIZATION_RATINGS_QUEUE)
-    private SYNC_ORGANIZATION_RATINGS_QUEUE: Queue,
+    private SEND_REPLY_QUEUE: Queue,
+
   ) {}
 
   async addTask(task: ITaskPayload) {
@@ -64,9 +44,9 @@ export class BullService implements ITaskService {
     const queue = this.getQueueByName(queueName);
     const job = await queue.getJob(key);
 
-    if (job) return true;
+    return !!job;
 
-    return false;
+
   }
 
   async deleteByKey(key: string, queueName: string): Promise<void> {
@@ -95,18 +75,5 @@ export class BullService implements ITaskService {
   private getQueueByName(queueName: QueueValueType) {
     const list = this.list();
     return list[queueName];
-  }
-
-  async getJobCounts(queueName: string): Promise<{ waiting: number; active: number; delayed: number; completed: number; failed: number }> {
-    const queue = this.getQueueByName(queueName);
-    
-    const jobCounts = await queue.getJobCounts();
-    return {
-      waiting: jobCounts.waiting || 0,
-      active: jobCounts.active || 0,
-      delayed: jobCounts.delayed || 0,
-      completed: jobCounts.completed || 0,
-      failed: jobCounts.failed || 0,
-    };
   }
 }

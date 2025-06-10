@@ -16,10 +16,10 @@ export class SubscriptionEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
-    @Column()
+    @Column({type: "uuid"})
     public companyId: string;
 
-    @Column()
+    @Column({type: "uuid"})
     public tariffId: string;
 
     @Column()

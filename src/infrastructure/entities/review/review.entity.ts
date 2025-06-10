@@ -24,25 +24,24 @@ export class ReviewEntity {
     @Column()
     public rating: number;
 
-    @Column()
+    @Column({type: "uuid"})
     public profileId: string;
 
-    @Column()
+    @Column({type: "uuid"})
     public placementId: string;
 
     @Column({ type: 'enum', enum: Platform })
     public platform: Platform;
 
     @ManyToOne(() => ProfileEntity, (profile) => profile.reviews)
-    @JoinColumn({ name: 'profile_id' })
     profile: ProfileEntity;
 
     @ManyToOne(() => OrganizationPlacementEntity, placement => placement.reviews)
-    @JoinColumn({ name: "placement_id" })
     placement: OrganizationPlacementEntity;
 
     @OneToOne(
         () => TwogisReviewPlacementDetailEntity,
+        twogisDetail => twogisDetail.review,
         {
             cascade: ['insert', 'update', 'soft-remove'],
             eager: true,
@@ -52,6 +51,7 @@ export class ReviewEntity {
 
     @OneToOne(
         () => YandexReviewPlacementDetailEntity,
+        yandexDetail => yandexDetail.review,
         {
             cascade: ['insert', 'update', 'soft-remove'],
             eager: true,

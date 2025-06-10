@@ -44,7 +44,7 @@ export const CONTROL_ROUTES = {
     CREATE: '', //POST
     LIST: '', //GET
     BY_ID: ':companyId', //GET
-    UPDATE: ':companyId', //PATCH
+    UPDATE: ':companyId', //PUT
     DELETE: ':companyId', //DELETE
   }
 } as const;

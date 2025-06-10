@@ -449,9 +449,11 @@ export const GET_REVIEW_ANSWERS_CONFIG = (
 };
 
 export const GET_REVIEW_CONFIG = (
-    accessToken: string,
     reviewExternalId: string | number,
+    accessToken: string
 ) => {
+    console.log(accessToken, "accessToken GET_REVIEW_CONFIG")
+    console.log(reviewExternalId, "reviewExternalId GET_REVIEW_CONFIG")
     return {
         requestConfig: {
             method: REQUEST_METHOD.GET,

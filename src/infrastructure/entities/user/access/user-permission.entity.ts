@@ -6,7 +6,7 @@ export class UserPermissionEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
-    @Column()
+    @Column({type: "uuid"})
     roleId: string;
 
     @Column()
@@ -15,7 +15,7 @@ export class UserPermissionEntity {
     @Column()
     permission: string;
 
-    @Column({ nullable: true, type: "varchar" })
+    @Column({ nullable: true, type: "uuid" })
     organizationId: string | null;
 
     @ManyToOne(() => UserRoleEntity, (role) => role.permissions, { onDelete: 'SET NULL' })

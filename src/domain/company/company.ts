@@ -9,9 +9,6 @@ export class Company {
       private readonly _id: CompanyId,
       private readonly _managerId: ManagerId,
       private _name: CompanyName,
-
-      private readonly _createdAt: Date = new Date(),
-      private _updatedAt: Date | null = null,
     ) {}
 
     static create(managerId: ManagerId, name: CompanyName): Company {
@@ -32,6 +29,10 @@ export class Company {
 
     get name() {
         return this._name;
+    }
+
+    set name(name: CompanyName) {
+        this._name = name;
     }
 
     get managerId() {

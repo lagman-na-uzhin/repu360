@@ -29,13 +29,17 @@ async function bootstrap() {
 
   await app.register(fastifyCookie);
 
-  await app.register(fastifyCors, { credentials: true, origin: true });
+  await app.register(fastifyCors, {
+    credentials: true,
+    origin: true,
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   app.useGlobalFilters(new AllExceptionFilter(new WinstonService()));
 
   if (isInitTypeEnv(TYPE_ENV.FACE)) {
     console.log('STARTED SERVER');
-    await app.listen(3000, '0.0.0.0');
+    await app.listen(3000);
   } else {
     console.log('STARTED INIT');
     await app.init();

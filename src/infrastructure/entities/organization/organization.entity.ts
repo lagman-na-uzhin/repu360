@@ -19,7 +19,7 @@ export class OrganizationEntity {
     @Column()
     public name: string;
 
-    @Column()
+    @Column({type: "uuid"})
     public companyId: string;
 
     @CreateDateColumn({ type: "timestamptz" })
@@ -35,7 +35,7 @@ export class OrganizationEntity {
     @OneToMany(() => OrganizationPlacementEntity, orgPlacement => orgPlacement.organization, {cascade: ["soft-remove"]})
     placements: OrganizationPlacementEntity[];
 
-    @ManyToOne(() => CompanyEntity, (company) => company.id)
+    @ManyToOne(() => CompanyEntity, (company) => company.organizations)
     @JoinColumn({ name: "company_id"})
     company: CompanyEntity;
 

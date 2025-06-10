@@ -31,6 +31,7 @@ export class UserEntity {
 
   @Column({
     unique: true,
+    type: "uuid"
   })
   public roleId: string;
 

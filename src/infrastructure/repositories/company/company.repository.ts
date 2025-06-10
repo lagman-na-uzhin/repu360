@@ -41,9 +41,9 @@ export class CompanyOrmRepository implements ICompanyRepository {
     const entity = await this.manager
         .getRepository(CompanyEntity)
         .createQueryBuilder('company')
-        .leftJoin('company.organizations', 'organizations')
-        .leftJoin('organizations.placements', 'placements')
-        .where('placements.id = :id', {id: placementId.toString()})
+        .leftJoin('company.organizations', 'organization')
+        .leftJoin('organization.placements', 'placement')
+        .where('placement.id = :id', {id: placementId.toString()})
         .getOne();
 
     return entity ? this.toDomain(entity) : null;

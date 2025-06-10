@@ -13,6 +13,7 @@ import {
 } from "@application/use-cases/background/review/twogis/sync/sync-reviews-pc.usecase";
 import {QUEUES} from "@application/interfaces/services/task/task-service.interface";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
+import {PlacementId} from "@domain/placement/placement";
 
 @Injectable()
 @Processor(QUEUES.SYNC_TWOGIS_REVIEWS)
@@ -21,9 +22,9 @@ export class SyncTwogisReviewsProcess {
     @Inject(ReviewProxy.TWOGIS_SYNC_REVIEWS_PROCESS_USE_CASE)
     private readonly syncTwogisReviewsProcessUseCaseProxy: UseCaseProxy<SyncTwogisReviewsProcessUseCase>,
   ) {}
-  @Process({ concurrency: 10 })
+  @Process({ concurrency: 1 })
   private async process(job: Job) {
-    return this.syncTwogisReviewsProcessUseCaseProxy.getInstance().execute(job.data);
+    return this.syncTwogisReviewsProcessUseCaseProxy.getInstance().execute(new PlacementId(job.data.placementId));
   }
 
   @OnQueueError()

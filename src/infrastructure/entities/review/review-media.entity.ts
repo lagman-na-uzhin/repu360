@@ -6,7 +6,7 @@ export class ReviewMediaEntity {
   @PrimaryColumn("uuid")
   public id: string;
 
-  @Column()
+  @Column({type: "uuid"})
   public reviewId: string;
 
   @Column()

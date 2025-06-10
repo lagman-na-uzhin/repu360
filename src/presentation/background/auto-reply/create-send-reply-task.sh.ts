@@ -8,18 +8,20 @@ import {
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 
 @Injectable()
-export class CreateSendReplyTask implements OnModuleInit {
+export class CreateSendReplyTaskSh implements OnModuleInit {
     constructor(
         @Inject(ReviewProxy.TWOGIS_CREATE_SEND_REPLY_TASK_SH_USE_CASE)
         private readonly twogisCreateSendReplyTaskUseCaseProxy: UseCaseProxy<TwogisCreateSendReplyTaskScheduleUseCase>,
     ) {}
 
     async onModuleInit() {
+        console.log("test for CreateSendReplyTaskSh")
         await this.sendReplyTwogis();
     }
 
-    @Interval(5 * SECOND)
+    @Interval(500000)
     async sendReplyTwogis() {
+        console.log("sendReplyTwogis")
         return this.twogisCreateSendReplyTaskUseCaseProxy.getInstance().execute();
     }
 }

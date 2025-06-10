@@ -1,22 +1,27 @@
-import {ITwogisClient} from "@application/interfaces/integrations/twogis/client/twogis-client.interface";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
-import {IReviewRepository} from "@domain/review/repositories/review-repository.interface";
-import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
-import {Placement, PlacementId} from "@domain/placement/placement";
-import {Review} from "@domain/review/review";
-import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
-import {IProxyService} from "@application/interfaces/services/proxy/proxy-service.interface";
-import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
-import {IProfileRepository} from "@domain/review/repositories/profile-repository.interface";
-import {LANGUAGE} from "@domain/common/language.enum";
-import {IReplyTemplateRepository} from "@domain/review/repositories/reply-template-repository.interface";
-import {ILanguageDetectorService} from "@application/interfaces/services/language-detector/language-detector-service.interface";
-import {ITemplateService} from "@application/interfaces/services/template/template-service.interface";
-import {ERR_REQUEST} from "@application/interfaces/services/request/request.enum";
-import {TwogisSendReplyCommand} from "@application/use-cases/background/review/twogis/reply/send-reply.command";
-import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
-import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
-import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
+import { ICacheRepository } from "@application/interfaces/repositories/cache/cache-repository.interface";
+import { IReviewRepository } from "@domain/review/repositories/review-repository.interface";
+import { IPlacementRepository } from "@domain/placement/repositories/placement-repository.interface";
+import { Placement, PlacementId } from "@domain/placement/placement";
+import { Review, ReviewId } from "@domain/review/review";
+import { ReplyType } from "@domain/review/value-object/reply/reply-type.vo";
+import { IProfileRepository } from "@domain/review/repositories/profile-repository.interface";
+import { LANGUAGE } from "@domain/common/language.enum";
+import { IReplyTemplateRepository } from "@domain/review/repositories/reply-template-repository.interface";
+import { ILanguageDetectorService } from "@application/interfaces/services/language-detector/language-detector-service.interface";
+import { ITemplateService } from "@application/interfaces/services/template/template-service.interface";
+import { ERR_REQUEST } from "@application/interfaces/services/request/request.enum";
+import { TwogisSendReplyCommand } from "@application/use-cases/background/review/twogis/reply/send-reply.command";
+import { ITwogisSession } from "@application/interfaces/integrations/twogis/twogis-session.interface";
+import { EXCEPTION } from "@domain/common/exceptions/exceptions.const";
+import { Profile } from "@domain/review/profile";
+import { CompanyId } from "@domain/company/company";
+import {IFirstAnswer} from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
+
+
+interface ReviewEligibility {
+    canBeReplied: boolean;
+    hasExistingOfficialReply: IFirstAnswer | boolean;
+}
 
 export class TwogisSendReplyProcessUseCase {
     constructor(
@@ -24,189 +29,190 @@ export class TwogisSendReplyProcessUseCase {
         private readonly cacheRepo: ICacheRepository,
         private readonly reviewRepo: IReviewRepository,
         private readonly placementRepo: IPlacementRepository,
-        private readonly proxyService: IProxyService,
         private readonly profileRepo: IProfileRepository,
         private readonly replyTemplateRepo: IReplyTemplateRepository,
         private readonly languageDetectorService: ILanguageDetectorService,
         private readonly templateService: ITemplateService,
     ) {}
 
-    async execute(cmd: TwogisSendReplyCommand) {
-        const {placementId, reviewId, companyId} = cmd;
+    async execute(command: TwogisSendReplyCommand): Promise<void> {
+        const { reviewId, placementId, companyId } = this.initializeCommandObjects(command);
 
         await this.twogisSession.init(companyId);
 
-        const review = await this.reviewRepo.getById(reviewId);
-        if (!review || !review.hasOfficialReply()) throw new Error(EXCEPTION.REVIEW.OFFICIAL_ANSWER_ALREADY_EXIST);
+        const review = await this.retrieveReviewAndPreCheck(reviewId);
 
-        const placement = await this.placementRepo.getById(placementId);
-        if (!placement) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_NOT_FOUND);
+        const placement = await this.retrievePlacement(placementId);
+        const accessToken = await this.getTwogisCabinetAccessToken(placement);
 
-        const accessToken = await this.getAccessToken(placement);
         if (!accessToken) return;
 
         try {
-            const isAnswerable = await this.checkIfReviewAnswerable(
-                review,
-                accessToken,
-            );
+            const eligibility = await this.evaluateReviewEligibilityAndSync(review, accessToken);
 
-            if (!isAnswerable) {
-                await this.cacheRepo.setTwogisReplyCooldown(placement.id);
+            if (eligibility.hasExistingOfficialReply) {
+                return;
             }
 
-            await this.send(placement, review, accessToken);
-        } catch (err) {
-            if (err.message === ERR_REQUEST.INVALID_GRANT) {
+            if (!eligibility.canBeReplied) {
+                await this.cacheRepo.setTwogisReplyCooldown(placement.id);
+                return;
+            }
+
+            await this.composeAndSubmitReply(review, accessToken, placement);
+
+            await this.reviewRepo.save(review);
+
+        } catch (error) {
+            if (error instanceof Error && error.message === ERR_REQUEST.INVALID_GRANT) {
                 await this.cacheRepo.deleteTwogisCabinetAuth(placementId);
             }
-            throw err;
+            throw error;
         }
     }
 
-    private async getAccessToken(placement: Placement): Promise<string | null> {
+    private initializeCommandObjects(command: TwogisSendReplyCommand) {
+        return {
+            reviewId: new ReviewId(command.reviewId),
+            placementId: new PlacementId(command.placementId),
+            companyId: new CompanyId(command.companyId)
+        };
+    }
+
+    private async retrieveReviewAndPreCheck(reviewId: ReviewId): Promise<Review> {
+        const review = await this.reviewRepo.getById(reviewId);
+        if (!review) {
+            throw new Error(EXCEPTION.REVIEW.NOT_FOUND);
+        }
+        if (review.hasOfficialReply()) {
+            throw new Error(EXCEPTION.REVIEW.OFFICIAL_ANSWER_ALREADY_EXIST);
+        }
+        return review;
+    }
+
+    private async retrievePlacement(placementId: PlacementId): Promise<Placement> {
+        const placement = await this.placementRepo.getById(placementId);
+        if (!placement) {
+            throw new Error(EXCEPTION.PLACEMENT.TWOGIS_NOT_FOUND);
+        }
+        return placement;
+    }
+
+    private async getTwogisCabinetAccessToken(placement: Placement): Promise<string | null> {
         const credentials = placement.getTwogisPlacementDetail().cabinetCredentials;
-        if (!credentials) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_INVALID_CABINET_CREDENTIALS);
-
-        const accessToken = await this.twogisSession.getCabinetAccessToken(credentials);
-        if (!accessToken) throw new Error("Access token not found");
-
-        return accessToken
-
-
-    }
-
-    private async checkIfReviewAnswerable(
-        review: Review,
-        accessToken: string,
-    ): Promise<boolean> {
-        const reviewRes = await this.twogisSession.getReviewFromCabinet(
-            review.getTwogisReviewPlacementDetail().externalId,
-            accessToken,
-        );
-
-        const responseCode = reviewRes?.meta?.code || reviewRes;
-
-        if (responseCode === 200) {
-            const { result } = reviewRes;
-
-            const rating = Number(result.rating);
-            const hasAnswer = result.hasCompanyComment || result.firstAnswer;
-            const isAnswerable = rating >= 4 && !hasAnswer;
-
-            if (rating != review.rating) {
-                review.rating = rating;
-            }
-
-            if (hasAnswer) {
-                review.setOfficialReply(result.firstAnswer.id, result.firstAnswer.text, ReplyType.EXTERNAL)
-            }
-
-            return isAnswerable;
-        } else if (responseCode == 404) {
-            await this.reviewRepo.delete(review.id);
-
-            throw new Error(
-                `Review not found id: ${review.id}`,
-            );
-        } else {
-            console.log(`Can not get review answers`, {
-                response: reviewRes,
-            });
-
-            throw new Error(
-                `Some error happend while fetching review's answers, review id: ${review.id}`,
-            );
+        if (!credentials) {
+            throw new Error(EXCEPTION.PLACEMENT.TWOGIS_INVALID_CABINET_CREDENTIALS);
         }
+
+        const accessTokenResponse = await this.twogisSession.getCabinetAccessToken(credentials);
+        if (!accessTokenResponse || !accessTokenResponse.result || !accessTokenResponse.result.access_token) {
+            throw new Error("2GIS access token not found or invalid response structure.");
+        }
+        return accessTokenResponse.result.access_token;
     }
 
-    private async send(
-        placement: Placement,
+    private async evaluateReviewEligibilityAndSync(
         review: Review,
         accessToken: string,
-    ) {
-        const answer = await this.generateAnswer(
-            review,
+    ): Promise<ReviewEligibility> {
+        const twogisReviewExternalId = review.getTwogisReviewPlacementDetail().externalId;
+        const twogisReviewData = await this.twogisSession.getReviewFromCabinet(
+            twogisReviewExternalId,
             accessToken,
-            placement,
         );
 
-        if (!answer) {
-            console.log(`Bad generated answer response`, review);
+        const responseCode = twogisReviewData?.meta?.code || twogisReviewData;
+
+        if (responseCode === 404) {
+            await this.reviewRepo.delete(review.id);
+            throw new Error(`Review with ID ${review.id.toString()} not found in 2GIS; deleted from local system.`);
+        }
+        if (responseCode !== 200 || !twogisReviewData?.result) {
+            throw new Error(`Failed to fetch review status from 2GIS for review ID ${review.id.toString()}. Code: ${responseCode}`);
+        }
+
+        const { result } = twogisReviewData;
+        const currentRating = Number(result.rating);
+        const hasCompanyCommentInTwogis = result.hasCompanyComment || result.firstAnswer;
+
+        if (currentRating !== review.rating) {
+            review.rating = currentRating;
+        }
+
+        if (hasCompanyCommentInTwogis) {
+            review.setOfficialReply(result.firstAnswer.id, result.firstAnswer.text, ReplyType.EXTERNAL);
+        }
+
+        const canBeReplied = currentRating >= 4 && !hasCompanyCommentInTwogis;
+
+        return {
+            canBeReplied: canBeReplied,
+            hasExistingOfficialReply: hasCompanyCommentInTwogis,
+        };
+    }
+
+    private async composeAndSubmitReply(
+        review: Review,
+        accessToken: string,
+        placement: Placement,
+    ): Promise<void> {
+        const reviewAuthorProfile = await this.profileRepo.getById(review.profileId) as Profile;
+        const reviewLanguage = await this.languageDetectorService.detect(review.text!);
+
+        const replyContent = await this.generateReplyContent(
+            reviewAuthorProfile,
+            reviewLanguage,
+            accessToken,
+            placement.id
+        );
+
+        if (!replyContent) {
             return;
         }
 
-        const sentReplyRes = await this.twogisSession.sendOfficialReply(
+        const twogisReviewExternalId = review.getTwogisReviewPlacementDetail().externalId;
+        const sendResult = await this.twogisSession.sendOfficialReply(
             accessToken,
-            review.getTwogisReviewPlacementDetail().externalId,
-            answer,
-            proxy
+            replyContent,
+            twogisReviewExternalId
         );
 
-        const responseCode = sentReplyRes?.meta?.code || sentReplyRes;
+        const responseCode = sendResult?.meta?.code || sendResult;
 
-        if (responseCode === 200) {
-            const { result } = sentReplyRes;
-
-            review.setOfficialReply(result.id, result.text, ReplyType.SENT);
+        if (responseCode === 200 && sendResult.result) {
+            review.setOfficialReply(sendResult.result.id, sendResult.result.text, ReplyType.SENT);
         } else {
-            console.log(`Can not sent answer to review`, {
-                placementId: placement.id,
-                response: sentReplyRes,
-            });
+            throw new Error(`Failed to send official reply for review ID ${review.id.toString()}. Code: ${responseCode}.`);
         }
     }
 
-    private async generateAnswer(
-        review: Review,
+    private async generateReplyContent(
+        profile: Profile,
+        language: LANGUAGE,
         accessToken: string,
-        placement: Placement,
-        proxy: IProxy,
+        placementId: PlacementId
     ): Promise<string | undefined> {
-        const profile = await this.profileRepo.getById(review.profileId);
+        let content: string | undefined;
 
-        const reviewLanguage = await this.languageDetectorService.detect(
-            review.text!,
-        );
-
-        let generatedAnswer: string | undefined;
-
-        try {
-            if (reviewLanguage === LANGUAGE.KZ || reviewLanguage === LANGUAGE.RU) {
-                const customTemplate = await this.replyTemplateRepo.getCustomTemplate(placement.id, reviewLanguage)
-                if (customTemplate) {
-                    generatedAnswer = this.templateService.renderTemplate(customTemplate.text, {
-                        name: profile?.firstname!,
-                    });
-                } else {
-                    const generatedReply = await this.twogisSession.generateReply(
-                        accessToken,
-                        profile?.firstname!,
-                        proxy,
-                    );
-
-                    generatedAnswer = generatedReply?.result?.comment;
-                }
+        if (language === LANGUAGE.KZ || language === LANGUAGE.RU) {
+            const customTemplate = await this.replyTemplateRepo.getCustomTemplate(placementId, language);
+            if (customTemplate) {
+                content = this.templateService.renderTemplate(customTemplate.text, {
+                    name: profile?.firstname || '',
+                });
+            } else {
+                const generatedReply = await this.twogisSession.generateReply(
+                    accessToken,
+                    profile?.firstname || '',
+                );
+                content = generatedReply?.result?.comment;
             }
-        } catch (err) {
-        } finally {
-            if (generatedAnswer && generatedAnswer.indexOf('{') !== -1)
-                generatedAnswer = undefined;
         }
 
-        //
-        // if (generatedAnswer && closingPhrase && closingPhrase[reviewLanguage]) {
-        //     generatedAnswer += ` ${closingPhrase[reviewLanguage]}`;
-        // }
+        if (content && content.indexOf('{') !== -1) {
+            return undefined;
+        }
 
-        return generatedAnswer;
-    }
-
-
-    private getFirstName(fullName: string): string | undefined {
-        if (!fullName || !fullName.length || typeof fullName != 'string') return;
-
-        const splitted = fullName.split(' ');
-        return splitted[0];
+        return content;
     }
 }

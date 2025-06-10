@@ -3,7 +3,7 @@ import {InjectEntityManager} from '@nestjs/typeorm';
 import {EntityManager, Equal} from 'typeorm';
 import {IReplyTemplateRepository} from "@domain/review/repositories/reply-template-repository.interface";
 import {ReplyTemplate, ReplyTemplateId} from "@domain/review/model/review/reply/reply-template";
-import {ReplyTemplateEntity} from "@infrastructure/entities/autoreply/reply-template.entity";
+import {AutoReplyTemplateEntity} from "@infrastructure/entities/autoreply/reply-template.entity";
 import {LANGUAGE} from "@domain/common/language.enum";
 import {PlacementId} from "@domain/placement/placement";
 
@@ -14,16 +14,16 @@ export class ReplyTemplateOrmRepository implements IReplyTemplateRepository {
     ) {}
 
     async getById(id: ReplyTemplateId): Promise<ReplyTemplate | null> {
-        const entity = await this.manager.getRepository(ReplyTemplateEntity).findOneBy({ id: Equal(id.toString()) });
+        const entity = await this.manager.getRepository(AutoReplyTemplateEntity).findOneBy({ id: Equal(id.toString()) });
         return entity ? this.toDomain(entity) : null;
     }
 
-    private toDomain(entity: ReplyTemplateEntity): ReplyTemplate {
+    private toDomain(entity: AutoReplyTemplateEntity): ReplyTemplate {
         return ReplyTemplate.fromPersistence(entity.id, entity.placementId, entity.text, entity.language);
     }
 
     async getCustomTemplate(placementId: PlacementId, language: LANGUAGE): Promise<ReplyTemplate | null> {
-        const qb = this.manager.getRepository(ReplyTemplateEntity).createQueryBuilder('template');
+        const qb = this.manager.getRepository(AutoReplyTemplateEntity).createQueryBuilder('template');
 
         qb.where('template.placementId = :placementId', { placementId: placementId.toString() });
 

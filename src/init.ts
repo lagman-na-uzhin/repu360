@@ -1,7 +1,10 @@
 export enum TYPE_ENV {
     FACE = 'FACE',
 
-    AUTO_REPLy = 'AUTO_REPLy'
+    AUTO_REPLY = 'AUTO_REPLY',
+
+
+    REVIEW_SYNC = 'REVIEW_SYNC'
 }
 
 const productionNodeEnvs = ['prod', 'PROD', 'production'];

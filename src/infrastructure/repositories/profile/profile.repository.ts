@@ -1,6 +1,6 @@
 import { IProfileRepository } from '@domain/review/repositories/profile-repository.interface';
 import { Profile, ProfileId } from '@domain/review/profile';
-import { EntityManager, Repository } from 'typeorm';
+import {EntityManager, In, Repository} from 'typeorm';
 import { ProfileEntity } from 'src/infrastructure/entities/profile/profile.entity';
 import { TwogisProfilePlacementDetailEntity } from '@infrastructure/entities/profile/placement-details/twogis-profile.entity';
 import { YandexProfilePlacementDetailEntity } from '@infrastructure/entities/profile/placement-details/yandex-profile.entity';
@@ -8,6 +8,16 @@ import { TwogisProfilePlacementDetail } from '@domain/review/model/profile/twogi
 import { YandexProfilePlacementDetail } from '@domain/review/model/profile/yandex-profile-placement-detail';
 import {profile} from "winston";
 import {InjectEntityManager} from "@nestjs/typeorm";
+import {Review} from "@domain/review/review";
+import {TwogisReviewPlacementDetail} from "@domain/review/model/review/twogis-review-placement-detail";
+import {YandexReviewPlacementDetail} from "@domain/review/model/review/yandex-review-placement-detail";
+import {
+    TwogisReviewPlacementDetailEntity
+} from "@infrastructure/entities/review/placement-details/twogis-review.entity";
+import {
+    YandexReviewPlacementDetailEntity
+} from "@infrastructure/entities/review/placement-details/yandex-review.entity";
+import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
 
 export class ProfileOrmRepository implements IProfileRepository {
     constructor(
@@ -21,7 +31,7 @@ export class ProfileOrmRepository implements IProfileRepository {
 
     async saveAll(profiles: Profile[]): Promise<void> {
         const profileEntities = profiles.map(profile => this.fromDomain(profile));
-        await this.manager.save(ProfileEntity, profileEntities);
+        await this.manager.getRepository(ProfileEntity).save(profileEntities);
 
         for (const profile of profiles) {
             const detailEntity = await this.toDetailEntity(profile);
@@ -70,25 +80,67 @@ export class ProfileOrmRepository implements IProfileRepository {
             },
         };
 
-        const platform = platformMappings[entity.placement];
+        const platformKey = entity.placement.toLowerCase();
+        const platform = platformMappings[platformKey];
+
+        if (!platform) {
+            throw new Error(`Unsupported platform: ${entity.placement} for profile ${entity.id}`);
+        }
 
         if (platform.details) {
             return platform.getModel(platform.details);
         } else {
             const detailEntity = await platform.repository.findOne({ where: { profileId: entity.id } });
-            return platform.getModel(detailEntity!);
+
+            if (!detailEntity) {
+                throw new Error(`Profile detail not found for platform ${entity.placement} and profile ${entity.id}`);
+            }
+            return platform.getModel(detailEntity);
         }
     }
 
     private fromDomain(profile: Profile): ProfileEntity {
+        const { twogisDetailEntity, yandexDetailEntity } = this.fromDomainPlacementDetail(profile);
+
         const entity = new ProfileEntity();
         entity.id = profile.id.toString();
         entity.firstname = profile.firstname;
         entity.surname = profile.surname;
         entity.avatar = profile.avatar;
         entity.placement = profile.platform;
+        entity.twogisDetail = twogisDetailEntity;
+        entity.yandexDetail = yandexDetailEntity;
         return entity;
     }
+
+    private fromDomainPlacementDetail(profile: Profile) {
+        let twogisDetail: TwogisProfilePlacementDetail | null = null;
+        let yandexDetail: YandexProfilePlacementDetail | null = null;
+
+        try {
+            twogisDetail = profile.getTwogisProfilePlacementDetail();
+            yandexDetail = profile.getYandexProfilePlacementDetail();
+        } catch {}
+
+        let twogisDetailEntity: TwogisProfilePlacementDetailEntity | null = null;
+        let yandexDetailEntity: YandexProfilePlacementDetailEntity | null = null;
+
+        if (twogisDetail) {
+            twogisDetailEntity = new TwogisProfilePlacementDetailEntity();
+            twogisDetailEntity.profileId = profile.id.toString();
+            twogisDetailEntity.externalId = twogisDetail.externalId;
+        }
+
+        if (yandexDetail) {
+            yandexDetailEntity = new YandexProfilePlacementDetailEntity();
+            yandexDetailEntity.profileId = profile.id.toString();
+            yandexDetailEntity.externalId = yandexDetail.externalId;
+        }
+
+        return { twogisDetailEntity, yandexDetailEntity };
+    }
+
+
 
     private async toDetailEntity(profile: Profile): Promise<TwogisProfilePlacementDetailEntity | YandexProfilePlacementDetailEntity | null> {
         if (profile.platform === 'TWOGIS') {
@@ -103,7 +155,16 @@ export class ProfileOrmRepository implements IProfileRepository {
         return null;
     }
 
-    getByExternalIds(externalIds: string[]): Promise<Profile[]> {
-        return Promise.resolve([]);
+    async getByTwogisExternalIds(externalIds: string[]): Promise<Profile[]> {
+        if (!externalIds.length) return [];
+
+        const entities = await this.manager
+            .getRepository(ProfileEntity)
+            .createQueryBuilder('profile')
+            .leftJoinAndSelect('profile.twogisDetail', 'twogisDetail')
+            .where('twogisDetail.externalId IN (:...externalIds)', { externalIds })
+            .getMany();
+
+        return Promise.all(entities.map(entity => this.toDomain(entity)));
     }
 }

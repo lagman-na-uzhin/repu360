@@ -9,6 +9,12 @@ import { REVIEW_ENTITIES } from 'src/infrastructure/entities/review';
 import { RequestModule } from 'src/infrastructure/services/request/request.module';
 import { USER_ENTITIES } from '@infrastructure/entities/user';
 import { BaseRepository } from '@infrastructure/repositories/base-repository';
+import {AUTO_REPLY_ENTITIES} from "@infrastructure/entities/autoreply";
+import {PLACEMENT_ENTITIES} from "@infrastructure/entities/placement";
+import {PROFILE_ENTITIES} from "@infrastructure/entities/profile";
+import {PROXY_ENTITIES} from "@infrastructure/entities/proxy";
+import {SUBSCRIPTION_ENTITIES} from "@infrastructure/entities/subscription";
+import {TARIFF_ENTITIES} from "@infrastructure/entities/tariff";
 
 @Module({
   imports: [
@@ -18,6 +24,12 @@ import { BaseRepository } from '@infrastructure/repositories/base-repository';
       ...COMPANY_ENTITIES,
       ...REVIEW_ENTITIES,
       ...USER_ENTITIES,
+        ...AUTO_REPLY_ENTITIES,
+        ...PLACEMENT_ENTITIES,
+        ...PROFILE_ENTITIES,
+        ...PROXY_ENTITIES,
+        ...SUBSCRIPTION_ENTITIES,
+        ...TARIFF_ENTITIES,
     ]),
     forwardRef(() => RequestModule),
     EnvConfigModule,

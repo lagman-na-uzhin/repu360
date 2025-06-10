@@ -16,7 +16,19 @@ export class TwogisReviewPlacementDetailEntity {
     @Column()
     externalId: string;
 
-    @OneToOne(() => ReviewEntity, {onDelete: 'CASCADE'})
+    // @Column()
+    // isHidden: boolean;
+    //
+    // @Column()
+    // isRated: boolean;
+    //
+    // @Column()
+    // isVerified: boolean;
+    //
+    // @Column()
+    // dateCreated: boolean;
+
+    @OneToOne(() => ReviewEntity)
     @JoinColumn({name: 'review_id'})
     review: ReviewEntity;
 }

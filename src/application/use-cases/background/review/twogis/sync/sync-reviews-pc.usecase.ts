@@ -7,23 +7,28 @@ import { Profile } from '@domain/review/profile';
 import {Placement, PlacementId} from "@domain/placement/placement";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-work.interface";
+import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
 
 export class SyncTwogisReviewsProcessUseCase {
   constructor(
       private readonly placementRepo: IPlacementRepository,
-      private readonly twogisRepo: ITwogisRepository,
+      private readonly twogisSession: ITwogisSession,
       private readonly reviewRepo: IReviewRepository,
       private readonly profileRepo: IProfileRepository,
       private readonly uow: IUnitOfWork,
   ) {}
 
   async execute(placementId: PlacementId) {
+    console.log("PRoxeccer execute")
+    await this.twogisSession.init()
+
     const placement = await this.getPlacementOrFail(placementId);
     const unSyncedObj = await this.getUnSyncedReviewObj(placement);
 
-    if (!unSyncedObj) return;
-
-    const { reviewsToSave, profilesToSave } = await this.handleUnSyncedReviews(unSyncedObj)
+    if (!unSyncedObj) {
+      return;
+    }
+    const { reviewsToSave, profilesToSave } = await this.handleUnSyncedReviews(unSyncedObj!);
 
     await this.saveEntities(reviewsToSave, profilesToSave);
   }
@@ -36,15 +41,15 @@ export class SyncTwogisReviewsProcessUseCase {
 
   private async getUnSyncedReviewObj(placement: Placement): Promise<{ profile: Profile, review: Review }[] | null> {
     const twogisDetail = placement.getTwogisPlacementDetail();
-    return this.twogisRepo.getOrganizationReviews(placement.id, twogisDetail.externalId, {type: twogisDetail.type})
+    return this.twogisSession.getOrganizationReviews(placement.id, twogisDetail.externalId, {type: twogisDetail.type})
   }
 
   private async handleUnSyncedReviews(unSyncedObj: { profile: Profile; review: Review }[]) {
     const reviewIds: string[]  = unSyncedObj.map(x => x.review.getTwogisReviewPlacementDetail().externalId);
     const profileIds: string[] = unSyncedObj.map(x => x.profile.getTwogisProfilePlacementDetail().externalId);
 
-    const existingReviews  = await this.reviewRepo.getByExternalIds(reviewIds);
-    const existingProfiles = await this.profileRepo.getByExternalIds(profileIds);
+    const existingReviews  = await this.reviewRepo.getByTwogisExternalIds(reviewIds);
+    const existingProfiles = await this.profileRepo.getByTwogisExternalIds(profileIds);
 
     const reviewMap: Map<string, Review>  = new Map(existingReviews.map(r  => [r.getTwogisReviewPlacementDetail().externalId, r]));
     const profileMap: Map<string, Profile> = new Map(existingProfiles.map(p => [p.getTwogisProfilePlacementDetail().externalId, p]));
@@ -81,9 +86,10 @@ export class SyncTwogisReviewsProcessUseCase {
   }
 
   private async saveEntities(reviewsToSave: Review[], profilesToSave: Profile[]) {
+    console.log(" saveEntities method")
     await this.uow.run(async (ctx) => {
-      if (reviewsToSave.length) await ctx.reviewRepo.saveAll(reviewsToSave);
       if (profilesToSave.length) await ctx.profileRepo.saveAll(profilesToSave);
+      if (reviewsToSave.length) await ctx.reviewRepo.saveAll(reviewsToSave);
     })
   }
 }

@@ -10,7 +10,7 @@ export class TwogisProfilePlacementDetailEntity {
   @Column()
   externalId: string
 
-  @OneToOne(() => ProfileEntity, { onDelete: 'CASCADE' })
+  @OneToOne(() => ProfileEntity)
   @JoinColumn({name: 'profile_id'})
   profile: ProfileEntity;
 }
