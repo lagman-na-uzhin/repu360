@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {EntityManager, Equal, Repository} from 'typeorm';
+import {EntityManager, Equal, In, Repository} from 'typeorm';
 import {InjectEntityManager, InjectRepository} from '@nestjs/typeorm';
 import { OrganizationEntity } from '@infrastructure/entities/organization/organization.entity';
 import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
@@ -46,6 +46,16 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
 
 
     return this.base.getList<Organization>(qb, this.toDomain, params.pagination,  params.sort);
+  }
+
+  async getByIds(ids: OrganizationId[]): Promise<Organization[]> {
+    const entities = await this.manager.getRepository(OrganizationEntity).find({
+      where: {
+        id: In(ids)
+      }
+    })
+
+    return entities.map(this.toDomain);
   }
 
   private toDomain(entity: OrganizationEntity): Organization {

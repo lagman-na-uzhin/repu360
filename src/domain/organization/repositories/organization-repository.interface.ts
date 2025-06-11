@@ -8,5 +8,6 @@ export interface IOrganizationRepository {
     getActiveList(): Promise<Organization[]>;
     getById(id: OrganizationId): Promise<Organization | null>;
     save(organization: Organization): Promise<void>;
-    getListByCompanyId(params: GetOrganizationListByCompanyParams): Promise<PaginatedResult<Organization>>
+    getListByCompanyId(params: GetOrganizationListByCompanyParams): Promise<PaginatedResult<Organization>>;
+    getByIds(ids: OrganizationId[]): Promise<Organization[]>;
 }

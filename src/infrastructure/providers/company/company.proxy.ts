@@ -6,6 +6,7 @@ import {
   UpdateCompanyUseCase
 } from "@application/use-cases/default/company/commands/update-company/update-company.usecase";
 import {CreateCompanyUseCase} from "@application/use-cases/control/company/commands/create/create-company.usecase";
+import {ByIdCompanyUseCase} from "@application/use-cases/default/company/queries/by-id/by-id-company.usecase";
 
 
 export const companyProxyProviders = [
@@ -22,6 +23,14 @@ export const companyProxyProviders = [
     provide: CompanyProxy.CREATE_COMPANY_USE_CASE,
     useFactory: (companyRepo: ICompanyRepository) => {
       return new UseCaseProxy(new CreateCompanyUseCase(companyRepo))
+    }
+  },
+
+  {
+    inject: [CompanyOrmRepository],
+    provide: CompanyProxy.BY_ID_COMPANY_USE_CASE,
+    useFactory: (companyRepo: ICompanyRepository) => {
+      return new UseCaseProxy(new ByIdCompanyUseCase(companyRepo))
     }
   },
 ]

@@ -10,7 +10,7 @@ export class CreateCompanyCommand extends BaseCommand {
     super(actor);
   }
 
-  public static of(name: string, actor: Actor) {
-    return new CreateCompanyCommand(new CompanyName(name), actor);
+  public static of(dto: {companyName: string}, actor: Actor) {
+    return new CreateCompanyCommand(new CompanyName(dto.companyName), actor);
   }
 }

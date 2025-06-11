@@ -6,6 +6,7 @@ export class EmployeePermissions {
     constructor(
         public readonly companies: Set<string> = new Set(),
         public readonly reviews: Map<OrganizationId, Set<string>> = new Map(),
+        public readonly organizations: Map<OrganizationId, Set<string>> = new Map(),
     ) {}
 
     static fromPersistence(companies: Set<string>, reviews: Map<OrganizationId, Set<string>> ) {

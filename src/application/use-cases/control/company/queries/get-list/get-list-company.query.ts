@@ -15,18 +15,20 @@ export class GetListCompanyQuery extends BaseQuery {
     }
 
     static of(
-        filter: GetCompanyListFilter,
-        pagination: PaginationParams,
+        dto: {
+            filter: GetCompanyListFilter,
+            pagination: PaginationParams,
+            sort?: SortParams,
+            search?: string,
+        },
         actor: Actor,
-        sort?: SortParams,
-        search?: string,
     ) {
         return new GetListCompanyQuery(
-            filter,
-            pagination,
+            dto.filter,
+            dto.pagination,
             actor,
-            sort,
-            search
+            dto.sort,
+            dto.search
         )
     }
 }

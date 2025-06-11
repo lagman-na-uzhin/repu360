@@ -8,22 +8,20 @@ import { RepositoriesModule } from '@infrastructure/repositories/repositories.mo
 import { BcryptModule } from '@infrastructure/services/hash/bcrypt.module';
 import { JwtServiceModule } from '@infrastructure/services/jwt/jwt.module';
 import { RequestModule } from '@infrastructure/services/request/request.module';
-import {managerProxyExports, managerProxyProviders} from "@infrastructure/providers/manager/manager.proxy";
-import {
-  organizationProxyExports,
-  organizationProxyProviders
-} from "@infrastructure/providers/organization/organization.proxy";
-import {authProxyExports, authProxyProviders} from "@infrastructure/providers/auth/auth.proxy";
-import {reviewProxyProviders} from "@infrastructure/providers/review/review.providers";
 import {BullServiceModule} from "@infrastructure/services/bull/bull.module";
-import {
-  proxySessionProviders,
-  proxySessionProxyExports
-} from "@infrastructure/providers/proxy-session/proxy-session.providers";
 import {LanguageDetectorServiceModule} from "@infrastructure/services/language-detector/language-detector.module";
 import {TemplateServiceModule} from "@infrastructure/services/template/template.module";
 import {UnitOfWorkModule} from "@infrastructure/services/unit-of-work/unit-of-work.module";
 import {companyProxyExports} from "@application/use-case-proxies/company/company.proxy";
+import {organizationProxyExports} from "@application/use-case-proxies/organization/organization.proxy";
+import {
+  proxySessionProviders,
+  proxySessionProxyExports
+} from "@infrastructure/providers/proxy-session/proxy-session.providers";
+import {managerProxyExports, managerProxyProviders} from "@infrastructure/providers/manager/manager.proxy";
+import {organizationProxyProviders} from "@infrastructure/providers/organization/organization.proxy";
+import {authProxyExports, authProxyProviders} from "@infrastructure/providers/auth/auth.proxy";
+import {reviewProxyProviders} from "@infrastructure/providers/review/review.providers";
 
 @Module({
   imports: [

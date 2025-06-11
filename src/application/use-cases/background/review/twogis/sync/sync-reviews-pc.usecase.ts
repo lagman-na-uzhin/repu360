@@ -1,4 +1,3 @@
-import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
 import {Review} from "@domain/review/review";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import { IReviewRepository } from '@domain/review/repositories/review-repository.interface';

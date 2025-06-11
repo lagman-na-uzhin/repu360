@@ -1,13 +1,13 @@
 import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 
 export class CompanyName {
-    private readonly value: string;
+    private readonly _value: string;
 
     constructor(name: string) {
         if (!this.isValid(name)) {
             throw new Error(EXCEPTION.COMPANY.INVALID_COMPANY_NAME);
         }
-        this.value = name;
+        this._value = name;
     }
 
     private isValid(name: string): boolean {
@@ -15,6 +15,6 @@ export class CompanyName {
     }
 
     toString(): string {
-        return this.value;
+        return this._value;
     }
 }

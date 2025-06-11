@@ -1,4 +1,3 @@
-import { LogMethod } from '@infrastructure/common/decorators/logging.decorator';
 import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
 import {CompanyPolicy} from "@domain/policy/policies/company-policy";
@@ -11,7 +10,6 @@ export class UpdateCompanyUseCase {
         private readonly companyRepo: ICompanyRepository,
     ) {}
 
-    @LogMethod(UpdateCompanyUseCase.name)
     async execute(cmd: UpdateCompanyCommand): Promise<void> {
         if (!CompanyPolicy.canUpdateCompany(cmd.actor)) {
             throw new Error(EXCEPTION.ROLE.PERMISSION_DENIED);

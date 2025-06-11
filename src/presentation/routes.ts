@@ -2,14 +2,17 @@ export const DEFAULT_ROUTES = {
   COMPANY: {
     BASE: 'company',
 
-    MY: ':companyId', //GET
+    BY_ID: ':companyId', //GET
     UPDATE: ':companyId', //PATCH
   },
 
   ORGANIZATION: {
     BASE: 'organizations',
 
-    GET_LIST_BY_COMPANY: ':companyId'
+    GET_LIST_BY_COMPANY: ':companyId',
+
+    USER_PERMITTED_GET_LIST: 'user'
+
   },
 
   EMPLOYEE: {
