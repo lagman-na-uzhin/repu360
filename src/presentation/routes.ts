@@ -49,6 +49,18 @@ export const CONTROL_ROUTES = {
     BY_ID: ':companyId', //GET
     UPDATE: ':companyId', //PUT
     DELETE: ':companyId', //DELETE
+  },
+
+  SUBSCRIPTION: {
+    BASE: 'control/subscriptions',
+
+    CREATE: '',//POST
+    LIST: '', //GET
+    BY_ID: ':subscriptionId', //GET
+    UPDATE: ':subscriptionId', //PUT
+
+    //TARIFF
+    CREATE_TARIFF: 'tariff'
   }
 } as const;
 

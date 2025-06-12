@@ -22,6 +22,8 @@ import {managerProxyExports, managerProxyProviders} from "@infrastructure/provid
 import {organizationProxyProviders} from "@infrastructure/providers/organization/organization.proxy";
 import {authProxyExports, authProxyProviders} from "@infrastructure/providers/auth/auth.proxy";
 import {reviewProxyProviders} from "@infrastructure/providers/review/review.providers";
+import {subscriptionProxyProviders} from "@infrastructure/providers/subscription/subscription.providers";
+import {subscriptionProxyExports} from "@application/use-case-proxies/subscription/subscription.proxy";
 
 @Module({
   imports: [
@@ -48,7 +50,8 @@ export class UsecaseProxyModule {
         ...managerProxyProviders,
         ...organizationProxyProviders,
         ...authProxyProviders,
-        ...proxySessionProviders
+        ...proxySessionProviders,
+        ...subscriptionProxyProviders
       ],
       exports: [
         ...reviewProxyExports,
@@ -58,6 +61,7 @@ export class UsecaseProxyModule {
         ...organizationProxyExports,
         ...authProxyExports,
         ...proxySessionProxyExports,
+        ...subscriptionProxyExports
       ],
     };
   }

@@ -14,8 +14,11 @@ export class CreateSubscriptionCommand extends BaseCommand {
         super(actor);
     }
 
-    static of(dto: { tariffId: TariffId, companyId: CompanyId, period: SubscriptionPeriod, actor: Actor }) {
-        const { tariffId, companyId, period, actor } = dto;
-        return new CreateSubscriptionCommand(tariffId, companyId, period, actor);
+    static of(dto: { tariffId: string, companyId: string, periodStart: Date, periodEnd: Date }, actor: Actor) {
+        return new CreateSubscriptionCommand(
+            new TariffId(dto.tariffId),
+            new CompanyId(dto.companyId),
+            new SubscriptionPeriod(dto.periodStart, dto.periodEnd),
+            actor);
     }
 }

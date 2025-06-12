@@ -18,4 +18,29 @@ export class TariffFeatures {
 
     ) {}
 
+    static create(
+        companyDataSync: boolean,
+        multiAccess: boolean,
+        registerPlacement: boolean,
+        reviewReply: boolean,
+        reviewAutoReply: boolean,
+        reviewComplaint: boolean,
+        reviewAutoComplaint: boolean,
+        analysisReview: boolean,
+        analysisByRadius: boolean,
+        analysisCompetitor: boolean
+    ) {
+        return new TariffFeatures(
+            companyDataSync,
+            multiAccess,
+            registerPlacement,
+            reviewReply,
+            reviewAutoReply,
+            reviewComplaint,
+            reviewAutoComplaint,
+            analysisReview,
+            analysisByRadius,
+            analysisCompetitor
+        )
+    }
 }
