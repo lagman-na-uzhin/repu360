@@ -1,6 +1,6 @@
 import {Actor} from "@domain/policy/actor";
 import {BaseQuery} from "@application/common/base-query";
-import {PaginationParams, SortParams} from "@domain/common/interfaces/repositories/get-list.interface";
+import {PaginationParams, SortParams} from "@domain/common/repositories/get-list.interface";
 import {GetOrganizationListByCompanyFilter} from "@domain/organization/repositories/params/get-list-by-company.params";
 import {CompanyId} from "@domain/company/company";
 
@@ -15,10 +15,10 @@ export class GetOrganizationListQuery extends BaseQuery {
 
     static of(
         {companyId, pagination, sort, search}:
-        {companyId: CompanyId, pagination: PaginationParams, sort?: SortParams, search?: string},
+        {companyId: string, pagination: PaginationParams, sort?: SortParams, search?: string},
         actor: Actor) {
 
-        const filter: GetOrganizationListByCompanyFilter = {companyId}
+        const filter: GetOrganizationListByCompanyFilter = {companyId: new CompanyId(companyId)}
         return new GetOrganizationListQuery(
             filter,
             pagination,

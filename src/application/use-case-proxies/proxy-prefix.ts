@@ -4,6 +4,8 @@ export enum ProxyPrefix {
   ORGANIZATION_PROXY = 'OrganizationProxy',
   YANDEX_ORGANIZATION_PROXY = 'YandexOrganizationProxy',
   REVIEW_PROXY = 'ReviewProxy',
+  LEAD_PROXY = 'LEAD_PROXY',
+  SUBSCRIPTION_PROXY = 'SubscriptionProxy',
   YANDEX_REVIEW_PROXY = 'YandexReviewProxy',
   PROFILE_PROXY = 'ProfileProxy',
   YANDEX_PROFILE_PROXY = 'YandexProfileProxy',

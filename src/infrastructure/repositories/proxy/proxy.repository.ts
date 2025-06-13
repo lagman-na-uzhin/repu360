@@ -24,7 +24,6 @@ export class ProxyOrmRepository implements IProxyRepository {
     }
 
     async getCompanyProxies(companyId: CompanyId): Promise<IProxy[]> {
-        console.log(companyId, "companyid getCompanyProxies")
         return this.manager
             .getRepository(ProxyEntity)
             .createQueryBuilder('proxy')

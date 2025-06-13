@@ -61,6 +61,13 @@ export const CONTROL_ROUTES = {
 
     //TARIFF
     CREATE_TARIFF: 'tariff'
+  },
+
+  LEAD: {
+    BASE: 'control/lead',
+
+    ASSIGN: 'assign', //PATCH
+    CONFIRM: 'confirm' //PATCH
   }
 } as const;
 
@@ -71,4 +78,11 @@ export const GENERAl_ROUTES = {
     MANAGER_LOGIN: 'manager/login', //POST
     ME: 'me', //GET
   },
+
+  LANDING: {
+    BASE: 'landing',
+
+    CREATE_LEAD: 'lead', //POST
+
+  }
 } as const;

@@ -21,7 +21,7 @@ export class Tariff {
     return new Tariff(new TariffId(), isActive, price, _features);
   }
 
-  static fromPersistence(id: string, isActive: boolean, price: number, startedAt: Date | string, features: TariffFeatures): Tariff {
+  static fromPersistence(id: string, isActive: boolean, price: number, features: TariffFeatures): Tariff {
     return new Tariff(new TariffId(id), isActive, price, features);
 
   }

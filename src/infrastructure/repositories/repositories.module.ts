@@ -15,6 +15,7 @@ import {PROFILE_ENTITIES} from "@infrastructure/entities/profile";
 import {PROXY_ENTITIES} from "@infrastructure/entities/proxy";
 import {SUBSCRIPTION_ENTITIES} from "@infrastructure/entities/subscription";
 import {TARIFF_ENTITIES} from "@infrastructure/entities/tariff";
+import {LEAD_ENTITIES} from "@infrastructure/entities/lead";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import {TARIFF_ENTITIES} from "@infrastructure/entities/tariff";
         ...PROXY_ENTITIES,
         ...SUBSCRIPTION_ENTITIES,
         ...TARIFF_ENTITIES,
+        ...LEAD_ENTITIES
     ]),
     forwardRef(() => RequestModule),
     EnvConfigModule,

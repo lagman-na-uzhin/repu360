@@ -4,7 +4,7 @@ import {InjectEntityManager, InjectRepository} from '@nestjs/typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {Company, CompanyId} from '@domain/company/company';
 import {ICompanyRepository} from '@domain/company/repositories/company-repository.interface';
-import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
+import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
 import {GetCompanyListParams} from "@domain/company/repositories/types/get-company-list.params";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {PlacementId} from "@domain/placement/placement";

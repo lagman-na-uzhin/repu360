@@ -9,8 +9,12 @@ export class EmployeePermissions {
         public readonly organizations: Map<OrganizationId, Set<string>> = new Map(),
     ) {}
 
-    static fromPersistence(companies: Set<string>, reviews: Map<OrganizationId, Set<string>> ) {
-        return new EmployeePermissions(companies, reviews);
+    static fromPersistence(
+        companies: Set<string>,
+        reviews: Map<OrganizationId, Set<string>>,
+        organizations: Map<OrganizationId, Set<string>>
+    ) {
+        return new EmployeePermissions(companies, reviews, organizations);
     }
 
     static owner(): EmployeePermissions {

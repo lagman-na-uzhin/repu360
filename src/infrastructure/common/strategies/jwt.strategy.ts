@@ -58,7 +58,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const managerData = persistence as ManagerAuthDataType;
 
       permissions = ManagerPermissions.fromPersistence(
-          new Set(managerData.role.permissions.companies)
+          new Set(managerData.role.permissions.companies),
+          new Set(managerData.role.permissions.leads)
       );
 
       const role = Role.fromPersistence(
@@ -82,6 +83,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 new Set(item.permissions)
               ])
           ),
+          new Map(
+              employeeData.role.permissions.organizations.map(item => [
+                new OrganizationId(item.organizationId),
+                new Set(item.permissions)
+              ])
+          ),
       )
 
       const role = Role.fromPersistence(
@@ -90,6 +97,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           persistence.role.type,
           permissions
       )
+
+      console.log(role, "roleeee")
 
       return Actor.fromPersistence(
           persistence.id,

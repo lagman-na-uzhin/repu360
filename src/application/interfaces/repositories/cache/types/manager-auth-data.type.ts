@@ -5,6 +5,7 @@ type Role = {
     type: string;
     permissions: {
         companies: string[];
+        leads: string[];
     }
 }
 export type ManagerAuthDataType = {

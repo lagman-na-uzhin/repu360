@@ -5,6 +5,9 @@ import {
 import {OrganizationOrmRepository} from "@infrastructure/repositories/organization/organization.repository";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 import {OrganizationProxy} from "@application/use-case-proxies/organization/organization.proxy";
+import {
+    GetUserPermittedOrganizationListUseCase
+} from "@application/use-cases/default/organization/queries/get-list-by-user/get-list-by-user.usecase";
 
 
 export const organizationProxyProviders = [
@@ -13,6 +16,14 @@ export const organizationProxyProviders = [
         provide: OrganizationProxy.GET_LIST,
         useFactory: (organizationRepo: IOrganizationRepository) => {
             return new UseCaseProxy(new GetOrganizationListUseCase(organizationRepo))
+        }
+    },
+
+    {
+        inject: [OrganizationOrmRepository],
+        provide: OrganizationProxy.GET_USER_PERMITTED_ORGANIZATIONS_LIST,
+        useFactory: (organizationRepo: IOrganizationRepository) => {
+            return new UseCaseProxy(new GetUserPermittedOrganizationListUseCase(organizationRepo))
         }
     },
 

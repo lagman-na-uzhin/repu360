@@ -21,7 +21,10 @@ export class EmployeeLoginUseCase {
         const employee = await this.employeeRepo.getByEmail(cmd.email);
         if (!employee) throw new Error(EXCEPTION.EMPLOYEE.INCORRECT_EMAIL_OR_PASSWORD);
 
+        console.log(employee, "employee")
+
         const role = await this.roleRepo.getById(employee.roleId);
+        console.log(role, "role")
         if (!role) throw new Error(EXCEPTION.ROLE.NOT_FOUND);
 
         const passwordIsValid = await this.hashService.compare(cmd.password.toString(), employee.password.toString());

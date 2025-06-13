@@ -38,4 +38,13 @@ export class Company {
     get managerId() {
         return this._managerId;
     }
+
+    toPlainObject() {
+        return {
+            id: this._id.toString(),
+            managerId: this._managerId.toString(),
+            name: this._name.toString()
+        }
+    }
+
 }

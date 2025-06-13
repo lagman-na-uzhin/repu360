@@ -43,7 +43,11 @@ export class CacheRepository implements ICacheRepository {
             organizationId: orgId.toString(),
             permissions: Array.from(permissions),
           })),
-          companies: Array.from(role.managerPermissions.companies)
+          companies: Array.from(role.employeePermissions.companies),
+          organizations: Array.from(role.employeePermissions.organizations.entries()).map(([orgId, permissions]) => ({
+            organizationId: orgId.toString(),
+            permissions: Array.from(permissions),
+          }))
         },
       }
     };

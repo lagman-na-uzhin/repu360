@@ -1,4 +1,4 @@
-import {FilterParams, GetListParams} from "@domain/common/interfaces/repositories/get-list.interface";
+import {FilterParams, GetListParams} from "@domain/common/repositories/get-list.interface";
 import {CompanyId} from "@domain/company/company";
 
 export interface GetOrganizationListByCompanyFilter extends FilterParams{

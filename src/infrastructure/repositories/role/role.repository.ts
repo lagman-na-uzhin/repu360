@@ -44,10 +44,15 @@ export class RoleOrmRepository implements IRoleRepository {
 
         const reviewsPermissionsMap = this.getPermissionsForOrganization(entity.permissions, "REVIEWS");
 
+        const organizationsPermissionsMap = this.getPermissionsForOrganization(entity.permissions, "ORGANIZATIONS");
+
+        const leadsPermissions = this.getPermissionsForModule(entity.permissions, "LEADS");
+
+
         if (roleType.equals(RoleType.type.ADMIN) || roleType.equals(RoleType.type.MANAGER)) {
-            return ManagerPermissions.fromPersistence(companiesPermissions);
+            return ManagerPermissions.fromPersistence(companiesPermissions, leadsPermissions);
         } else {
-            return EmployeePermissions.fromPersistence(companiesPermissions, reviewsPermissionsMap);
+            return EmployeePermissions.fromPersistence(companiesPermissions, reviewsPermissionsMap, organizationsPermissionsMap);
         }
     }
 

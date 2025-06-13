@@ -6,6 +6,7 @@ type Role = {
     type: string;
     permissions: {
         reviews: { organizationId: string; permissions: string[] }[];
+        organizations: { organizationId: string; permissions: string[] }[];
         companies: string[];
     }
 }

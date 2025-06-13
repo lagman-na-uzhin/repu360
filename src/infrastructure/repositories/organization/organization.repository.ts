@@ -5,7 +5,7 @@ import { OrganizationEntity } from '@infrastructure/entities/organization/organi
 import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
 import { Organization, OrganizationId } from '@domain/organization/organization';
-import {PaginatedResult} from "@domain/common/interfaces/repositories/paginated-result.interface";
+import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
 
@@ -51,7 +51,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
   async getByIds(ids: OrganizationId[]): Promise<Organization[]> {
     const entities = await this.manager.getRepository(OrganizationEntity).find({
       where: {
-        id: In(ids)
+        id: In(ids.map(id => id.toString()))
       }
     })
 

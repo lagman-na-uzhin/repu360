@@ -10,6 +10,9 @@ import {ManagerOrmRepository} from "@infrastructure/repositories/manager/manager
 import {ProxyOrmRepository} from "@infrastructure/repositories/proxy/proxy.repository";
 import {TwogisRepository} from "@infrastructure/integrations/twogis/twogis.repository";
 import {ReplyTemplateOrmRepository} from "@infrastructure/repositories/auto-reply/reply-template.repository";
+import {SubscriptionOrmRepository} from "@infrastructure/repositories/subscription/subscription.repository";
+import {TariffOrmRepository} from "@infrastructure/repositories/subscription/tariff.repository";
+import {LeadOrmRepository} from "@infrastructure/repositories/lead/lead.repository";
 
 export const REPOSITORIES = [
   CacheRepository,
@@ -20,8 +23,11 @@ export const REPOSITORIES = [
   ProfileOrmRepository,
   ReviewOrmRepository,
   RoleOrmRepository,
-    ManagerOrmRepository,
-    ProxyOrmRepository,
+  ManagerOrmRepository,
+  ProxyOrmRepository,
   TwogisRepository,
-  ReplyTemplateOrmRepository
+  ReplyTemplateOrmRepository,
+  SubscriptionOrmRepository,
+  TariffOrmRepository,
+  LeadOrmRepository
 ]

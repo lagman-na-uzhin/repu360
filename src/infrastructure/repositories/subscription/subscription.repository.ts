@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {EntityManager, Equal} from "typeorm";
 import {ISubscriptionRepository} from "@domain/subscription/repositories/subscription-repository.interface";
+import {Subscription} from "@domain/subscription/subscription";
 
 @Injectable()
 export class SubscriptionOrmRepository implements ISubscriptionRepository {

@@ -3,7 +3,7 @@ import { ManagerEmail } from '@domain/manager/value-object/manager-email.vo';
 import { ManagerName } from '@domain/manager/value-object/manager-name.vo';
 import { ManagerPhone } from '@domain/manager/value-object/manager-phone.vo';
 import { ManagerPassword } from '@domain/manager/value-object/manager-password.vo';
-import {Lead} from "@domain/manager/model/lead/lead";
+import {Lead} from "@domain/lead/lead";
 import {RoleId} from "@domain/policy/model/role";
 
 export class ManagerId extends UniqueID {}
@@ -16,7 +16,6 @@ export class Manager {
       private _phone: ManagerPhone,
       private _password: ManagerPassword,
       private _roleId: RoleId,
-      // private _leads: Lead[],
 
       private readonly _createdAt: Date = new Date(),
       private _updatedAt: Date | null = null,

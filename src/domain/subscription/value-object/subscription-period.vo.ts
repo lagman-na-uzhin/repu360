@@ -28,6 +28,10 @@ export class SubscriptionPeriod {
         return new SubscriptionPeriod(start, end);
     }
 
+    public static create(start: Date, end: Date): SubscriptionPeriod {
+        return new SubscriptionPeriod(start, end);
+    }
+
     public get start(): Date {
         return this._start;
     }

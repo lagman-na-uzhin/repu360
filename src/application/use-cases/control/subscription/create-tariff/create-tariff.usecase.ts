@@ -1,25 +1,44 @@
-import { ICompanyRepository } from '@domain/company/repositories/company-repository.interface';
-import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
-import {Subscription} from "@domain/subscription/subscription";
-import {ISubscriptionRepository} from "@domain/subscription/repositories/subscription-repository.interface";
 import {CreateTariffCommand} from "@application/use-cases/control/subscription/create-tariff/create-tariff.command";
 import {TariffFeatures} from "@domain/subscription/model/tariff-feature";
+import {Tariff} from "@domain/subscription/model/tariff";
 
 export class CreateTariffUseCase {
     constructor(
-        private readonly companyRepo: ICompanyRepository,
         private readonly tariffRepo: ITariffRepository,
-        private readonly subscriptionRepo: ISubscriptionRepository
     ) {}
 
     async execute(cmd: CreateTariffCommand): Promise<void> {
-        const features = TariffFeatures.create(
-            cmd.
-        )
+        const features = this.createTariffFeatures(cmd);
 
+        const tariff = Tariff.create(true, cmd.price, features);
 
+        await this.tariffRepo.save(tariff);
+    }
 
-        await this.subscriptionRepo.save(subscription);
+    private createTariffFeatures(cmd: CreateTariffCommand) {
+        const companyDataSync = cmd.features.companyDataSync;
+        const multiAccess = cmd.features.multiAccess;
+        const registerPlacement = cmd.features.registerPlacement;
+        const reviewReply = cmd.features.reviewReply;
+        const reviewAutoReply = cmd.features.reviewAutoReply;
+        const reviewComplaint = cmd.features.reviewComplaint;
+        const reviewAutoComplaint = cmd.features.reviewAutoComplaint;
+        const analysisReview = cmd.features.analysisReview;
+        const analysisByRadius = cmd.features.analysisByRadius;
+        const analysisCompetitor = cmd.features.analysisCompetitor;
+
+        return TariffFeatures.create(
+            companyDataSync,
+            multiAccess,
+            registerPlacement,
+            reviewReply,
+            reviewAutoReply,
+            reviewComplaint,
+            reviewAutoComplaint,
+            analysisReview,
+            analysisByRadius,
+            analysisCompetitor
+        );
     }
 }

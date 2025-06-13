@@ -18,7 +18,7 @@ export class CreateSubscriptionCommand extends BaseCommand {
         return new CreateSubscriptionCommand(
             new TariffId(dto.tariffId),
             new CompanyId(dto.companyId),
-            new SubscriptionPeriod(dto.periodStart, dto.periodEnd),
+            SubscriptionPeriod.create(dto.periodStart, dto.periodEnd),
             actor);
     }
 }
