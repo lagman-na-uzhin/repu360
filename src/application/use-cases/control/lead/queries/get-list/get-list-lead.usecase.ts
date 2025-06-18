@@ -9,7 +9,7 @@ export class GetListLeadUseCase {
     ) {}
 
     async execute(qy: GetLeadListQuery): Promise<PaginatedResult<Lead>> {
-        return this.leadRepo.getList(qy);
+        return this.leadRepo.getLeadList(qy);
     }
 
 }

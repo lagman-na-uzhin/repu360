@@ -14,19 +14,19 @@ export interface Response<T> {
 @Injectable()
 export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(
-    context: ExecutionContext,
-    next: CallHandler,
+      context: ExecutionContext,
+      next: CallHandler,
   ): Observable<Response<T>> {
     return next.handle().pipe(
-      map((data) => {
-        return this.return(data);
-      }),
+        map((data) => {
+          return this.return(data);
+        }),
     );
   }
 
   return(data: any) {
     if (data?.statusCode || data?.message) return this.custom(data);
-    if (data?.list) return this.list(data);
+    if (data?.list !== undefined) return this.list(data); // Changed to check for undefined to be more robust
     if (data?.generatedMaps?.length >= 0) return this.update(data);
     if (data?.affected !== undefined) return this.delete();
     else return this.default(data);
@@ -52,21 +52,33 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
     };
   }
 
-  list(data: Record<'list' | 'total' | 'pages', string[]>) {
+  // --- CORRECTED LIST METHOD ---
+  list(data: Record<string, any>) {
     if (!Array.isArray(data.list)) {
       throw new HttpException('data.list is not an array', 500);
     }
-    const toReturn: Record<string, any> = {
+
+    const responseData: Record<string, any> = {
+      list: data.list,
+    };
+
+    // If meta exists, add it directly to the data object
+    if (data?.meta) {
+      responseData.meta = data.meta;
+    } else {
+      // Fallback for cases without a 'meta' object, if needed
+      // (You might consider removing this else block if all list responses will have 'meta')
+      if (typeof data?.total === 'number') responseData.total = data.total;
+      if (typeof data?.pages === 'number') responseData.pages = data.pages;
+    }
+
+    return {
       statusCode: 200,
       message: 'SUCCESS',
-      data: {
-        list: data.list,
-      },
+      data: responseData,
     };
-    if (typeof data?.total === 'number') toReturn.data.total = data.total;
-    if (typeof data?.pages === 'number') toReturn.data.pages = data.pages;
-    return toReturn;
   }
+  // --- END OF CORRECTED LIST METHOD ---
 
   delete() {
     return {

@@ -10,7 +10,7 @@ export class UserPermissionEntity {
     roleId: string;
 
     @Column()
-    module: "COMPANIES" | "REVIEWS";
+    module: "COMPANIES" | "REVIEWS" | "ORGANIZATIONS";
 
     @Column()
     permission: string;

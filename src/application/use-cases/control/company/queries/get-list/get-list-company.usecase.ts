@@ -9,6 +9,6 @@ export class GetListCompanyUseCase {
     ) {}
 
     async execute(query: GetListCompanyQuery): Promise<PaginatedResult<Company>> {
-        return this.companyRepo.getList(query);
+        return this.companyRepo.getCompanyList(query);
     }
 }

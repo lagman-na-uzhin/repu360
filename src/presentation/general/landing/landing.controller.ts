@@ -1,4 +1,4 @@
-import {Controller, HttpCode, HttpStatus, Inject, Post} from '@nestjs/common';
+import {Controller, HttpCode, HttpStatus, Inject, Patch, Post} from '@nestjs/common';
 import {GENERAl_ROUTES} from "@presentation/routes";
 import {LeadProxy} from "@application/use-case-proxies/lead/lead.proxy";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";

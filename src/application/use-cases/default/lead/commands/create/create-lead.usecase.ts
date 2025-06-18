@@ -9,7 +9,7 @@ export class CreateLeadUseCase {
     ) {}
 
     async execute(cmd: CreateLeadCommand): Promise<void> {
-        const contact = LeadContact.create(cmd.phone, cmd.name, cmd.email);
+        const contact = LeadContact.create(cmd.companyName, cmd.phone, cmd.name, cmd.email);
 
         const lead = Lead.create(contact);
 

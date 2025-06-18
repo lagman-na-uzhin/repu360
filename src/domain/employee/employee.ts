@@ -66,6 +66,19 @@ export class Employee {
         )
     }
 
+    toPlainObject() {
+        return {
+            id: this._id.toString(),
+            companyId: this._companyId.toString(),
+            roleId: this._roleId.toString(),
+            name: this._name.toString(),
+            email: this._email.toString(),
+            phone: this._phone.toString(),
+            password: this._password.toString(),
+            avatar: this._avatar
+        }
+    }
+
     set name(newName: EmployeeName) {
         this._name = newName;
     }

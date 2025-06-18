@@ -9,7 +9,7 @@ export const DEFAULT_ROUTES = {
   ORGANIZATION: {
     BASE: 'organizations',
 
-    GET_LIST_BY_COMPANY: ':companyId',
+    GET_LIST: '',
 
     USER_PERMITTED_GET_LIST: 'user'
 
@@ -64,7 +64,7 @@ export const CONTROL_ROUTES = {
   },
 
   LEAD: {
-    BASE: 'control/lead',
+    BASE: 'control/leads',
 
     ASSIGN: 'assign', //PATCH
     CONFIRM: 'confirm' //PATCH

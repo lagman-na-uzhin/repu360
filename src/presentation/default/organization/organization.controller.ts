@@ -12,6 +12,11 @@ import {
 import {BaseQuery} from "@application/common/base-query";
 import {OrganizationProxy} from "@application/use-case-proxies/organization/organization.proxy";
 import {OrganizationResponseDto} from "@presentation/dtos/organization.response";
+import {RequestQuery} from "@infrastructure/common/decorators/request-query.decorator";
+import {
+    GetOrganizationListQuery
+} from "@application/use-cases/default/organization/queries/get-list-by-company/get-list-by-company.query";
+import {GetOrganizationListQueryDto} from "@presentation/default/organization/dto/get-list-organizations.request";
 
 @UseGuards(JwtAuthGuard)
 @Controller(DEFAULT_ROUTES.ORGANIZATION.BASE)
@@ -24,16 +29,20 @@ export class OrganizationController {
     ) {}
 
 
-    // @Get(ORGANIZATION_API_ROUTES.GET_LIST_BY_COMPANY.path(':companyId'))
-    // async getListByCompany(
-    //     @RequestParams('companyId') companyId: typeof ORGANIZATION_API_ROUTES.GET_LIST_BY_COMPANY._pathParams['companyId'],
-    //     @RequestQuery() query: typeof ORGANIZATION_API_ROUTES.GET_LIST_BY_COMPANY._queryParams,
-    //     @RequestActor() actor: Actor
-    // ) {
-    //     // const query = GetOrganizationListQuery.of(companyId, query, actor);
-    //     //
-    //     // return this.getListUseCaseProxy.getInstance().execute(query);
-    // }
+    @Get(DEFAULT_ROUTES.ORGANIZATION.GET_LIST)
+    async getListByCompany(
+        @RequestQuery() dto: GetOrganizationListQueryDto,
+        @RequestActor() actor
+    ) {
+        const query = GetOrganizationListQuery.of(dto, actor);
+
+        const {list, meta} = await this.getListUseCaseProxy.getInstance().execute(query);
+
+        return {
+            list: list.map(OrganizationResponseDto.fromDomain),
+            meta
+        };
+    }
 
 
     @Get(DEFAULT_ROUTES.ORGANIZATION.USER_PERMITTED_GET_LIST)

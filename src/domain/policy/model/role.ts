@@ -23,8 +23,9 @@ export class Role {
         return new Role(new RoleId(id), name, new RoleType(type), permissions);
     }
 
-    get id() {
-        return this._id
+    static createCompanyOwnerRole() {
+        const ownerPermissions = EmployeePermissions.owner();
+        return new Role(new RoleId(), 'Owner', new RoleType("OWNER"), ownerPermissions)
     }
 
     get employeePermissions(): EmployeePermissions {
@@ -52,12 +53,9 @@ export class Role {
     }
 
 
-    get name() {
-        return this._name
-    }
-    get type() {
-        return this._type
-    }
+    get id() {return this._id}
+    get name() {return this._name}
+    get type() {return this._type}
 
     public isManager(): boolean {
         return this._type.equals(RoleType.type.MANAGER);
@@ -74,5 +72,6 @@ export class Role {
     public isEmployee(): boolean {
         return this._type.equals(RoleType.type.EMPLOYEE);
     }
+
 
 }

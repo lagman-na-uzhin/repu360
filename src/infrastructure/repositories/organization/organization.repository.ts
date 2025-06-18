@@ -8,13 +8,18 @@ import { Organization, OrganizationId } from '@domain/organization/organization'
 import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
+import {LeadEntity} from "@infrastructure/entities/lead/lead.entity";
+import {Lead} from "@domain/lead/lead";
 
 @Injectable()
-export class OrganizationOrmRepository implements IOrganizationRepository {
+export class OrganizationOrmRepository
+    extends BaseRepository<OrganizationEntity>
+    implements IOrganizationRepository {
   constructor(
       @InjectEntityManager() private readonly manager: EntityManager,
-      private readonly base: BaseRepository<OrganizationEntity>
-  ) {}
+  ) {
+    super()
+  }
 
   async getById(id: OrganizationId): Promise<Organization | null> {
     const entity = await this.manager.getRepository(OrganizationEntity).findOneBy({id: Equal(id.toString())});
@@ -29,7 +34,6 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
   async getActiveList(): Promise<Organization[]> {
     const entities = await this.manager.getRepository(OrganizationEntity)
       .createQueryBuilder('organization')
-      .leftJoinAndSelect('organization.platforms', 'platforms')
       .leftJoin('organization.company', 'company')
       .leftJoin('company.tariff', 'tariff')
       .where('tariff.isActive = :isActive', { isActive: true })
@@ -45,7 +49,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     qb.andWhere('organization.companyId = :companyId', { companyId: params.filter?.companyId });
 
 
-    return this.base.getList<Organization>(qb, this.toDomain, params.pagination,  params.sort);
+    return this.getList<Organization>(qb, this.toDomain, params.pagination,  params.sort);
   }
 
   async getByIds(ids: OrganizationId[]): Promise<Organization[]> {

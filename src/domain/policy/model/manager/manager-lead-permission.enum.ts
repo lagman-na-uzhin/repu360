@@ -1,0 +1,4 @@
+export enum ManagerLeadPermission {
+    ASSIGN_SELF_AS_MANAGER = 'ASSIGN_SELF_AS_MANAGER',
+    ASSIGN_LEADS_TO_ANYONE = "ASSIGN_LEADS_TO_ANYONE"
+}

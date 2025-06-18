@@ -8,9 +8,16 @@ export class GetUserPermittedOrganizationListUseCase {
     ) {}
 
     async execute(query: BaseQuery) {
-        // Get the IDs of organizations to which the actor has any permissions
-        const permittedOrganizationIds: OrganizationId[] = Array.from(query.actor.role.employeePermissions.organizations.keys())
+        const organizationPermissions = query.actor.role.employeePermissions.organizations;
+        console.log(organizationPermissions, "permission")
+        const permittedOrganizationIds: OrganizationId[] = [];
 
+        organizationPermissions.forEach((_perms, key) => {
+            if (key !== '*') {
+                permittedOrganizationIds.push(new OrganizationId(key));
+            }
+        });
+        console.log(permittedOrganizationIds, "permittedOrganizationIds")
         return this.organizationRepo.getByIds(permittedOrganizationIds);
     }
 }

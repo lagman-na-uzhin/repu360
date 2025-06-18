@@ -41,4 +41,5 @@ export class Lead {
     get createdAt() {return this._createdAt}
 
     set managerId(managerId: ManagerId) {this._managerId = managerId}
+    processed() {this._processedAt = new Date()}
 }

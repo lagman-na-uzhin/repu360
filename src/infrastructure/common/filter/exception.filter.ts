@@ -22,7 +22,6 @@ export class AllExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest();
 
     const actor = request.actor ?? '';
-    console.log(exception, 'exception')
     const combinedData = {
       ...request.body,
       ...request.query,

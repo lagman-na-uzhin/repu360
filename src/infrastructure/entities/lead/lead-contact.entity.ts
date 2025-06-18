@@ -19,6 +19,9 @@ export class LeadContactEntity {
     public leadId: string;
 
     @Column()
+    public companyName: string;
+
+    @Column()
     public phone: string;
 
     @Column()

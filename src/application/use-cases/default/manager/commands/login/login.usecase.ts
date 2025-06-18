@@ -5,7 +5,6 @@ import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";
 import {ManagerLoginCommand} from "@application/use-cases/default/manager/commands/login/login.command";
-import {ManagerLoginOutput} from "@application/use-cases/default/manager/commands/login/login.output";
 
 export class ManagerLoginUseCase {
     constructor(
@@ -16,7 +15,7 @@ export class ManagerLoginUseCase {
         private readonly cacheRepo: ICacheRepository
     ) {}
 
-    async execute(cmd: ManagerLoginCommand): Promise<ManagerLoginOutput> {
+    async execute(cmd: ManagerLoginCommand): Promise<{token: string, expireTime: string}> {
         const manager = await this.managerRepo.getByEmail(cmd.email);
         if (!manager) throw new Error(EXCEPTION.MANAGER.INCORRECT_EMAIL_OR_PASSWORD);
 
@@ -28,11 +27,9 @@ export class ManagerLoginUseCase {
 
         await this.cacheRepo.setManagerAuth(manager, role);
 
-        return ManagerLoginOutput.of(
-            manager,
-            role,
-            this.jwtService.generateUserToken(manager.id.toString()),
-            this.jwtService.getJwtExpirationTime()
-        )
+        return {
+            token: this.jwtService.generateUserToken(manager.id.toString()),
+            expireTime: this.jwtService.getJwtExpirationTime()
+        }
     }
 }

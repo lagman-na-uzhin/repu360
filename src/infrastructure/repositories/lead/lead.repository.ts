@@ -23,18 +23,19 @@ import {LeadContact} from "@domain/lead/model/lead-contact";
 import {LeadContactEmail} from "@domain/manager/value-object/lead/lead-contact-email.vo";
 
 @Injectable()
-export class LeadOrmRepository implements ILeadRepository {
+export class LeadOrmRepository extends BaseRepository<LeadEntity> implements ILeadRepository {
     constructor(
         @InjectEntityManager() private readonly manager: EntityManager,
-        private readonly base: BaseRepository<LeadEntity>
-    ) {}
+    ) {
+        super()
+    }
 
     async getById(id: LeadId): Promise<Lead | null> {
         const entity = await this.manager.getRepository(LeadEntity).findOneBy({id: Equal(id.toString())});
         return entity ? this.toDomain(entity) : null;
     }
 
-    async getList(params: GetLeadListParams): Promise<PaginatedResult<Lead>> {
+    async getLeadList(params: GetLeadListParams): Promise<PaginatedResult<Lead>> {
         const { filter } = params;
 
         const qb = this.manager.getRepository(LeadEntity).createQueryBuilder('lead');
@@ -42,7 +43,7 @@ export class LeadOrmRepository implements ILeadRepository {
         if (filter?.status) {
         }
 
-        return this.base.getList<Lead>(qb, this.toDomain, params.pagination,  params.sort);
+        return this.getList<Lead>(qb, this.toDomain, params.pagination,  params.sort);
     }
 
     async save(lead: Lead): Promise<void> {
@@ -70,6 +71,7 @@ export class LeadOrmRepository implements ILeadRepository {
         const entity = new LeadContactEntity();
 
         entity.leadId = leadId.toString();
+        entity.companyName = contact.companyName.toString();
         entity.name = contact.name.toString();
         entity.email = contact.email.toString();
         entity.phone = contact.phone.toString();
@@ -79,6 +81,6 @@ export class LeadOrmRepository implements ILeadRepository {
 
 
     private toContactDomain(entity: LeadContactEntity): LeadContact {
-        return LeadContact.fromPersistence(entity.phone, entity.name, entity.email);
+        return LeadContact.fromPersistence(entity.companyName, entity.phone, entity.name, entity.email);
     }
 }

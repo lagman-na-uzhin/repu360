@@ -1,5 +1,3 @@
-import {OrganizationId} from "@domain/organization/organization";
-
 type Role = {
     id: string;
     name: string | null;

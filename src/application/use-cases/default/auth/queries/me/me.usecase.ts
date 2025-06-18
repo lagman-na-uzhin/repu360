@@ -1,8 +1,9 @@
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {UserMeQuery} from "@application/use-cases/default/auth/queries/me/me.query";
-import {UserMeOutput} from "@application/use-cases/default/auth/queries/me/me.output";
 import {IEmployeeRepository} from "@domain/employee/repositories/employee-repository.interface";
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";
+import {Employee} from "@domain/employee/employee";
+import {Manager} from "@domain/manager/manager";
 
 export class MeUseCase {
     constructor(
@@ -10,7 +11,7 @@ export class MeUseCase {
         private readonly managerRepo: IManagerRepository,
     ) {
     }
-    async execute(query: UserMeQuery): Promise<UserMeOutput> {
+    async execute(query: UserMeQuery): Promise<Employee | Manager> {
         let user;
         if (query.actor.role.isManager() || query.actor.role.isAdmin()) {
             user = await this.managerRepo.getById(query.actor.id);
@@ -22,14 +23,6 @@ export class MeUseCase {
         if (!user) {
             throw new Error(EXCEPTION.COMMON.UNAUTHORIZED);
         }
-
-        return UserMeOutput.of(
-            user.id,
-            user.name,
-            query.actor.role,
-            user.companyId,
-            user.phone,
-            user.email
-        );
+        return user
     }
 }

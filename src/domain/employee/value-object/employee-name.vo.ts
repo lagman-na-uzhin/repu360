@@ -14,6 +14,10 @@ export class EmployeeName {
     return name.length >= 2 && name.length <= 50;
   }
 
+  static of(name: string) {
+    return new EmployeeName(name);
+  }
+
   toString(): string {
     return this.value;
   }

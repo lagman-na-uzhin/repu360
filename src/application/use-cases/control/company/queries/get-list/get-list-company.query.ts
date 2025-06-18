@@ -1,11 +1,11 @@
 import {BaseQuery} from "@application/common/base-query";
 import {PaginationParams, SortParams} from "@domain/common/repositories/get-list.interface";
-import {GetCompanyListFilter} from "@domain/company/repositories/types/get-company-list.params";
+import {GetCompanyListFilterParams} from "@domain/company/repositories/types/get-company-list.params";
 import {Actor} from "@domain/policy/actor";
 
 export class GetListCompanyQuery extends BaseQuery {
     private constructor(
-        public readonly filter: GetCompanyListFilter,
+        public readonly filter: GetCompanyListFilterParams,
         public readonly pagination: PaginationParams,
         actor: Actor,
         public readonly sort?: SortParams,
@@ -16,7 +16,7 @@ export class GetListCompanyQuery extends BaseQuery {
 
     static of(
         dto: {
-            filter: GetCompanyListFilter,
+            filter: GetCompanyListFilterParams,
             pagination: PaginationParams,
             sort?: SortParams,
             search?: string,

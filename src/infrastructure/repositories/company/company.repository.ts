@@ -10,11 +10,12 @@ import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {PlacementId} from "@domain/placement/placement";
 
 @Injectable()
-export class CompanyOrmRepository implements ICompanyRepository {
+export class CompanyOrmRepository extends BaseRepository<CompanyEntity> implements ICompanyRepository {
   constructor(
       @InjectEntityManager() private readonly manager: EntityManager,
-      private readonly base: BaseRepository<CompanyEntity>
-  ) {}
+  ) {
+    super()
+  }
 
   async getById(id: CompanyId): Promise<Company | null> {
     const entity = await this.manager.getRepository(CompanyEntity).findOne({where: { id: id.toString() }})
@@ -25,7 +26,7 @@ export class CompanyOrmRepository implements ICompanyRepository {
     await this.manager.getRepository(CompanyEntity).save(this.toPersistence(company))
   }
 
-  async getList(params: GetCompanyListParams): Promise<PaginatedResult<Company>> {
+  async getCompanyList(params: GetCompanyListParams): Promise<PaginatedResult<Company>> {
     const { filter } = params;
 
     const qb = this.manager.getRepository(CompanyEntity).createQueryBuilder('company');
@@ -34,7 +35,7 @@ export class CompanyOrmRepository implements ICompanyRepository {
       qb.andWhere('company.city = :city', { city: filter.managerId });
     }
 
-    return this.base.getList<Company>(qb, this.toDomain, params.pagination,  params.sort);
+    return this.getList<Company>(qb, this.toDomain, params.pagination,  params.sort);
   }
 
   async getCompanyByPlacementId(placementId: PlacementId): Promise<Company | null> {

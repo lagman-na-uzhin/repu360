@@ -9,11 +9,18 @@ import { FastifyRequest } from 'fastify';
 import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/types/employee-auth-data.type";
 import {Actor} from "@domain/policy/actor";
 import {Role} from "@domain/policy/model/role";
-import {RoleType} from "@domain/policy/value-object/role/type.vo";
+import {ManagerAuthDataType} from "@application/interfaces/repositories/cache/types/manager-auth-data.type";
 import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
 import {EmployeePermissions} from "@domain/policy/model/employee-permissions";
-import {ManagerAuthDataType} from "@application/interfaces/repositories/cache/types/manager-auth-data.type";
-import {OrganizationId} from "@domain/organization/organization";
+import {RoleType} from "@domain/policy/value-object/role/type.vo";
+import {ManagerOrganizationPermission} from "@domain/policy/model/manager/manager-organization-permission.enum";
+import {ManagerLeadPermission} from "@domain/policy/model/manager/manager-lead-permission.enum";
+import {ManagerCompanyPermission} from "@domain/policy/model/manager/manager-company.permission.enum";
+import {EmployeeCompanyPermission} from "@domain/policy/model/employee/employee-company-permission.enum";
+import {EmployeeReviewPermission} from "@domain/policy/model/employee/employee-review-permission.enum";
+import {EmployeeOrganizationPermission} from "@domain/policy/model/employee/employee-organization-permission.enum";
+
+const GLOBAL_ORGANIZATION_KEY = "*"
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -33,6 +40,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: IJwtServicePayload) {
+    console.log("validate")
     const { authId, ownerId } = payload;
 
     const redisClient = this.redisService.getOrThrow('default');
@@ -41,25 +49,33 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         ? await redisClient.get(CACHE_KEY.COMMON.MULTIPLE_AUTH_TOKEN(ownerId, authId))
         : await redisClient.get(CACHE_KEY.COMMON.AUTH_TOKEN(authId));
 
+    console.log(rawUserData, "rawUserData")
     if (!rawUserData) return false;
-
-    return this.getActor(rawUserData)
+    console.log(this.getActor(rawUserData))
+    return this.getActor(rawUserData);
   }
 
-  private getActor(raw: string) {
+  private getActor(raw: string): Actor {
     const persistence: ManagerAuthDataType | EmployeeAuthDataType = JSON.parse(raw);
-    let permissions
-    const roleType = new RoleType(persistence.role.type)
-    if (
-        roleType.equals(RoleType.type.MANAGER)
-        ||
-        roleType.equals(RoleType.type.ADMIN)
-    ) {
+    let permissions: EmployeePermissions | ManagerPermissions;
+
+    const roleType = new RoleType(persistence.role.type);
+
+    if (roleType.equals(RoleType.type.ADMIN) || roleType.equals(RoleType.type.MANAGER)) {
       const managerData = persistence as ManagerAuthDataType;
 
+
+      const managerCompanies = managerData.role.permissions.companies as ManagerCompanyPermission[];
+
+
+      const managerOrganizationsMap = new Map<string, ManagerOrganizationPermission[]>();
+
+      const managerLeads = managerData.role.permissions.leads as ManagerLeadPermission[];
+
       permissions = ManagerPermissions.fromPersistence(
-          new Set(managerData.role.permissions.companies),
-          new Set(managerData.role.permissions.leads)
+          managerCompanies,        // 1st arg: companies (ManagerCompanyPermission[])
+          managerOrganizationsMap, // 2nd arg: organizations (Map<string, ManagerOrganizationPermission[]>)
+          managerLeads             // 3rd arg: leads (ManagerLeadPermission[])
       );
 
       const role = Role.fromPersistence(
@@ -67,44 +83,41 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           persistence.role.name,
           persistence.role.type,
           permissions
-      )
-      return Actor.fromPersistence(
-          persistence.id,
-          role
-      )
+      );
+      return Actor.fromPersistence(persistence.id, role);
+
     } else {
       const employeeData = persistence as EmployeeAuthDataType;
 
+      const employeeCompanies = employeeData.role.permissions.companies as EmployeeCompanyPermission[];
+
+      const employeeReviewsRecord: Record<string, EmployeeReviewPermission[]> = {};
+      employeeData.role.permissions.reviews.forEach(item => {
+        employeeReviewsRecord[item.organizationId] = item.permissions as EmployeeReviewPermission[];
+      });
+      const employeeReviewsMap = new Map(Object.entries(employeeReviewsRecord)); // Convert to Map
+
+      const employeeOrganizationsRecord: Record<string, EmployeeOrganizationPermission[]> = {};
+      employeeData.role.permissions.organizations.forEach(item => {
+        employeeOrganizationsRecord[item.organizationId] = item.permissions as EmployeeOrganizationPermission[];
+      });
+      const employeeOrganizationsMap = new Map(Object.entries(employeeOrganizationsRecord)); // Convert to Map
+
+
       permissions = EmployeePermissions.fromPersistence(
-          new Set(employeeData.role.permissions.companies),
-          new Map(
-              employeeData.role.permissions.reviews.map(item => [
-                  new OrganizationId(item.organizationId),
-                new Set(item.permissions)
-              ])
-          ),
-          new Map(
-              employeeData.role.permissions.organizations.map(item => [
-                new OrganizationId(item.organizationId),
-                new Set(item.permissions)
-              ])
-          ),
-      )
+          employeeCompanies,
+          employeeReviewsMap,
+          employeeOrganizationsMap,
+      );
 
       const role = Role.fromPersistence(
           persistence.role.id,
           persistence.role.name,
           persistence.role.type,
           permissions
-      )
+      );
 
-      console.log(role, "roleeee")
-
-      return Actor.fromPersistence(
-          persistence.id,
-          role
-      )
+      return Actor.fromPersistence(persistence.id, role);
     }
-
   }
 }

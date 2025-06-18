@@ -14,6 +14,10 @@ export class CompanyName {
         return name.length >= 2 && name.length <= 50;
     }
 
+    static of(name: string) {
+        return new CompanyName(name);
+    }
+
     toString(): string {
         return this._value;
     }

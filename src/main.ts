@@ -10,21 +10,28 @@ import {
 } from '@nestjs/platform-fastify';
 import * as fastifyCookie from '@fastify/cookie';
 import * as fastifyCors from '@fastify/cors';
+const qs = require('qs');
 
 async function bootstrap() {
+  const adapter = new FastifyAdapter({
+    querystringParser: str => qs.parse(str),
+  });
+
   const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-    {
-      logger:
-        process.env.NODE_ENV === 'development'
-          ? ['log', 'debug', 'error', 'verbose', 'warn']
-          : ['error', 'warn'],
-    },
+      AppModule,
+      adapter,
+      {
+        logger:
+            process.env.NODE_ENV === 'development'
+                ? ['log', 'debug', 'error', 'verbose', 'warn']
+                : ['error', 'warn'],
+      },
   );
 
   app.useGlobalPipes(
-    new ValidationPipe({ validateCustomDecorators: true, transform: true }),
+      new ValidationPipe({
+        transform: true,
+      }),
   );
 
   await app.register(fastifyCookie);

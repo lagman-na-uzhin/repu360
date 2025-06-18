@@ -17,14 +17,11 @@ export class EmployeeLoginUseCase {
         private readonly cacheRepo: ICacheRepository
     ) {}
 
-    async execute(cmd: EmployeeLoginCommand): Promise<LoginOutput> {
+    async execute(cmd: EmployeeLoginCommand): Promise<{ token: string, expire: string }> {
         const employee = await this.employeeRepo.getByEmail(cmd.email);
         if (!employee) throw new Error(EXCEPTION.EMPLOYEE.INCORRECT_EMAIL_OR_PASSWORD);
 
-        console.log(employee, "employee")
-
         const role = await this.roleRepo.getById(employee.roleId);
-        console.log(role, "role")
         if (!role) throw new Error(EXCEPTION.ROLE.NOT_FOUND);
 
         const passwordIsValid = await this.hashService.compare(cmd.password.toString(), employee.password.toString());
@@ -32,10 +29,9 @@ export class EmployeeLoginUseCase {
 
         await this.cacheRepo.setEmployeeAuth(employee, role);
 
-        return new LoginOutput(
-            employee,
-            this.jwtService.generateUserToken(employee.id.toString()),
-            this.jwtService.getJwtExpirationTime()
-        )
+        return {
+            token: this.jwtService.generateUserToken(employee.id.toString()),
+            expire: this.jwtService.getJwtExpirationTime()
+        }
     }
 }

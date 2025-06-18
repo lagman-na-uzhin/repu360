@@ -5,5 +5,5 @@ import {PaginatedResult} from "@domain/common/repositories/paginated-result.inte
 export interface ILeadRepository {
     getById(id: LeadId): Promise<Lead | null>;
     save(lead: Lead): Promise<void>;
-    getList(params: GetLeadListParams): Promise<PaginatedResult<Lead>>
+    getLeadList(params: GetLeadListParams): Promise<PaginatedResult<Lead>>
 }

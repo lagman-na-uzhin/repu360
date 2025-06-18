@@ -3,7 +3,7 @@ import {PaginatedResult} from "@domain/common/repositories/paginated-result.inte
 import {PaginationParams, SortParams} from "@domain/common/repositories/get-list.interface";
 
 export class BaseRepository<Entity extends ObjectLiteral> {
-  constructor(protected readonly repo: Repository<Entity>) {}
+  constructor() {}
 
   async getList<Domain>(
       qb: SelectQueryBuilder<Entity>,
@@ -21,6 +21,8 @@ export class BaseRepository<Entity extends ObjectLiteral> {
     qb.skip(skip).take(take);
 
     const [entities, total] = await qb.getManyAndCount();
+    console.log(pagination, "pagination)")
+    console.log(total, "total")
     const totalPages = Math.ceil(total / pagination.limit);
 
     return {

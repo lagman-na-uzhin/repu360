@@ -6,7 +6,7 @@ import {PlacementId} from "@domain/placement/placement";
 export interface ICompanyRepository {
     getById(id: CompanyId): Promise<Company | null>;
     save(company: Company): Promise<void>;
-    getList(params: GetCompanyListParams): Promise<PaginatedResult<Company>>;
+    getCompanyList(params: GetCompanyListParams): Promise<PaginatedResult<Company>>;
 
     getCompanyByPlacementId(placementId: PlacementId): Promise<Company | null>;
 }
