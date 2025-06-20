@@ -6,6 +6,7 @@ import {ICompanyRepository} from "@domain/company/repositories/company-repositor
 import {Organization} from "@domain/organization/organization";
 import {IOrganizationRepository} from "@domain/organization/repositories/organization-repository.interface";
 import {CompanyPolicy} from "@domain/policy/policies/company-policy";
+import {OrganizationAddress} from "@domain/organization/value-object/organization-address.vo";
 
 export class AddOrganizationUseCase {
     constructor(
@@ -20,7 +21,8 @@ export class AddOrganizationUseCase {
         const company = await this.companyRepo.getById(cmd.companyId);
         if (!company) throw new Error(EXCEPTION.COMPANY.NOT_FOUND);
 
-        const organization = Organization.create(company.id, cmd.name);
+        const address = {} as OrganizationAddress //TODO
+        const organization = Organization.create(company.id, cmd.name, address);
 
         await this.organizationRepo.save(organization);
     }

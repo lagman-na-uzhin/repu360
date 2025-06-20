@@ -1,6 +1,6 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Inject, Post, Req, Res, UseGuards} from '@nestjs/common';
 import {FastifyRequest, FastifyReply} from 'fastify';
-import {EmployeeLoginDto, ManagerLoginDto} from "@presentation/general/auth/dto/login.dto";
+import {EmployeeLoginDto, ManagerLoginDto} from "@presentation/general/auth/dto/login.request";
 import {ManagerLoginCommand} from "@application/use-cases/default/manager/commands/login/login.command";
 import {ManagerLoginUseCase} from "@application/use-cases/default/manager/commands/login/login.usecase";
 import {EmployeeLoginCommand} from "@application/use-cases/default/auth/commands/login/login.command";
@@ -13,6 +13,7 @@ import {AuthProxy} from "@infrastructure/providers/auth/auth.proxy";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
 import {Actor} from "@domain/policy/actor";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
+import {UserMeResponseDto} from "@presentation/general/auth/dto/user-me.response";
 
 @Controller(GENERAl_ROUTES.AUTH.BASE)
 export class AuthController {
@@ -73,8 +74,11 @@ export class AuthController {
     ) {
         const query = UserMeQuery.of(actor);
 
-        return this.meUseCaseProxy
+        const {user, role} = await this.meUseCaseProxy
             .getInstance()
             .execute(query);
+
+        console.log(user, role)
+        return UserMeResponseDto.fromDomain(user, role);
     }
 }

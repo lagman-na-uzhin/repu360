@@ -1,4 +1,13 @@
-import {Column, Entity, JoinColumn, OneToOne, PrimaryColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    JoinColumn,
+    OneToOne,
+    PrimaryColumn,
+    UpdateDateColumn
+} from "typeorm";
 import {TariffEntity} from "@infrastructure/entities/tariff/tariff.entity";
 
 @Entity('tariff_features')
@@ -39,4 +48,16 @@ export class TariffFeaturesEntity {
     @OneToOne(() => TariffEntity, tariff => tariff.features)
     @JoinColumn({name: "tariff_id"})
     tariff: TariffEntity;
+
+
+
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+    public deletedAt: Date | null;
 }

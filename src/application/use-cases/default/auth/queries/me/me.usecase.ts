@@ -4,6 +4,7 @@ import {IEmployeeRepository} from "@domain/employee/repositories/employee-reposi
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";
 import {Employee} from "@domain/employee/employee";
 import {Manager} from "@domain/manager/manager";
+import {Role} from "@domain/policy/model/role";
 
 export class MeUseCase {
     constructor(
@@ -11,7 +12,10 @@ export class MeUseCase {
         private readonly managerRepo: IManagerRepository,
     ) {
     }
-    async execute(query: UserMeQuery): Promise<Employee | Manager> {
+    async execute(query: UserMeQuery): Promise<{
+        user: Employee | Manager,
+        role: Role
+    }> {
         let user;
         if (query.actor.role.isManager() || query.actor.role.isAdmin()) {
             user = await this.managerRepo.getById(query.actor.id);
@@ -23,6 +27,9 @@ export class MeUseCase {
         if (!user) {
             throw new Error(EXCEPTION.COMMON.UNAUTHORIZED);
         }
-        return user
+        return {
+            user,
+            role: query.actor.role
+        }
     }
 }

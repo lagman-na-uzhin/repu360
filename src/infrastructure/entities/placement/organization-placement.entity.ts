@@ -23,16 +23,6 @@ export class OrganizationPlacementEntity {
     @Column({ type: 'enum', enum: Platform })
     public platform: Platform;
 
-    @CreateDateColumn({ type: "timestamptz" })
-    public createdAt: Date;
-
-    @UpdateDateColumn({ type: "timestamptz", nullable: true })
-    public updatedAt: Date | null;
-
-    @DeleteDateColumn({ type: "timestamptz", nullable: true })
-    public deletedAt: Date | null;
-
-
     @ManyToOne(() => OrganizationEntity, organization => organization.placements)
     organization: OrganizationEntity;
 
@@ -56,5 +46,18 @@ export class OrganizationPlacementEntity {
         nullable: true
     })
     autoReply?: AutoReplyEntity;
+
+
+
+
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+    public deletedAt: Date | null;
 
 }

@@ -77,13 +77,13 @@ export class ReviewEntity {
         })
     replies: ReviewReplyEntity[];
 
-    @CreateDateColumn({ type: "timestamptz" })
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
     public createdAt: Date;
 
-    @UpdateDateColumn({ type: "timestamptz", nullable: true })
-    public updatedAt: Date | null;
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
 
-    @DeleteDateColumn({ type: "timestamptz", nullable: true })
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
     public deletedAt: Date | null;
 
     // @OneToMany(() => ReviewComplaintEntity, complaint => complaint.review, { cascade: ['insert', 'update', 'soft-remove'], eager: true} )

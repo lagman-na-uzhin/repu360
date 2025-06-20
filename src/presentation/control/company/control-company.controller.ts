@@ -29,9 +29,7 @@ export class ControlCompanyController {
       @RequestQuery() dto: GetCompanyListQueryDto,
       @RequestActor() actor: any
   ) {
-    console.log(dto, "dto")
     const query = GetListCompanyQuery.of(dto, actor)
-    console.log(query, "query")
 
     return {
       statusCode: HttpStatus.CREATED,

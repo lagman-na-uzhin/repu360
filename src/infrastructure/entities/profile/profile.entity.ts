@@ -1,4 +1,13 @@
-import {Column, Entity, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
+import {
+    Column,
+    CreateDateColumn, DeleteDateColumn,
+    Entity,
+    OneToMany,
+    OneToOne,
+    PrimaryColumn,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from 'typeorm';
 import { ReviewEntity } from '@infrastructure/entities/review/review.entity';
 import {
   TwogisProfilePlacementDetailEntity,
@@ -39,4 +48,16 @@ export class ProfileEntity {
         eager: true
       })
   yandexDetail?: YandexProfilePlacementDetailEntity | null;
+
+
+
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+    public deletedAt: Date | null;
 }

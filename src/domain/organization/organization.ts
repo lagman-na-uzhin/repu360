@@ -2,6 +2,7 @@ import { UniqueID } from '@domain/common/unique-id';
 import { CompanyId } from '@domain/company/company';
 import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 import { EmployeeId } from "@domain/employee/employee";
+import {OrganizationAddress} from "@domain/organization/value-object/organization-address.vo";
 
 export class OrganizationId extends UniqueID {}
 
@@ -10,14 +11,15 @@ export class Organization {
     private readonly _id: OrganizationId,
     private readonly _companyId: CompanyId,
     private _name: string,
+    private _address: OrganizationAddress
   ) {}
 
-  static create(companyId: CompanyId, name: string): Organization {
-    return new Organization(new OrganizationId(), companyId, name);
+  static create(companyId: CompanyId, name: string, address: OrganizationAddress): Organization {
+    return new Organization(new OrganizationId(), companyId, name, address);
   }
 
-  static fromPersistence(id: string, companyId: string, name: string) {
-    return new Organization(new OrganizationId(id), new CompanyId(companyId), name);
+  static fromPersistence(id: string, companyId: string, name: string, address: OrganizationAddress) {
+    return new Organization(new OrganizationId(id), new CompanyId(companyId), name, address);
   }
 
   set name(newName: string) {

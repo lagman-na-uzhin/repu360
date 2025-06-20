@@ -4,12 +4,13 @@ import {
     CreateDateColumn, DeleteDateColumn,
     Entity, JoinColumn,
     ManyToOne,
-    OneToMany,
+    OneToMany, OneToOne,
     PrimaryColumn,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from 'typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
+import {OrganizationAddressEntity} from "@infrastructure/entities/organization/organization-address.entity";
 
 @Entity('organization')
 export class OrganizationEntity {
@@ -22,15 +23,15 @@ export class OrganizationEntity {
     @Column({type: "uuid"})
     public companyId: string;
 
-    @CreateDateColumn({ type: "timestamptz" })
-    public createdAt: Date;
-
-    @UpdateDateColumn({ type: "timestamptz", nullable: true })
-    public updatedAt: Date | null;
-
-    @DeleteDateColumn({ type: "timestamptz", nullable: true })
-    public deletedAt: Date | null;
-
+    @OneToOne(
+        () => OrganizationAddressEntity,
+            address => address.organization,
+        {
+            cascade: ["update", "insert", "soft-remove", "recover"],
+            eager: true
+        }
+    )
+    address: OrganizationAddressEntity;
 
     @OneToMany(() => OrganizationPlacementEntity, orgPlacement => orgPlacement.organization, {cascade: ["soft-remove"]})
     placements: OrganizationPlacementEntity[];
@@ -38,5 +39,17 @@ export class OrganizationEntity {
     @ManyToOne(() => CompanyEntity, (company) => company.organizations)
     @JoinColumn({ name: "company_id"})
     company: CompanyEntity;
+
+
+
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+    public deletedAt: Date | null;
 
 }

@@ -24,15 +24,16 @@ export class LeadEntity {
     @Column({ type: "timestamptz", nullable: true })
     public processedAt: Date | null;
 
-    @CreateDateColumn({ type: "timestamptz" })
+    @OneToOne(() => LeadContactEntity, (contact) => contact.lead, { cascade: ['soft-remove', 'insert', 'update'] })
+    contact: LeadContactEntity;
+
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
     public createdAt: Date;
 
-    @UpdateDateColumn({ type: "timestamptz", nullable: true })
-    public updatedAt: Date | null;
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
 
-    @DeleteDateColumn({ type: "timestamptz", nullable: true })
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
     public deletedAt: Date | null;
-
-    @OneToOne(() => LeadContactEntity, (contact) => contact.lead, { cascade: ['soft-remove', 'insert', 'update'] })
-    contact: LeadContactEntity
 }

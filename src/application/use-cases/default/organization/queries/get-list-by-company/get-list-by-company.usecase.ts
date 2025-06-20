@@ -11,9 +11,6 @@ export class GetOrganizationListUseCase {
     ) {}
 
     async execute(query: GetOrganizationListQuery): Promise<PaginatedResult<Organization>> {
-        const result = await this.organizationRepo.getListByCompanyId(query);
-        console.log(query.pagination, "query.pagination")
-        console.log(result)
-        return result;
+        return this.organizationRepo.getListByCompanyId(query);
     }
 }

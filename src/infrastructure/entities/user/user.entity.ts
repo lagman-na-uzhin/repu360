@@ -1,4 +1,13 @@
-import { Column, ManyToOne, Entity, OneToOne, JoinColumn, PrimaryColumn} from 'typeorm';
+import {
+  Column,
+  ManyToOne,
+  Entity,
+  OneToOne,
+  JoinColumn,
+  PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn, DeleteDateColumn
+} from 'typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
 
@@ -43,4 +52,17 @@ export class UserEntity {
   @OneToOne(() => UserRoleEntity, {cascade: ['insert', 'soft-remove', 'update'], eager: true })
   @JoinColumn({name: "role_id"})
   role: UserRoleEntity;
+
+
+
+
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+  public createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+  public updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+  public deletedAt: Date | null;
 }

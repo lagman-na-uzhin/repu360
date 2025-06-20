@@ -1,4 +1,13 @@
-import {Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn} from 'typeorm';
+import {
+  Column,
+  CreateDateColumn, DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from 'typeorm';
 import { ReviewEntity } from '@infrastructure/entities/review/review.entity';
 
 @Entity('review_media')
@@ -12,10 +21,20 @@ export class ReviewMediaEntity {
   @Column()
   public url: string;
 
-  @Column({ type: "timestamptz"})
-  public createdAt: Date;
-
   @ManyToOne(() => ReviewEntity, (review) => review.media)
   @JoinColumn({ name: "review_id" })
   review: ReviewEntity;
+
+
+
+
+
+  @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+  public createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+  public updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+  public deletedAt: Date | null;
 }

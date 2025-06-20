@@ -14,15 +14,6 @@ export class CompanyEntity {
     @Column({type: 'uuid'})
     public managerId: string;
 
-    @CreateDateColumn({ type: "timestamptz" })
-    public createdAt: Date;
-
-    @UpdateDateColumn({ type: "timestamptz", nullable: true })
-    public updatedAt: Date | null;
-
-    @DeleteDateColumn({ type: "timestamptz", nullable: true })
-    public deletedAt: Date | null;
-
     @OneToMany(() => OrganizationEntity, (organization) => organization.company, { cascade: ['soft-remove'] })
     organizations: OrganizationEntity[]
 
@@ -31,4 +22,14 @@ export class CompanyEntity {
 
     @OneToMany(() => SubscriptionEntity, (subscription) => subscription.company, { cascade: ['soft-remove'] })
     subscriptions: SubscriptionEntity[];
+
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+    public deletedAt: Date | null;
 }

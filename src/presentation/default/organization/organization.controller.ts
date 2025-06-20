@@ -17,6 +17,7 @@ import {
     GetOrganizationListQuery
 } from "@application/use-cases/default/organization/queries/get-list-by-company/get-list-by-company.query";
 import {GetOrganizationListQueryDto} from "@presentation/default/organization/dto/get-list-organizations.request";
+import {PaginatedResultDto} from "@presentation/dtos/paginated-response";
 
 @UseGuards(JwtAuthGuard)
 @Controller(DEFAULT_ROUTES.ORGANIZATION.BASE)
@@ -36,18 +37,16 @@ export class OrganizationController {
     ) {
         const query = GetOrganizationListQuery.of(dto, actor);
 
-        const {list, meta} = await this.getListUseCaseProxy.getInstance().execute(query);
+        const result = await this.getListUseCaseProxy.getInstance().execute(query);
+        console.log(result, "result")
 
-        return {
-            list: list.map(OrganizationResponseDto.fromDomain),
-            meta
-        };
+        return PaginatedResultDto.fromDomain(result, OrganizationResponseDto.fromDomain)
     }
 
 
     @Get(DEFAULT_ROUTES.ORGANIZATION.USER_PERMITTED_GET_LIST)
     async getUserPermittedList(
-        @RequestActor() actor: any
+        @RequestActor() actor
     ) {
         const query = new BaseQuery(actor);
 

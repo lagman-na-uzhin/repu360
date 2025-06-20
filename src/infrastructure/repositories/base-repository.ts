@@ -21,18 +21,14 @@ export class BaseRepository<Entity extends ObjectLiteral> {
     qb.skip(skip).take(take);
 
     const [entities, total] = await qb.getManyAndCount();
-    console.log(pagination, "pagination)")
-    console.log(total, "total")
     const totalPages = Math.ceil(total / pagination.limit);
 
     return {
       list: entities.map(mapFn),
-      meta: {
-        total,
-        totalPages,
-        currentPage: pagination.page,
-        limit: pagination.limit,
-      },
+      total,
+      totalPages,
+      currentPage: pagination.page,
+      limit: pagination.limit,
     };
   }
 

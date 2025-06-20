@@ -1,9 +1,9 @@
 import {
-    Column,
+    Column, CreateDateColumn, DeleteDateColumn,
     Entity,
     JoinColumn,
     OneToOne,
-    PrimaryColumn,
+    PrimaryColumn, UpdateDateColumn,
 } from 'typeorm';
 import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/organization-placement.entity";
 
@@ -27,4 +27,18 @@ export class AutoReplyEntity {
     @OneToOne(() => OrganizationPlacementEntity, placement => placement.autoReply)
     @JoinColumn({name: 'placement_id'})
     placement: OrganizationPlacementEntity;
+
+
+
+
+
+
+    @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public createdAt: Date;
+
+    @UpdateDateColumn({ name: 'updated_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
+    public updatedAt: Date;
+
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamp with time zone', nullable: true })
+    public deletedAt: Date | null;
 }

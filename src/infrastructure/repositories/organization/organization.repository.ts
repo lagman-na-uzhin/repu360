@@ -10,6 +10,7 @@ import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
 import {LeadEntity} from "@infrastructure/entities/lead/lead.entity";
 import {Lead} from "@domain/lead/lead";
+import {OrganizationAddress} from "@domain/organization/value-object/organization-address.vo";
 
 @Injectable()
 export class OrganizationOrmRepository
@@ -45,9 +46,7 @@ export class OrganizationOrmRepository
   async getListByCompanyId(params: GetOrganizationListByCompanyParams): Promise<PaginatedResult<Organization>> {
 
     const qb = this.manager.getRepository(OrganizationEntity).createQueryBuilder('organization');
-
-    qb.andWhere('organization.companyId = :companyId', { companyId: params.filter?.companyId });
-
+    qb.andWhere('organization.companyId = :companyId', { companyId: params.filter!.companyId });
 
     return this.getList<Organization>(qb, this.toDomain, params.pagination,  params.sort);
   }
@@ -63,10 +62,12 @@ export class OrganizationOrmRepository
   }
 
   private toDomain(entity: OrganizationEntity): Organization {
+    const addred = {} as OrganizationAddress //TODO
     return Organization.fromPersistence(
       entity.id,
       entity.companyId,
       entity.name,
+        addred
     );
   }
 
