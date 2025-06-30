@@ -4,6 +4,9 @@ import {IReviewRepository} from "@domain/review/repositories/review-repository.i
 import {IProfileRepository} from "@domain/review/repositories/profile-repository.interface";
 import {ILeadRepository} from "@domain/lead/repositories/lead-repository.interface";
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
+import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
+import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
+import {IOrganizationRepository} from "@domain/organization/repositories/organization-repository.interface";
 
 export interface IUnitOfWork {
     run<T>(work: (ctx: IUnitOfWorkContext) => Promise<T>): Promise<T>;
@@ -17,4 +20,7 @@ export interface IUnitOfWorkContext {
     profileRepo: IProfileRepository;
     leadRepo: ILeadRepository;
     companyRepo: ICompanyRepository;
+    tariffRepo: ITariffRepository;
+    placementRepo: IPlacementRepository;
+    organizationRepo: IOrganizationRepository;
 }

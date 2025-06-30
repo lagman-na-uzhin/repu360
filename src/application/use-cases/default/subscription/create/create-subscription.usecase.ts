@@ -1,5 +1,5 @@
 import { ICompanyRepository } from '@domain/company/repositories/company-repository.interface';
-import {CreateSubscriptionCommand} from "@application/use-cases/control/subscription/create/create-subscription.command";
+import {CreateSubscriptionCommand} from "@application/use-cases/default/subscription/create/create-subscription.command";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
 import {Subscription} from "@domain/subscription/subscription";

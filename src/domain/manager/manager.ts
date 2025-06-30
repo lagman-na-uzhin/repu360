@@ -58,6 +58,17 @@ export class Manager {
         );
     }
 
+    toPlaintObject() {
+        return {
+            id: this._id.toString(),
+            email: this._email.toString(),
+            name: this._name.toString(),
+            phone: this._phone.toString(),
+            password: this._password.toString(),
+            roleId: this._roleId.toString()
+        }
+    }
+
     get id(): ManagerId {
         return this._id;
     }

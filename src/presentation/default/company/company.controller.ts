@@ -15,7 +15,11 @@ import {
 } from "@application/use-cases/default/company/commands/update-company/update-company.usecase";
 import {RequestParams} from "@infrastructure/common/decorators/request-param.decorator";
 import {ByIdCompanyUseCase} from "@application/use-cases/default/company/queries/by-id/by-id-company.usecase";
-import {CompanyId} from "@domain/company/company";
+import {
+    ByIdCompanyParamsRequestDto,
+} from "@presentation/default/company/dto/by-id-company.request";
+import {ByIdCompanyQuery} from "@application/use-cases/default/company/queries/by-id/by-id-company.query";
+import {CompanyResponseDto} from "@presentation/dtos/company.response";
 
 @UseGuards(JwtAuthGuard)
 @Controller(DEFAULT_ROUTES.COMPANY.BASE)
@@ -29,8 +33,15 @@ export class CompanyController {
 
 
     @Get(DEFAULT_ROUTES.COMPANY.BY_ID)
-    async byId(@RequestParams() params: { companyId: string }) {
-        return this.myCompanyUseCaseProxy.getInstance().execute(new CompanyId(params.companyId));
+    async byId(
+        @RequestParams() params: ByIdCompanyParamsRequestDto,
+        @RequestActor() actor
+
+    ) {
+        const query = ByIdCompanyQuery.of(params, actor);
+        const domain = await this.myCompanyUseCaseProxy.getInstance().execute(query);
+
+        return CompanyResponseDto.fromDomain(domain);
     }
 
     @Put(DEFAULT_ROUTES.COMPANY.UPDATE)

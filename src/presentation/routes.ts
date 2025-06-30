@@ -9,6 +9,8 @@ export const DEFAULT_ROUTES = {
   ORGANIZATION: {
     BASE: 'organizations',
 
+    ADD: '',
+
     GET_LIST: '',
 
     USER_PERMITTED_GET_LIST: 'user'
@@ -37,6 +39,12 @@ export const DEFAULT_ROUTES = {
     UPDATE_REPLY: 'reply/:replyId', //PATCH
     DELETE_REPLY: 'reply/:replyId', //DELETE
   },
+
+  MANAGER: {
+    BASE: 'managers',
+
+    BY_ID: ':managerId', //GET
+  }
 
 } as const;
 
@@ -67,15 +75,15 @@ export const CONTROL_ROUTES = {
     BASE: 'control/leads',
 
     ASSIGN: 'assign', //PATCH
-    CONFIRM: 'confirm' //PATCH
+    CONFIRM: 'confirm' //POST
   }
 } as const;
 
 export const GENERAl_ROUTES = {
   AUTH: {
     BASE: 'auth',
-    EMPLOYEE_LOGIN: 'employee/login', //POST
-    MANAGER_LOGIN: 'manager/login', //POST
+    EMPLOYEE_LOGIN: 'employee/login-admin', //POST
+    MANAGER_LOGIN: 'manager/login-admin', //POST
     ME: 'me', //GET
   },
 

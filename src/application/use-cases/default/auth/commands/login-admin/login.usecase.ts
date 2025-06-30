@@ -4,7 +4,7 @@ import {ICacheRepository} from "@application/interfaces/repositories/cache/cache
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";
-import {ManagerLoginCommand} from "@application/use-cases/default/manager/commands/login/login.command";
+import {ManagerLoginCommand} from "@application/use-cases/default/auth/commands/login-admin/login.command";
 
 export class ManagerLoginUseCase {
     constructor(

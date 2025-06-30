@@ -17,8 +17,8 @@ export class UserRoleEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
-    @Column()
-    public name: string;
+    @Column({type: 'varchar'})
+    public name: string | null;
 
     @Column()
     public type: string;

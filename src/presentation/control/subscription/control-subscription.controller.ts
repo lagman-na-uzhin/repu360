@@ -18,11 +18,11 @@ import {
 import {RequestQuery} from "@infrastructure/common/decorators/request-query.decorator";
 import {
     CreateSubscriptionUseCase
-} from "@application/use-cases/control/subscription/create/create-subscription.usecase";
+} from "@application/use-cases/default/subscription/create/create-subscription.usecase";
 import {SubscriptionProxy} from "@application/use-case-proxies/subscription/subscription.proxy";
 import {
     CreateSubscriptionCommand
-} from "@application/use-cases/control/subscription/create/create-subscription.command";
+} from "@application/use-cases/default/subscription/create/create-subscription.command";
 
 @Controller(CONTROL_ROUTES.SUBSCRIPTION.BASE)
 @UseGuards(JwtAuthGuard)

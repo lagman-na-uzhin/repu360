@@ -18,7 +18,7 @@ import {
   proxySessionProviders,
   proxySessionProxyExports
 } from "@infrastructure/providers/proxy-session/proxy-session.providers";
-import {managerProxyExports, managerProxyProviders} from "@infrastructure/providers/manager/manager.proxy";
+import {managerProxyProviders} from "@infrastructure/providers/manager/manager.proxy";
 import {organizationProxyProviders} from "@infrastructure/providers/organization/organization.proxy";
 import {authProxyExports, authProxyProviders} from "@infrastructure/providers/auth/auth.proxy";
 import {reviewProxyProviders} from "@infrastructure/providers/review/review.providers";
@@ -26,6 +26,7 @@ import {subscriptionProxyProviders} from "@infrastructure/providers/subscription
 import {subscriptionProxyExports} from "@application/use-case-proxies/subscription/subscription.proxy";
 import {leadProxyProviders} from "@infrastructure/providers/lead/lead.provider";
 import {leadProxyExports} from "@application/use-case-proxies/lead/lead.proxy";
+import {managerProxyExports} from "@application/use-case-proxies/manager/manager.proxy";
 
 @Module({
   imports: [

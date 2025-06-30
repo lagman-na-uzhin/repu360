@@ -4,13 +4,11 @@ import {
     CreateDateColumn, DeleteDateColumn,
     Entity, JoinColumn,
     ManyToOne,
-    OneToMany, OneToOne,
+    OneToMany,
     PrimaryColumn,
-    PrimaryGeneratedColumn,
     UpdateDateColumn
 } from 'typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
-import {OrganizationAddressEntity} from "@infrastructure/entities/organization/organization-address.entity";
 
 @Entity('organization')
 export class OrganizationEntity {
@@ -23,15 +21,8 @@ export class OrganizationEntity {
     @Column({type: "uuid"})
     public companyId: string;
 
-    @OneToOne(
-        () => OrganizationAddressEntity,
-            address => address.organization,
-        {
-            cascade: ["update", "insert", "soft-remove", "recover"],
-            eager: true
-        }
-    )
-    address: OrganizationAddressEntity;
+    @Column()
+    address: string;
 
     @OneToMany(() => OrganizationPlacementEntity, orgPlacement => orgPlacement.organization, {cascade: ["soft-remove"]})
     placements: OrganizationPlacementEntity[];

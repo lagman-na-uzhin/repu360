@@ -13,8 +13,7 @@ import {IHashService} from "@application/interfaces/services/hash/hash-service.i
 import {IJwtService} from "@application/interfaces/services/jwt/jwt-service.interface";
 import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
 import {EmployeeLoginUseCase} from "@application/use-cases/default/auth/commands/login/login.usecase";
-import {ManagerLoginUseCase} from "@application/use-cases/default/manager/commands/login/login.usecase";
-import {ManagerProxy} from "@infrastructure/providers/manager/manager.proxy";
+import {ManagerLoginUseCase} from "@application/use-cases/default/auth/commands/login-admin/login.usecase";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 
 export const AuthProxy = {

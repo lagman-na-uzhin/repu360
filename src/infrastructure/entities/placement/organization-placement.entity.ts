@@ -31,13 +31,15 @@ export class OrganizationPlacementEntity {
 
     @OneToOne(() => YandexPlacementDetailEntity, yandexDetail => yandexDetail.placement, {
         cascade: ['update', 'insert', 'soft-remove'],
-        nullable: true
+        nullable: true,
+        eager: true
     })
     yandexDetail?: YandexPlacementDetailEntity;
 
     @OneToOne(() => TwogisPlacementDetailEntity, twogisDetail => twogisDetail.placement, {
         cascade: ['update', 'insert', 'soft-remove'],
-        nullable: true
+        nullable: true,
+        eager: true
     })
     twogisDetail?: TwogisPlacementDetailEntity;
 

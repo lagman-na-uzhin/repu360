@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {EntityManager, Equal} from "typeorm";
 import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
-import {Tariff, TariffId} from "@domain/subscription/model/tariff";
 import {TariffEntity} from "@infrastructure/entities/tariff/tariff.entity";
 import {TariffFeaturesEntity} from "@infrastructure/entities/tariff/tariff-features.entity";
 import {TariffFeatures} from "@domain/subscription/model/tariff-feature";
+import {Tariff, TariffId} from "@domain/subscription/model/tariff";
 
 @Injectable()
 export class TariffOrmRepository implements ITariffRepository {
@@ -19,10 +19,10 @@ export class TariffOrmRepository implements ITariffRepository {
     }
 
     async save(tariff: Tariff): Promise<void> {
-        await this.manager.getRepository(TariffEntity).save(this.toPersistence(tariff));
+        await this.manager.getRepository(TariffEntity).save(this.fromDomain(tariff));
     }
 
-    private toPersistence(tariff: Tariff): TariffEntity {
+    private fromDomain(tariff: Tariff): TariffEntity {
         const entity = new TariffEntity();
         const featuresEntity = this.toFeaturesPersistence(tariff.features, tariff.id);
 

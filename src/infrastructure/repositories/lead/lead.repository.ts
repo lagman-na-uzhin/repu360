@@ -51,6 +51,7 @@ export class LeadOrmRepository extends BaseRepository<LeadEntity> implements ILe
     }
 
     private toDomain(entity: LeadEntity): Lead {
+        console.log(entity, "ebrrr")
         const contact = this.toContactDomain(entity.contact);
         return Lead.fromPersistence(entity.id, contact, entity.managerId, entity.processedAt, entity.createdAt);
     }

@@ -3,12 +3,13 @@ export class ManagerPhone {
 
   constructor(phone: string) {
     if (!this.isValid(phone)) {
-      throw new Error('Некорректный номер телефона');
+      throw new Error('Invalid phone number');
     }
     this.value = phone;
   }
 
   private isValid(phone: string): boolean {
+    console.log(phone, "phoneeeeeeeeeeeeeeeeeeeeeeeeeee")
     const phoneRegex = /^\+?[1-9]\d{1,14}$/; // Поддержка международного формата E.164
     return phoneRegex.test(phone);
   }

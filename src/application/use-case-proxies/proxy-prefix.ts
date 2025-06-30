@@ -1,6 +1,7 @@
 export enum ProxyPrefix {
   COMPANY_PROXY = 'CompanyProxy',
   USER_PROXY = 'UserProxy',
+  MANAGER_PROXY = 'ManagerProxy',
   ORGANIZATION_PROXY = 'OrganizationProxy',
   YANDEX_ORGANIZATION_PROXY = 'YandexOrganizationProxy',
   REVIEW_PROXY = 'ReviewProxy',

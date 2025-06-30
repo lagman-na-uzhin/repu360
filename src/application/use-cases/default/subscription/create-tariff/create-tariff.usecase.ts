@@ -1,5 +1,5 @@
 import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
-import {CreateTariffCommand} from "@application/use-cases/control/subscription/create-tariff/create-tariff.command";
+import {CreateTariffCommand} from "@application/use-cases/default/subscription/create-tariff/create-tariff.command";
 import {TariffFeatures} from "@domain/subscription/model/tariff-feature";
 import {Tariff} from "@domain/subscription/model/tariff";
 
@@ -11,7 +11,7 @@ export class CreateTariffUseCase {
     async execute(cmd: CreateTariffCommand): Promise<void> {
         const features = this.createTariffFeatures(cmd);
 
-        const tariff = Tariff.create(true, cmd.price, features);
+        const tariff = Tariff.create(true, features);
 
         await this.tariffRepo.save(tariff);
     }

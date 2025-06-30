@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import {EntityManager, Equal, In, Repository} from 'typeorm';
-import {InjectEntityManager, InjectRepository} from '@nestjs/typeorm';
+import {EntityManager, Equal, In} from 'typeorm';
+import {InjectEntityManager} from '@nestjs/typeorm';
 import { OrganizationEntity } from '@infrastructure/entities/organization/organization.entity';
-import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/organization-placement.entity';
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
 import { Organization, OrganizationId } from '@domain/organization/organization';
 import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
-import {LeadEntity} from "@infrastructure/entities/lead/lead.entity";
-import {Lead} from "@domain/lead/lead";
-import {OrganizationAddress} from "@domain/organization/value-object/organization-address.vo";
 
 @Injectable()
 export class OrganizationOrmRepository
@@ -45,7 +41,7 @@ export class OrganizationOrmRepository
 
   async getListByCompanyId(params: GetOrganizationListByCompanyParams): Promise<PaginatedResult<Organization>> {
 
-    const qb = this.manager.getRepository(OrganizationEntity).createQueryBuilder('organization');
+    const qb = this.createQb();
     qb.andWhere('organization.companyId = :companyId', { companyId: params.filter!.companyId });
 
     return this.getList<Organization>(qb, this.toDomain, params.pagination,  params.sort);
@@ -61,21 +57,27 @@ export class OrganizationOrmRepository
     return entities.map(this.toDomain);
   }
 
-  private toDomain(entity: OrganizationEntity): Organization {
-    const addred = {} as OrganizationAddress //TODO
-    return Organization.fromPersistence(
-      entity.id,
-      entity.companyId,
-      entity.name,
-        addred
-    );
+  private createQb() {
+    return this.manager
+        .getRepository(OrganizationEntity)
+        .createQueryBuilder('organization')
+        .leftJoinAndSelect('organization.address', 'address'); //replaced eager true
   }
 
+  private toDomain(entity: OrganizationEntity): Organization {
+    return Organization.fromPersistence(
+        entity.id,
+        entity.companyId,
+        entity.name,
+        entity.address
+    );
+  }
   private toEntity(organization: Organization): OrganizationEntity {
     const entity = new OrganizationEntity();
     entity.id = organization.id.toString();
     entity.name = organization.name;
     entity.companyId = organization.companyId.toString();
+    entity.address = organization.address
     return entity;
   }
 }

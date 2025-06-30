@@ -23,7 +23,7 @@ export class CompanyOrmRepository extends BaseRepository<CompanyEntity> implemen
   }
 
   async save(company: Company): Promise<void> {
-    await this.manager.getRepository(CompanyEntity).save(this.toPersistence(company))
+    await this.manager.getRepository(CompanyEntity).save(this.fromDomain(company))
   }
 
   async getCompanyList(params: GetCompanyListParams): Promise<PaginatedResult<Company>> {
@@ -59,7 +59,7 @@ export class CompanyOrmRepository extends BaseRepository<CompanyEntity> implemen
     )
   }
 
-  private toPersistence(company: Company): CompanyEntity {
+  private fromDomain(company: Company): CompanyEntity {
     return {
       id: company.id.toString(),
       name: company.name.toString(),

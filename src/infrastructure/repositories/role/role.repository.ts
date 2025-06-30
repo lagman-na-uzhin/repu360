@@ -23,7 +23,7 @@ export class RoleOrmRepository implements IRoleRepository {
     ) {}
 
     async save(role: Role): Promise<void> {
-        return Promise.resolve(undefined); // Implementation needs to be added here
+        await this.manager.getRepository(UserRoleEntity).save(this.fromDomain(role));
     }
 
     async getById(id: RoleId): Promise<Role | null> {
@@ -125,5 +125,15 @@ export class RoleOrmRepository implements IRoleRepository {
             }
         });
         return result;
+    }
+
+    private fromDomain(role: Role): UserRoleEntity {
+        const entity = new UserRoleEntity();
+
+        entity.id = role.id.toString();
+        entity.name = role.name;
+        entity.type = role.type.toString();
+
+        return entity;
     }
 }

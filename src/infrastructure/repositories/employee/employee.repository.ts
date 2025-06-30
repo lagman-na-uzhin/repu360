@@ -47,8 +47,7 @@ export class EmployeeOrmRepository implements IEmployeeRepository {
   }
 
   async save(employee: Employee): Promise<void> {
-    const entity = this.fromDomain(employee);
-    await this.manager.save(UserEntity, entity);
+    await this.manager.getRepository(UserEntity).save(this.fromDomain(employee));
   }
 
   private toDomain(entity: UserEntity): Employee {
@@ -65,7 +64,17 @@ export class EmployeeOrmRepository implements IEmployeeRepository {
   }
 
   private fromDomain(employee: Employee): UserEntity {
-    // TODO: реализовать маппинг из Employee в UserEntity
-    throw new Error("Not implemented");
+    const entity = new UserEntity();
+
+    entity.id = employee.id.toString();
+    entity.name = employee.name.toString();
+    entity.email = employee.email.toString();
+    entity.phone = employee.phone.toString();
+    entity.password = employee.password.toString();
+    entity.avatar = employee.avatar
+    entity.companyId = employee.companyId.toString();
+    entity.roleId = employee.roleId.toString();
+
+    return entity;
   }
 }

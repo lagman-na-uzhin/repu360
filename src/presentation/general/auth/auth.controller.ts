@@ -1,8 +1,8 @@
 import {Body, Controller, Get, HttpCode, HttpStatus, Inject, Post, Req, Res, UseGuards} from '@nestjs/common';
 import {FastifyRequest, FastifyReply} from 'fastify';
 import {EmployeeLoginDto, ManagerLoginDto} from "@presentation/general/auth/dto/login.request";
-import {ManagerLoginCommand} from "@application/use-cases/default/manager/commands/login/login.command";
-import {ManagerLoginUseCase} from "@application/use-cases/default/manager/commands/login/login.usecase";
+import {ManagerLoginCommand} from "@application/use-cases/default/auth/commands/login-admin/login.command";
+import {ManagerLoginUseCase} from "@application/use-cases/default/auth/commands/login-admin/login.usecase";
 import {EmployeeLoginCommand} from "@application/use-cases/default/auth/commands/login/login.command";
 import {EmployeeLoginUseCase} from "@application/use-cases/default/auth/commands/login/login.usecase";
 import {GENERAl_ROUTES} from "@presentation/routes";
@@ -54,7 +54,7 @@ export class AuthController {
         @Body() dto: ManagerLoginDto,
         @Req() request: FastifyRequest,
         @Res() reply: FastifyReply
-    ) {        console.log("manager login")
+    ) {        console.log("manager login-admin")
         const cmd = ManagerLoginCommand.of(dto)
         const { token, expireTime } = await this.managerLoginUseCaseProxy
             .getInstance()

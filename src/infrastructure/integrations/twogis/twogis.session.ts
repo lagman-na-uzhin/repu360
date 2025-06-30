@@ -93,8 +93,6 @@ export class TwogisSession implements ITwogisSession {
         return this.repo.generateReply(accessToken, authorName, this.proxy);
     }
     async getReviewFromCabinet(reviewExternalId: string, accessToken: string): Promise<IReviewFromCabinet> {
-        console.log(accessToken, "accessToken sessionj")
-        console.log(reviewExternalId, "reviewExternalId sessionj")
         return this.repo.getReviewFromCabinet(reviewExternalId, accessToken, this.proxy);
     }
 

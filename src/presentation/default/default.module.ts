@@ -3,10 +3,16 @@ import { UsecaseProxyModule } from '@infrastructure/providers/usecase-proxy.modu
 import { EmployeeController } from '@presentation/default/employee/employee.controller';
 import {OrganizationController} from "@presentation/default/organization/organization.controller";
 import {CompanyController} from "@presentation/default/company/company.controller";
+import {ManagerController} from "@presentation/default/manager/manager.controlller";
 
 @Module({
   imports: [UsecaseProxyModule.register()],
   providers: [],
-  controllers: [EmployeeController, OrganizationController, CompanyController],
+  controllers: [
+      EmployeeController,
+      OrganizationController,
+      CompanyController,
+      ManagerController
+  ],
 })
 export class DefaultModule {}

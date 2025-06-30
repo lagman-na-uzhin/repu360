@@ -3,7 +3,7 @@ import {ICompanyRepository} from "@domain/company/repositories/company-repositor
 import {CompanyOrmRepository} from "@infrastructure/repositories/company/company.repository";
 import {
     CreateSubscriptionUseCase
-} from "@application/use-cases/control/subscription/create/create-subscription.usecase";
+} from "@application/use-cases/default/subscription/create/create-subscription.usecase";
 import {SubscriptionProxy} from "@application/use-case-proxies/subscription/subscription.proxy";
 import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
 import {ISubscriptionRepository} from "@domain/subscription/repositories/subscription-repository.interface";

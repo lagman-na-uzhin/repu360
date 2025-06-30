@@ -241,4 +241,5 @@ export class EmployeePermissions {
             this._organizations
         );
     }
+
 }

@@ -41,7 +41,7 @@ export class ControlLeadController {
     }
 
 
-    @Patch(CONTROL_ROUTES.LEAD.CONFIRM)
+    @Post(CONTROL_ROUTES.LEAD.CONFIRM)
     async confirm(
         @RequestBody() dto: ConfirmLeadRequestDto,
         @RequestActor() actor

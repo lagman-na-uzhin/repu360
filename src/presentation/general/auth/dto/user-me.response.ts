@@ -31,32 +31,32 @@ export class UserMeResponseDto {
     email: string;
 
     @Expose()
-    companyId?: string;
+    companyId: string | null;
 
     @Expose()
     avatar?: string;
 
 
     public static fromDomain(domain: Manager | Employee, domainRole: Role): UserMeResponseDto {
-        const userRoleDto = plainToInstance(UserMeResponseDto, {
+        const userRoleDto = plainToInstance(UserRoleResponseDto, {
             id: domainRole.id.toString(), // Convert UniqueID to string
             name: domainRole.name, // Convert ValueObject to string
             type: domainRole.type.toString(), // Convert ValueObject to string
-            companyId: domainRole.employeePermissions || domainRole.managerPermissions , // Use the determined companyId
+            permissions: domainRole.employeePermissions.toPlainObject() || domainRole.managerPermissions.toPlainObject() , // Use the determined companyId
         }, {
             excludeExtraneousValues: true,
         });
 
-        let companyId: string | undefined;
+        let companyId: string | null = null;
         if (domain instanceof Employee) {
-            companyId = domain.companyId?.toString(); // Call .toString() on CompanyId VO
+            companyId = domain.companyId.toString(); // Call .toString() on CompanyId VO
         }
 
         return plainToInstance(UserMeResponseDto, {
             id: domain.id.toString(), // Convert UniqueID to string
             name: domain.name.toString(), // Convert ValueObject to string
             email: domain.email.toString(), // Convert ValueObject to string
-            companyId: companyId, // Use the determined companyId
+            companyId, // Use the determined companyId
             role: userRoleDto,
         }, {
             excludeExtraneousValues: true,

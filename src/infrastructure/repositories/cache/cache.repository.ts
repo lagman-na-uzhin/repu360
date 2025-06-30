@@ -34,6 +34,7 @@ export class CacheRepository implements ICacheRepository {
 
     const data: EmployeeAuthDataType = <EmployeeAuthDataType>{
       id: employee.id.toString(),
+      companyId: employee.companyId.toString(),
       role: {
         id: role.id.toString(),
         name: role.name?.toString() || null,

@@ -51,12 +51,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     console.log(rawUserData, "rawUserData")
     if (!rawUserData) return false;
-    console.log(this.getActor(rawUserData))
+    console.log(this.getActor(rawUserData), "raw user data")
     return this.getActor(rawUserData);
   }
 
   private getActor(raw: string): Actor {
     const persistence: ManagerAuthDataType | EmployeeAuthDataType = JSON.parse(raw);
+    console.log(persistence, " persistencepersistence persistencepersistence")
     let permissions: EmployeePermissions | ManagerPermissions;
 
     const roleType = new RoleType(persistence.role.type);
@@ -64,9 +65,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (roleType.equals(RoleType.type.ADMIN) || roleType.equals(RoleType.type.MANAGER)) {
       const managerData = persistence as ManagerAuthDataType;
 
-
       const managerCompanies = managerData.role.permissions.companies as ManagerCompanyPermission[];
-
 
       const managerOrganizationsMap = new Map<string, ManagerOrganizationPermission[]>();
 
@@ -84,7 +83,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           persistence.role.type,
           permissions
       );
-      return Actor.fromPersistence(persistence.id, role);
+      return Actor.fromPersistence(persistence.id, null, role);
 
     } else {
       const employeeData = persistence as EmployeeAuthDataType;
@@ -117,7 +116,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           permissions
       );
 
-      return Actor.fromPersistence(persistence.id, role);
+      console.log(employeeData, " employeeData employeeData employeeData employeeData")
+      return Actor.fromPersistence(employeeData.id, employeeData.companyId, role);
     }
   }
 }

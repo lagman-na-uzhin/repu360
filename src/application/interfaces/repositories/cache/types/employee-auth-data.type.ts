@@ -10,5 +10,6 @@ type Role = {
 }
 export type EmployeeAuthDataType = {
     id: string;
+    companyId: string;
     role: Role;
 }

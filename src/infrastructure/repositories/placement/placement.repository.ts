@@ -8,6 +8,12 @@ import {TwogisPlacementDetail} from "@domain/placement/model/twogis-placement-de
 import {YandexPlacementDetail} from "@domain/placement/model/yandex-placement-detail";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {CompanyEntity} from "@infrastructure/entities/company/company.entity";
+import {
+    TwogisPlacementDetailEntity
+} from "@infrastructure/entities/placement/placement-details/twogis-placement.entity";
+import {
+    YandexPlacementDetailEntity
+} from "@infrastructure/entities/placement/placement-details/yandex-placement.entity";
 
 export class PlacementOrmRepository implements IPlacementRepository {
     constructor(
@@ -35,8 +41,12 @@ export class PlacementOrmRepository implements IPlacementRepository {
         return entities.map(this.toDomain);
     }
 
-    async save(placement: Placement): Promise<Placement> {
-        return {} as Placement
+    async save(placement: Placement): Promise<void> {
+    }
+
+    async batchSave(placements: Placement[]): Promise<void> {
+        const entities = placements.map(this.fromDomain)
+        await this.manager.getRepository(OrganizationPlacementEntity).save(entities);
     }
 
     async getActiveTwogisListOfAutoReply(): Promise<Placement[]> {
@@ -68,6 +78,32 @@ export class PlacementOrmRepository implements IPlacementRepository {
         return entities.map(this.toDomain);
     }
 
+    private fromDomain(placement: Placement): OrganizationPlacementEntity {
+        const entity = new OrganizationPlacementEntity();
+
+        entity.id = placement.id.toString();
+        entity.organizationId = placement.organizationId.toString();
+        entity.platform = placement.platform;
+
+        if (placement.placementDetail instanceof TwogisPlacementDetail) {
+            const twogisDetailEntity = new TwogisPlacementDetailEntity();
+            const detail = placement.getTwogisPlacementDetail();
+            twogisDetailEntity.placementId = placement.id.toString()
+            twogisDetailEntity.externalId = detail.externalId;
+            twogisDetailEntity.type = detail.type;
+            entity.twogisDetail = twogisDetailEntity;
+        } else if (placement.placementDetail instanceof YandexPlacementDetail) {
+            const yandexDetailEntity = new YandexPlacementDetailEntity();
+            yandexDetailEntity.placementId = placement.id.toString();
+            const detail = placement.getYandexPlacementDetail()
+            yandexDetailEntity.externalId = detail.externalId;
+            entity.yandexDetail = yandexDetailEntity;
+        } else {
+            throw new Error("Unsupported Placement Detail Type");
+        }
+
+        return entity;
+    }
 
     private toDomain(entity: OrganizationPlacementEntity) {
         let placementDetail;
@@ -89,5 +125,29 @@ export class PlacementOrmRepository implements IPlacementRepository {
             entity.platform,
             placementDetail
         )
+    }
+
+    private createQb() {
+        return this.manager
+            .getRepository(OrganizationPlacementEntity)
+            .createQueryBuilder('placement')
+            .leftJoinAndSelect('placement.yandexDetail', 'yandexDetail')
+            .leftJoinAndSelect('placement.twogisDetail', 'twogisDetail')
+    }
+
+    async getTwogisPlacementByExternalId(externalId: string): Promise<Placement | null> {
+        const entity = await this.createQb()
+            .where('twogisDetail.externalId = :externalId', { externalId })
+            .getOne();
+
+        return entity ? this.toDomain(entity) : null;
+    }
+
+    async getYandexPlacementByExternalId(externalId: string): Promise<Placement | null> {
+        const entity = await this.createQb()
+            .where('yandexDetail.externalId = :externalId', { externalId })
+            .getOne();
+
+        return entity ? this.toDomain(entity) : null;
     }
 }

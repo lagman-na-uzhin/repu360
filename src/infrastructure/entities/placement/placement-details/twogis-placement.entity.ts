@@ -12,10 +12,7 @@ import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/or
 
 @Entity('twogis_placement_detail')
 export class TwogisPlacementDetailEntity {
-    @PrimaryColumn('uuid')
-    id: string
-
-    @Column({ type: 'varchar', unique: true })
+    @PrimaryColumn({ type: 'varchar', unique: true })
     externalId: string;
 
     @Column()

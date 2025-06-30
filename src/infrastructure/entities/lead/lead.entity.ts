@@ -24,7 +24,7 @@ export class LeadEntity {
     @Column({ type: "timestamptz", nullable: true })
     public processedAt: Date | null;
 
-    @OneToOne(() => LeadContactEntity, (contact) => contact.lead, { cascade: ['soft-remove', 'insert', 'update'] })
+    @OneToOne(() => LeadContactEntity, (contact) => contact.lead, { cascade: ['soft-remove', 'insert', 'update'], eager: true })
     contact: LeadContactEntity;
 
 
