@@ -1,5 +1,5 @@
 import { UniqueID } from "@domain/common/unique-id";
-import { Platform } from "@domain/placement/types/platfoms.enum";
+import { PLATFORMS } from "@domain/placement/platfoms.enum";
 import { TwogisProfilePlacementDetail } from "@domain/review/model/profile/twogis-profile-placement-detail";
 import { YandexProfilePlacementDetail } from "@domain/review/model/profile/yandex-profile-placement-detail";
 
@@ -10,7 +10,7 @@ export class ProfileId extends UniqueID {}
 export class Profile {
     private constructor(
       private readonly _id: ProfileId,
-      private readonly _platform: Platform,
+      private readonly _platform: PLATFORMS,
       private _firstname: string,
       private _surname: string,
       private _avatar: string | null,
@@ -22,7 +22,7 @@ export class Profile {
     ) {}
 
     static create(
-      platform: Platform,
+      platform: PLATFORMS,
       firstname: string,
       surname: string,
       avatar: string | null,
@@ -34,7 +34,7 @@ export class Profile {
 
     static fromPersistence(
       id: string,
-      platform: Platform,
+      platform: PLATFORMS,
       firstname: string,
       surname: string,
       avatar: string | null,
@@ -50,24 +50,24 @@ export class Profile {
     }
 
     getTwogisProfilePlacementDetail(): TwogisProfilePlacementDetail {
-        if (this.platform === Platform.TWOGIS && this.detail instanceof TwogisProfilePlacementDetail) {
+        if (this.platform === PLATFORMS.TWOGIS && this.detail instanceof TwogisProfilePlacementDetail) {
             return this.detail;
         }
         throw new Error("Invalid detail access: Expected TWOGIS profile detail");
     }
 
     getYandexProfilePlacementDetail(): YandexProfilePlacementDetail {
-        if (this.platform === Platform.YANDEX && this.detail instanceof YandexProfilePlacementDetail) {
+        if (this.platform === PLATFORMS.YANDEX && this.detail instanceof YandexProfilePlacementDetail) {
             return this.detail;
         }
         throw new Error("Invalid detail access: Expected YANDEX profile detail");
     }
 
-    private static validateProfileDetail(platform: Platform, detail: ProfileDetail): void {
-        if (platform === Platform.TWOGIS && !(detail instanceof TwogisProfilePlacementDetail)) {
+    private static validateProfileDetail(platform: PLATFORMS, detail: ProfileDetail): void {
+        if (platform === PLATFORMS.TWOGIS && !(detail instanceof TwogisProfilePlacementDetail)) {
             throw new Error("Invalid profile detail for TWOGIS placement-details");
         }
-        if (platform === Platform.YANDEX && !(detail instanceof YandexProfilePlacementDetail)) {
+        if (platform === PLATFORMS.YANDEX && !(detail instanceof YandexProfilePlacementDetail)) {
             throw new Error("Invalid profile detail for YANDEX placement-details");
         }
     }
@@ -76,7 +76,7 @@ export class Profile {
         return this._id;
     }
 
-    get platform(): Platform {
+    get platform(): PLATFORMS {
         return this._platform;
     }
 

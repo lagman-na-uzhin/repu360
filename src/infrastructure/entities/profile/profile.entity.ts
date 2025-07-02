@@ -13,7 +13,7 @@ import {
   TwogisProfilePlacementDetailEntity,
 } from '@infrastructure/entities/profile/placement-details/twogis-profile.entity';
 import { YandexProfilePlacementDetailEntity } from "@infrastructure/entities/profile/placement-details/yandex-profile.entity";
-import {Platform} from "@domain/placement/types/platfoms.enum";
+import {PLATFORMS} from "@domain/placement/platfoms.enum";
 
 @Entity('profile')
 export class ProfileEntity {
@@ -29,8 +29,8 @@ export class ProfileEntity {
   @Column({ nullable: true, type: "text" })
   public avatar: string | null;
 
-  @Column({ type: 'enum', enum: Platform })
-  public placement: Platform
+  @Column({ type: 'enum', enum: PLATFORMS })
+  public placement: PLATFORMS
 
   @OneToMany(() => ReviewEntity, (review) => review.profile, {cascade: ['soft-remove']})
   reviews: ReviewEntity[];

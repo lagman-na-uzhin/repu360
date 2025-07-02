@@ -9,7 +9,7 @@ import {OrganizationEntity} from "@infrastructure/entities/organization/organiza
 import {ReviewEntity} from "@infrastructure/entities/review/review.entity";
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
 import { TwogisPlacementDetailEntity, } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
-import {Platform} from "@domain/placement/types/platfoms.enum";
+import {PLATFORMS} from "@domain/placement/platfoms.enum";
 import {AutoReplyEntity} from "@infrastructure/entities/autoreply/autoreply.entity";
 
 @Entity('organization_placement')
@@ -17,11 +17,14 @@ export class OrganizationPlacementEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
+    @PrimaryColumn("uuid")
+    public externalId: string;
+
     @Column({type: 'uuid'})
     public organizationId: string;
 
-    @Column({ type: 'enum', enum: Platform })
-    public platform: Platform;
+    @Column({ type: 'enum', enum: PLATFORMS })
+    public platform: PLATFORMS;
 
     @ManyToOne(() => OrganizationEntity, organization => organization.placements)
     organization: OrganizationEntity;

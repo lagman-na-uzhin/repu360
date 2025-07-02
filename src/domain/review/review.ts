@@ -1,5 +1,5 @@
 import { UniqueID } from '@domain/common/unique-id';
-import { Platform } from "@domain/placement/types/platfoms.enum";
+import { PLATFORMS } from "@domain/placement/platfoms.enum";
 import { ReviewMedia } from '@domain/review/model/review/review-media';
 import { PlacementId } from "@domain/placement/placement";
 import { TwogisReviewPlacementDetail } from "@domain/review/model/review/twogis-review-placement-detail";
@@ -18,7 +18,7 @@ export class Review {
       private readonly _id: ReviewId,
       private readonly _placementId: PlacementId,
       private readonly _profileId: ProfileId,
-      private readonly _platform: Platform,
+      private readonly _platform: PLATFORMS,
       private _text: string,
       private _rating: number,
       private _media: ReviewMedia[],
@@ -30,7 +30,7 @@ export class Review {
     static create(
         placementId: PlacementId,
         profileId: ProfileId,
-        platform: Platform,
+        platform: PLATFORMS,
         text: string,
         rating: number,
         media: ReviewMedia[],
@@ -47,7 +47,7 @@ export class Review {
       reviewId: string,
       placementId: string,
       profileId: string,
-      platform: Platform,
+      platform: PLATFORMS,
       text: string,
       rating: number,
       media: ReviewMedia[],
@@ -79,14 +79,14 @@ export class Review {
     }
 
     getTwogisReviewPlacementDetail(): TwogisReviewPlacementDetail {
-        if (this._platform === Platform.TWOGIS && this._placementDetail instanceof TwogisReviewPlacementDetail) {
+        if (this._platform === PLATFORMS.TWOGIS && this._placementDetail instanceof TwogisReviewPlacementDetail) {
             return this._placementDetail;
         }
         throw new Error('Invalid detail access: Expected TWOGIS placement detail');
     }
 
     getYandexReviewPlacementDetail(): YandexReviewPlacementDetail {
-        if (this._platform === Platform.YANDEX && this._placementDetail instanceof YandexReviewPlacementDetail) {
+        if (this._platform === PLATFORMS.YANDEX && this._placementDetail instanceof YandexReviewPlacementDetail) {
             return this._placementDetail;
         }
         throw new Error('Invalid detail access: Expected YANDEX placement detail');
@@ -96,11 +96,11 @@ export class Review {
         return this._replies.find(reply => reply.isOfficial)
     }
 
-    private static validatePlacementDetail(platform: Platform, detail: ReviewPlacementDetail): void {
-        if (platform === Platform.TWOGIS && !(detail instanceof TwogisReviewPlacementDetail)) {
+    private static validatePlacementDetail(platform: PLATFORMS, detail: ReviewPlacementDetail): void {
+        if (platform === PLATFORMS.TWOGIS && !(detail instanceof TwogisReviewPlacementDetail)) {
             throw new Error('Invalid placement detail for TWOGIS placement-details');
         }
-        if (platform === Platform.YANDEX && !(detail instanceof YandexReviewPlacementDetail)) {
+        if (platform === PLATFORMS.YANDEX && !(detail instanceof YandexReviewPlacementDetail)) {
             throw new Error('Invalid placement detail for YANDEX placement-details');
         }
     }
@@ -117,7 +117,7 @@ export class Review {
         return this._profileId;
     }
 
-    get platform(): Platform {
+    get platform(): PLATFORMS {
         return this._platform;
     }
 

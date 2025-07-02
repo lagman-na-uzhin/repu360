@@ -1,22 +1,11 @@
 export class YandexPlacementDetail {
-    private constructor(private _externalId: string) {}
+    private constructor() {}
 
-    static create(externalId: string): YandexPlacementDetail {
-        return new YandexPlacementDetail(externalId);
+    static create(): YandexPlacementDetail {
+        return new YandexPlacementDetail()
     }
 
-    static fromPersistence(externalId: string): YandexPlacementDetail {
-        return new YandexPlacementDetail(externalId)
-    }
-
-    get externalId(): string {
-        return this._externalId;
-    }
-
-    set externalId(value: string) {
-        if (!value.trim()) {
-            throw new Error("External ID cannot be empty");
-        }
-        this._externalId = value;
+    static fromPersistence() {
+        return new YandexPlacementDetail()
     }
 }

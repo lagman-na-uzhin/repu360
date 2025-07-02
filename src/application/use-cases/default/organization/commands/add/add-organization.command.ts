@@ -1,11 +1,11 @@
-import {Platform} from "@domain/placement/types/platfoms.enum";
+import {PLATFORMS} from "@domain/placement/platfoms.enum";
 import {BaseCommand} from "@application/common/base-command";
 import {Actor} from "@domain/policy/actor";
 import {CompanyId} from "@domain/company/company";
 class PlacementCommand {
     constructor(
         public readonly externalId: string,
-        public readonly platform: Platform,
+        public readonly platform: PLATFORMS,
         public readonly addressName: string,
         public readonly type: string,
     ) {}
@@ -29,7 +29,7 @@ export class AddOrganizationCommand extends BaseCommand{
             address: string,
             placements: {
                 externalId: string
-                platform: Platform
+                platform: PLATFORMS
                 addressName: string
                 type: string
             }[]

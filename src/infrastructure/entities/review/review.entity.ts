@@ -7,7 +7,7 @@ import { OrganizationPlacementEntity } from '@infrastructure/entities/placement/
 import { ProfileEntity } from 'src/infrastructure/entities/profile/profile.entity';
 import { TwogisReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/twogis-review.entity';
 import { YandexReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/yandex-review.entity';
-import {Platform} from "@domain/placement/types/platfoms.enum";
+import {PLATFORMS} from "@domain/placement/platfoms.enum";
 import { ReviewMediaEntity } from '@infrastructure/entities/review/review-media.entity';
 import {ReviewComplaintEntity} from "@infrastructure/entities/review/complaint/review-complaint.entity";
 import {ReviewReplyEntity} from "@infrastructure/entities/review/review-reply.entity";
@@ -30,8 +30,8 @@ export class ReviewEntity {
     @Column({type: "uuid"})
     public placementId: string;
 
-    @Column({ type: 'enum', enum: Platform })
-    public platform: Platform;
+    @Column({ type: 'enum', enum: PLATFORMS })
+    public platform: PLATFORMS;
 
     @ManyToOne(() => ProfileEntity, (profile) => profile.reviews)
     profile: ProfileEntity;

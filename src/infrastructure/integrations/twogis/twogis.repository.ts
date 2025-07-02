@@ -8,7 +8,7 @@ import {
 import { Review } from '@domain/review/review';
 import { Profile, ProfileId } from '@domain/review/profile';
 import {PlacementId} from '@domain/placement/placement';
-import { Platform } from '@domain/placement/types/platfoms.enum';
+import { PLATFORMS } from '@domain/placement/platfoms.enum';
 import { TwogisReviewPlacementDetail } from '@domain/review/model/review/twogis-review-placement-detail';
 import { TwogisProfilePlacementDetail } from '@domain/review/model/profile/twogis-profile-placement-detail';
 import { ReviewMedia } from '@domain/review/model/review/review-media';
@@ -148,7 +148,7 @@ export class TwogisRepository implements ITwogisRepository {
     return Review.create(
         placementId,
         profileId,
-        Platform.TWOGIS,
+        PLATFORMS.TWOGIS,
         contract.text,
         contract.rating,
         contract.photos.flatMap((i) =>
@@ -168,7 +168,7 @@ export class TwogisRepository implements ITwogisRepository {
     name: string,
     twogisPreviewUrls: ITwogisPreviewUrls,
   ): Profile {
-    return Profile.create(Platform.TWOGIS, name, name, twogisPreviewUrls.url, TwogisProfilePlacementDetail.create(id))
+    return Profile.create(PLATFORMS.TWOGIS, name, name, twogisPreviewUrls.url, TwogisProfilePlacementDetail.create(id))
   }
 
   private sleep(ms: number): Promise<void> {

@@ -3,7 +3,7 @@ import {Placement, PlacementId} from "@domain/placement/placement";
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {EntityManager, Equal} from "typeorm";
 import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/organization-placement.entity";
-import {Platform} from "@domain/placement/types/platfoms.enum";
+import {PLATFORMS} from "@domain/placement/platfoms.enum";
 import {TwogisPlacementDetail} from "@domain/placement/model/twogis-placement-detail";
 import {YandexPlacementDetail} from "@domain/placement/model/yandex-placement-detail";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
@@ -54,7 +54,7 @@ export class PlacementOrmRepository implements IPlacementRepository {
             .createQueryBuilder('placement')
             .leftJoinAndSelect('placement.autoReply', 'autoReply')
             .leftJoinAndSelect('placement.twogisDetail', 'twogisDetail')
-            .where('placement.platform = :platform', { platform: Platform.TWOGIS })
+            .where('placement.platform = :platform', { platform: PLATFORMS.TWOGIS })
             // .andWhere('autoReply.isEnabled = true AND autoReply.deletedAt IS NULL')
             // .andWhere(`
             //       (
@@ -89,14 +89,14 @@ export class PlacementOrmRepository implements IPlacementRepository {
             const twogisDetailEntity = new TwogisPlacementDetailEntity();
             const detail = placement.getTwogisPlacementDetail();
             twogisDetailEntity.placementId = placement.id.toString()
-            twogisDetailEntity.externalId = detail.externalId;
+            twogisDetailEntity.externalId = placement.externalId;
             twogisDetailEntity.type = detail.type;
             entity.twogisDetail = twogisDetailEntity;
         } else if (placement.placementDetail instanceof YandexPlacementDetail) {
             const yandexDetailEntity = new YandexPlacementDetailEntity();
             yandexDetailEntity.placementId = placement.id.toString();
-            const detail = placement.getYandexPlacementDetail()
-            yandexDetailEntity.externalId = detail.externalId;
+            yandexDetailEntity.externalId = placement.externalId;
+            // const detail = placement.getYandexPlacementDetail()
             entity.yandexDetail = yandexDetailEntity;
         } else {
             throw new Error("Unsupported Placement Detail Type");
@@ -109,13 +109,12 @@ export class PlacementOrmRepository implements IPlacementRepository {
         let placementDetail;
         if (entity.twogisDetail) {
             placementDetail = TwogisPlacementDetail.fromPersistence(
-                entity.twogisDetail.externalId,
                 entity.twogisDetail.type,
                 entity.twogisDetail.cabinetLogin,
                 entity.twogisDetail.cabinetPassword
             );
         } else if (entity.yandexDetail) {
-            placementDetail = YandexPlacementDetail.fromPersistence(entity.yandexDetail.externalId)
+            placementDetail = YandexPlacementDetail.fromPersistence()
         } else {
             throw new Error("Placement Detail Not Found")
         }
@@ -123,6 +122,7 @@ export class PlacementOrmRepository implements IPlacementRepository {
             entity.id,
             entity.organizationId,
             entity.platform,
+            entity.externalId,
             placementDetail
         )
     }

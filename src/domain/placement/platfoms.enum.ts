@@ -1,4 +1,4 @@
-export enum Platform {
+export enum PLATFORMS {
     TWOGIS = 'TWOGIS',
     YANDEX = 'YANDEX',
 }

@@ -4,15 +4,15 @@ import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.re
 import {GetListParams} from "@domain/common/repositories/get-list.interface";
 import {CompanyId} from "@domain/company/company";
 import {GetOrganizationListByCompanyFilter} from "@domain/organization/repositories/params/get-list-by-company.params";
-import {Platform} from "@domain/placement/types/platfoms.enum";
+import {PLATFORMS} from "@domain/placement/platfoms.enum";
 
 class PlacementRequestDto {
     @IsNotEmpty({ message: 'externalId Id is required' })
     @IsString({ message: 'externalId Id must be a string' })
     public readonly externalId: string;
 
-    @IsEnum(Platform)
-    public readonly platform: Platform;
+    @IsEnum(PLATFORMS)
+    public readonly platform: PLATFORMS;
 
     @IsNotEmpty({ message: 'addressName Id is required' })
     @IsString({ message: 'Company Id must be a string' })

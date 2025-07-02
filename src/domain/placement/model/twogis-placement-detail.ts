@@ -2,39 +2,23 @@ import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/tw
 
 export class TwogisPlacementDetail {
     private constructor(
-      private _externalId: string,
       private _type: string, // TODO: уточнить тип
       private _cabinet_credentials: TwogisCabinetCredentials | null
     ) {}
 
-    static create(externalId: string, type: string, cabinetCredentials: TwogisCabinetCredentials | null): TwogisPlacementDetail {
-        return new TwogisPlacementDetail(externalId, type, cabinetCredentials);
+    static create(type: string, cabinetCredentials: TwogisCabinetCredentials | null): TwogisPlacementDetail {
+        return new TwogisPlacementDetail(type, cabinetCredentials);
     }
 
     static fromPersistence(
-        externalId: string,
         type: string,
         login?: string,
         password?: string
     ): TwogisPlacementDetail {
         return new TwogisPlacementDetail(
-            externalId,
             type,
-            login && password ? new TwogisCabinetCredentials(login!, password!) : null
+            (login && password) ? new TwogisCabinetCredentials(login!, password!) : null
         );
-    }
-
-
-
-    get externalId(): string {
-        return this._externalId;
-    }
-
-    set externalId(value: string) {
-        if (!value.trim()) {
-            throw new Error("External ID cannot be empty");
-        }
-        this._externalId = value;
     }
 
     get type(): string {

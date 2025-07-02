@@ -7,7 +7,7 @@ import {AddOrganizationCommand} from "@application/use-cases/default/organizatio
 import {TwogisPlacementDetail} from "@domain/placement/model/twogis-placement-detail";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {Organization, OrganizationId} from "@domain/organization/organization";
-import {Platform} from "@domain/placement/types/platfoms.enum";
+import {PLATFORMS} from "@domain/placement/platfoms.enum";
 import {YandexPlacementDetail} from "@domain/placement/model/yandex-placement-detail";
 import {PlacementDetail} from "@domain/placement/types/placement-detail.types";
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
@@ -50,7 +50,7 @@ export class AddOrganizationUseCase {
     private async createAndValidatePlacement(
         organizationId: OrganizationId,
         externalId: string,
-        platform: Platform,
+        platform: PLATFORMS,
         type: string
     ): Promise < Placement > {
         let placementDetail: PlacementDetail;
@@ -70,7 +70,7 @@ export class AddOrganizationUseCase {
                 if (existingPlacement) {
                     throw new Error(EXCEPTION.PLACEMENT.ALREADY_EXIST);
                 }
-                placementDetail = YandexPlacementDetail.create(externalId);
+                placementDetail = YandexPlacementDetail.create();
                 break;
 
             default:
