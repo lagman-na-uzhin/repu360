@@ -1,6 +1,6 @@
 import { Expose, plainToInstance } from 'class-transformer';
 import {Review} from "@domain/review/review";
-import {PLATFORMS} from "@domain/placement/platfoms.enum";
+import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 
 export class ReviewResponseDto {

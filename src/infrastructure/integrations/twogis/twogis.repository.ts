@@ -10,7 +10,7 @@ import {
 import {Review} from '@domain/review/review';
 import {Profile, ProfileId} from '@domain/review/model/profile/profile';
 import {PlacementId} from '@domain/placement/placement';
-import {PLATFORMS} from '@domain/placement/platfoms.enum';
+import {PLATFORMS} from '@domain/common/platfoms.enum';
 import {TwogisReviewPlacementDetail} from '@domain/review/model/review/twogis-review-placement-detail';
 import {TwogisProfilePlacementDetail} from '@domain/review/model/profile/twogis-profile-placement-detail';
 import {ReviewMedia} from '@domain/review/model/review/review-media';

@@ -1,4 +1,4 @@
-import {PLATFORMS} from "@domain/placement/platfoms.enum";
+import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {BaseCommand} from "@application/common/base-command";
 import {Actor} from "@domain/policy/actor";
 import {CompanyId} from "@domain/company/company";

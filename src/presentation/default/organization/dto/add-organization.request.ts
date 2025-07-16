@@ -4,7 +4,7 @@ import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.re
 import {GetListParams} from "@domain/common/repositories/get-list.interface";
 import {CompanyId} from "@domain/company/company";
 import {GetOrganizationListByCompanyFilter} from "@domain/organization/repositories/params/get-list-by-company.params";
-import {PLATFORMS} from "@domain/placement/platfoms.enum";
+import {PLATFORMS} from "@domain/common/platfoms.enum";
 
 class PlacementRequestDto {
     @IsNotEmpty({ message: 'externalId Id is required' })

@@ -4,7 +4,7 @@ import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.re
 import {GetListParams} from "@domain/common/repositories/get-list.interface";
 import {CompanyId} from "@domain/company/company";
 import {OrganizationId} from "@domain/organization/organization";
-import {PLATFORMS} from "@domain/placement/platfoms.enum";
+import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {GetReviewListFilterParams} from "@domain/review/repositories/params/get-list.params";
 
 

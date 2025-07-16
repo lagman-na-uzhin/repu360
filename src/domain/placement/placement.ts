@@ -2,7 +2,7 @@ import { UniqueID } from '@domain/common/unique-id';
 import { OrganizationId } from '@domain/organization/organization';
 import { YandexPlacementDetail } from '@domain/placement/model/yandex-placement-detail';
 import { TwogisPlacementDetail } from '@domain/placement/model/twogis-placement-detail';
-import { PLATFORMS } from '@domain/placement/platfoms.enum';
+import { PLATFORMS } from '@domain/common/platfoms.enum';
 import { PlacementDetail } from "@domain/placement/types/placement-detail.types";
 
 export class PlacementId extends UniqueID {}
@@ -14,6 +14,7 @@ export class Placement {
       private readonly _external_id: string,
       private _platform: PLATFORMS,
       private _placement_detail: PlacementDetail,
+      private _rubrics?: any // TODO
       // private readonly _createdAt: Date = new Date(),
       // private _updatedAt: Date | null = null,
       // private _deletedAt: Date | null = null

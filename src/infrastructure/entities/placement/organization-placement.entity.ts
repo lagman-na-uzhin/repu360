@@ -9,7 +9,7 @@ import {OrganizationEntity} from "@infrastructure/entities/organization/organiza
 import {ReviewEntity} from "@infrastructure/entities/review/review.entity";
 import { YandexPlacementDetailEntity } from '@infrastructure/entities/placement/placement-details/yandex-placement.entity';
 import { TwogisPlacementDetailEntity, } from '@infrastructure/entities/placement/placement-details/twogis-placement.entity';
-import {PLATFORMS} from "@domain/placement/platfoms.enum";
+import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {AutoReplyEntity} from "@infrastructure/entities/autoreply/autoreply.entity";
 
 @Entity('organization_placement')

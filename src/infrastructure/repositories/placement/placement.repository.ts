@@ -3,7 +3,7 @@ import {Placement, PlacementId} from "@domain/placement/placement";
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {EntityManager, Equal} from "typeorm";
 import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/organization-placement.entity";
-import {PLATFORMS} from "@domain/placement/platfoms.enum";
+import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {TwogisPlacementDetail} from "@domain/placement/model/twogis-placement-detail";
 import {YandexPlacementDetail} from "@domain/placement/model/yandex-placement-detail";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";

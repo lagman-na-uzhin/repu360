@@ -1,5 +1,5 @@
 import { UniqueID } from "@domain/common/unique-id";
-import { PLATFORMS } from "@domain/placement/platfoms.enum";
+import { PLATFORMS } from "@domain/common/platfoms.enum";
 import { TwogisProfilePlacementDetail } from "@domain/review/model/profile/twogis-profile-placement-detail";
 import { YandexProfilePlacementDetail } from "@domain/review/model/profile/yandex-profile-placement-detail";
 

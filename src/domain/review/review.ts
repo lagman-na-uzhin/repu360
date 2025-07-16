@@ -1,5 +1,5 @@
 import { UniqueID } from '@domain/common/unique-id';
-import { PLATFORMS } from "@domain/placement/platfoms.enum";
+import { PLATFORMS } from "@domain/common/platfoms.enum";
 import { ReviewMedia } from '@domain/review/model/review/review-media';
 import { PlacementId } from "@domain/placement/placement";
 import { TwogisReviewPlacementDetail } from "@domain/review/model/review/twogis-review-placement-detail";

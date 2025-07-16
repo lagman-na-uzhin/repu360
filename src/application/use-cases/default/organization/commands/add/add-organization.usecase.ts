@@ -7,7 +7,7 @@ import {AddOrganizationCommand} from "@application/use-cases/default/organizatio
 import {TwogisPlacementDetail} from "@domain/placement/model/twogis-placement-detail";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {Organization, OrganizationId} from "@domain/organization/organization";
-import {PLATFORMS} from "@domain/placement/platfoms.enum";
+import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {YandexPlacementDetail} from "@domain/placement/model/yandex-placement-detail";
 import {PlacementDetail} from "@domain/placement/types/placement-detail.types";
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
@@ -19,6 +19,7 @@ import {DailyWorkingHours} from "@domain/organization/value-objects/working-hour
 import {OrgByIdOutDto, OrgSchedule} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 import {Time} from "@domain/organization/value-objects/working-hours/time.vo";
 import {TimeRange} from "@domain/organization/value-objects/working-hours/time-range.vo";
+import {ContactPoint} from "@domain/organization/value-objects/contact.point.vo";
 
 export class AddOrganizationUseCase {
     constructor(
@@ -58,12 +59,15 @@ export class AddOrganizationUseCase {
 
     private createOrganization(orgInfo: OrgByIdOutDto) {
         const workingSchedule = this.createWorkingSchedule(orgInfo.items[0].schedule);
-        const contactPoints = this.createContactPoints()
-        const organization = Organization.create(
+        const rubrics = orgInfo.items[0].rubrics.map((r) => r.alias)
+        return Organization.create(
             company.id,
             command.name,
             command.address,
             workingSchedule,
+            [],
+            rubrics,
+            orgInfo.items[0].flags["temporary_closed"] ? true : false
 
         );
 
