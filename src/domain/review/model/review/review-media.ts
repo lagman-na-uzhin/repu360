@@ -1,5 +1,5 @@
 export class ReviewMedia {
-    private constructor(private readonly _url: string, private readonly _dateCreated: Date) {}
+    private constructor(private readonly _url: string, private readonly _createdAt: Date) {}
 
     static create(url: string, dateCreated: Date): ReviewMedia {
         if (!url.trim()) {
@@ -19,7 +19,14 @@ export class ReviewMedia {
         return this._url;
     }
 
-    get dateCreated(): Date {
-        return this._dateCreated;
+    get createdAt(): Date {
+        return this._createdAt;
+    }
+
+    toPlainObject() {
+        return {
+            url: this._url,
+            createdAt: this._createdAt
+        }
     }
 }

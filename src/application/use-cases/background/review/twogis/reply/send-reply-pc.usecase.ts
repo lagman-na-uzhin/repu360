@@ -13,7 +13,7 @@ import { ERR_REQUEST } from "@application/interfaces/services/request/request.en
 import { TwogisSendReplyCommand } from "@application/use-cases/background/review/twogis/reply/send-reply.command";
 import { ITwogisSession } from "@application/interfaces/integrations/twogis/twogis-session.interface";
 import { EXCEPTION } from "@domain/common/exceptions/exceptions.const";
-import { Profile } from "@domain/review/profile";
+import { Profile } from "@domain/review/model/profile/profile";
 import { CompanyId } from "@domain/company/company";
 import {IFirstAnswer} from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
 
@@ -156,7 +156,7 @@ export class TwogisSendReplyProcessUseCase {
         accessToken: string,
         placement: Placement,
     ): Promise<void> {
-        const reviewAuthorProfile = await this.profileRepo.getById(review.profileId) as Profile;
+        const reviewAuthorProfile = await this.profileRepo.getById(review.profile.id) as Profile;
         const reviewLanguage = await this.languageDetectorService.detect(review.text!);
 
         const replyContent = await this.generateReplyContent(

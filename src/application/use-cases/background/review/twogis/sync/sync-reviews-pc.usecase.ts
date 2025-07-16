@@ -2,7 +2,7 @@ import {Review} from "@domain/review/review";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import { IReviewRepository } from '@domain/review/repositories/review-repository.interface';
 import { IProfileRepository } from '@domain/review/repositories/profile-repository.interface';
-import { Profile } from '@domain/review/profile';
+import { Profile } from '@domain/review/model/profile/profile';
 import {Placement, PlacementId} from "@domain/placement/placement";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-work.interface";
@@ -22,12 +22,12 @@ export class SyncTwogisReviewsProcessUseCase {
     await this.twogisSession.init()
 
     const placement = await this.getPlacementOrFail(placementId);
-    const unSyncedObj = await this.getUnSyncedReviewObj(placement);
+    const unSyncedReviews = await this.getUnSyncedReviewObj(placement);
 
-    if (!unSyncedObj) {
+    if (!unSyncedReviews) {
       return;
     }
-    const { reviewsToSave, profilesToSave } = await this.handleUnSyncedReviews(unSyncedObj!);
+    const { reviewsToSave, profilesToSave } = await this.handleUnSyncedReviews(unSyncedReviews!);
 
     await this.saveEntities(reviewsToSave, profilesToSave);
   }
@@ -38,14 +38,14 @@ export class SyncTwogisReviewsProcessUseCase {
     return placement;
   }
 
-  private async getUnSyncedReviewObj(placement: Placement): Promise<{ profile: Profile, review: Review }[] | null> {
+  private async getUnSyncedReviewObj(placement: Placement): Promise<Review[] | null> {
     const twogisDetail = placement.getTwogisPlacementDetail();
-    return this.twogisSession.getOrganizationReviews(placement.id, twogisDetail.externalId, {type: twogisDetail.type})
+    return this.twogisSession.getOrganizationReviews(placement.id, placement.externalId, {type: twogisDetail.type})
   }
 
-  private async handleUnSyncedReviews(unSyncedObj: { profile: Profile; review: Review }[]) {
-    const reviewIds: string[]  = unSyncedObj.map(x => x.review.getTwogisReviewPlacementDetail().externalId);
-    const profileIds: string[] = unSyncedObj.map(x => x.profile.getTwogisProfilePlacementDetail().externalId);
+  private async handleUnSyncedReviews(unSyncedReviews: Review[]) {
+    const reviewIds: string[]  = unSyncedReviews.map(x => x.getTwogisReviewPlacementDetail().externalId);
+    const profileIds: string[] = unSyncedReviews.map(x => x.profile.getTwogisProfilePlacementDetail().externalId);
 
     const existingReviews  = await this.reviewRepo.getByTwogisExternalIds(reviewIds);
     const existingProfiles = await this.profileRepo.getByTwogisExternalIds(profileIds);
@@ -53,14 +53,15 @@ export class SyncTwogisReviewsProcessUseCase {
     const reviewMap: Map<string, Review>  = new Map(existingReviews.map(r  => [r.getTwogisReviewPlacementDetail().externalId, r]));
     const profileMap: Map<string, Profile> = new Map(existingProfiles.map(p => [p.getTwogisProfilePlacementDetail().externalId, p]));
 
-    const reviewsToSave = unSyncedObj.map(({ review }) =>
+    const reviewsToSave = unSyncedReviews.map((review) =>
             this.getUpdatedOrNewReview(reviewMap.get(review.getTwogisReviewPlacementDetail().externalId) || null,
             review
             )
     );
-    const profilesToSave = unSyncedObj.map(({ profile }) =>
-            this.getUpdatedOrNewProfile(profileMap.get(profile.getTwogisProfilePlacementDetail().externalId) || null,
-            profile
+    const profilesToSave = unSyncedReviews.map((review) =>
+            this.getUpdatedOrNewProfile(
+                profileMap.get(review.profile.getTwogisProfilePlacementDetail().externalId) || null,
+            review.profile
             )
     );
 
@@ -78,7 +79,7 @@ export class SyncTwogisReviewsProcessUseCase {
 
   private getUpdatedOrNewProfile(existingProfile: Profile | null, newProfile: Profile): Profile {
     if (existingProfile) {
-      existingProfile.update(newProfile.firstname, newProfile.surname, newProfile.avatar);
+      existingProfile.update(newProfile.firstname, newProfile.lastName, newProfile.avatar);
       return existingProfile;
     }
     return newProfile;

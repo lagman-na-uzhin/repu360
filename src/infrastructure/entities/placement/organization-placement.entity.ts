@@ -17,7 +17,7 @@ export class OrganizationPlacementEntity {
     @PrimaryColumn("uuid")
     public id: string;
 
-    @PrimaryColumn("uuid")
+    @Column({unique: true})
     public externalId: string;
 
     @Column({type: 'uuid'})

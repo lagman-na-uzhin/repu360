@@ -16,10 +16,10 @@ const IMPORT_PROVIDERS_BY_TYPE_ENV = () => {
     //     processes.push(TwogisSendReplyPc);
     // }
 
-    // if (isInitTypeEnv(TYPE_ENV.REVIEW_SYNC)) {
-    //     schedules.push(SyncReviewsSchedule);
-    //     processes.push(SyncTwogisReviewsProcess);
-    // }
+    if (isInitTypeEnv(TYPE_ENV.REVIEW_SYNC)) {
+        schedules.push(SyncReviewsSchedule);
+        processes.push(SyncTwogisReviewsProcess);
+    }
 
 
     return [...processes, ...schedules];

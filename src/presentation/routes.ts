@@ -82,7 +82,7 @@ export const CONTROL_ROUTES = {
 export const GENERAl_ROUTES = {
   AUTH: {
     BASE: 'auth',
-    EMPLOYEE_LOGIN: 'employee/login-admin', //POST
+    EMPLOYEE_LOGIN: 'employee/login', //POST
     MANAGER_LOGIN: 'manager/login-admin', //POST
     ME: 'me', //GET
   },

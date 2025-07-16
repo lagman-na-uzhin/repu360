@@ -1,5 +1,5 @@
 import {UniqueID} from "@domain/common/unique-id";
-import {ProfileId} from "@domain/review/profile";
+import {ProfileId} from "@domain/review/model/profile/profile";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 
@@ -10,8 +10,8 @@ export class Reply {
         private readonly _id: ReplyId,
         private readonly _external_id: string,
         private readonly _text: string,
-        private readonly _isOfficial: boolean,
-        private readonly _profileId: ProfileId | null,
+        private readonly _is_official: boolean,
+        private readonly _profile_id: ProfileId | null,
         private readonly _type: ReplyType
     ) {}
 
@@ -37,6 +37,16 @@ export class Reply {
     }
 
     get isOfficial() {
-        return this._isOfficial;
+        return this._is_official;
+    }
+
+    toPlainObject() {
+        return {
+            id: this._id.toString(),
+            externalId: this._external_id,
+            isOfficial: this._is_official,
+            profileId: this._profile_id?.toString(),
+            type: this._type
+        }
     }
 }

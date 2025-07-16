@@ -13,6 +13,9 @@ export class BullService implements ITaskService {
     @InjectQueue(QUEUES.SEND_REPLY_QUEUE)
     private SEND_REPLY_QUEUE: Queue,
 
+    @InjectQueue(QUEUES.SEND_TO_EMAIL)
+    private SEND_TO_EMAIL: Queue,
+
   ) {}
 
   async addTask(task: ITaskPayload) {

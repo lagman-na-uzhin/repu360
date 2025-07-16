@@ -1,17 +1,19 @@
-import { ITwogisRepository } from '@application/interfaces/integrations/twogis/repository/twogis-repository.interface';
-import { GetOrganizationReviewsInDto } from '@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto';
+import {ITwogisRepository} from '@application/interfaces/integrations/twogis/repository/twogis-repository.interface';
+import {
+  GetOrganizationReviewsInDto
+} from '@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto';
 import {
   IOrganizationReviewsOutDto,
   ITwogisPreviewUrls,
   ITwogisReview,
 } from '@application/interfaces/integrations/twogis/client/dto/out/organization-reviews.out.dto';
-import { Review } from '@domain/review/review';
-import { Profile, ProfileId } from '@domain/review/profile';
+import {Review} from '@domain/review/review';
+import {Profile, ProfileId} from '@domain/review/model/profile/profile';
 import {PlacementId} from '@domain/placement/placement';
-import { PLATFORMS } from '@domain/placement/platfoms.enum';
-import { TwogisReviewPlacementDetail } from '@domain/review/model/review/twogis-review-placement-detail';
-import { TwogisProfilePlacementDetail } from '@domain/review/model/profile/twogis-profile-placement-detail';
-import { ReviewMedia } from '@domain/review/model/review/review-media';
+import {PLATFORMS} from '@domain/placement/platfoms.enum';
+import {TwogisReviewPlacementDetail} from '@domain/review/model/review/twogis-review-placement-detail';
+import {TwogisProfilePlacementDetail} from '@domain/review/model/profile/twogis-profile-placement-detail';
+import {ReviewMedia} from '@domain/review/model/review/review-media';
 import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {RequestService} from "@infrastructure/services/request/request.service";
@@ -22,7 +24,10 @@ import {ProxyService} from "@infrastructure/services/request/proxy.service";
 import {
   ACCOUNT_2GIS_AUTH,
   GENERATE_REVIEW_REPLY_CONFIG,
-  GET_ORGANIZATION_REVIEWS_CONFIG, GET_ORGANIZATION_REVIEWS_NEXT_CONFIG, GET_REVIEW_CONFIG, SEND_REVIEW_REPLY_CONFIG
+  GET_ORGANIZATION_REVIEWS_CONFIG,
+  GET_ORGANIZATION_REVIEWS_NEXT_CONFIG,
+  GET_REVIEW_CONFIG,
+  SEND_REVIEW_REPLY_CONFIG
 } from "@infrastructure/integrations/twogis/twogis.client.const";
 import {
   IReviewFromCabinet
@@ -61,18 +66,12 @@ export class TwogisRepository implements ITwogisRepository {
       externalId: string,
       payload: GetOrganizationReviewsInDto,
       proxy: IProxy
-  ): Promise<{ review: Review; profile: Profile }[] | null> {
+  ): Promise<Review[] | null> {
     const reviews = await this.fetchAllOrganizationReviews(externalId, payload, proxy);
     if (!reviews) return null;
 
     return reviews.map((obj) => {
-      const profile = this.createProfileModel(
-          obj.user.id,
-          obj.user.name,
-          obj.user.photo_preview_urls,
-      );
-      const review = this.createReviewModel(obj, placementId, profile.id);
-      return { review, profile };
+      return this.createReviewModel(obj, placementId);
     });
   }
 
@@ -85,7 +84,8 @@ export class TwogisRepository implements ITwogisRepository {
     if (!firstPage) return null;
 
     const allReviews = [...firstPage.reviews];
-    let nextReviewsUrl: string | undefined = firstPage.meta?.url;
+    let nextReviewsUrl: string | undefined = firstPage.meta?.next_link;
+    console.log(nextReviewsUrl, "next review linnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnk")
 
     while (nextReviewsUrl) {
       await this.sleep(2000);
@@ -93,7 +93,7 @@ export class TwogisRepository implements ITwogisRepository {
       const nextPage = await this.fetchReviews(nextReviewsUrl, payload, proxy, true);
       if (nextPage?.reviews?.length) {
         allReviews.push(...nextPage.reviews);
-        nextReviewsUrl = nextPage.meta?.url;
+        nextReviewsUrl = nextPage.meta?.next_link;
       } else {
         break;
       }
@@ -132,8 +132,9 @@ export class TwogisRepository implements ITwogisRepository {
   private createReviewModel(
     contract: ITwogisReview,
     placementId: PlacementId,
-    profileId: ProfileId,
   ): Review {
+    const profile = this.createProfileModel(contract.user.id, contract.user.name, contract.user.photo_preview_urls)
+
 
     const officialAnswer = contract.official_answer
         ? Reply.create(
@@ -141,13 +142,13 @@ export class TwogisRepository implements ITwogisRepository {
             contract.official_answer.text,
             ReplyType.EXTERNAL,
             true,
-            profileId
+            profile.id
         )
         : null;
 
     return Review.create(
         placementId,
-        profileId,
+        profile,
         PLATFORMS.TWOGIS,
         contract.text,
         contract.rating,

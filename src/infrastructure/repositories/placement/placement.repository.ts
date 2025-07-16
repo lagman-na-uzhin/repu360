@@ -32,10 +32,13 @@ export class PlacementOrmRepository implements IPlacementRepository {
         const entities = await this.manager
             .getRepository(OrganizationPlacementEntity)
             .createQueryBuilder('placement')
-            .leftJoinAndSelect('placement.twogisDetail', 'twogisDetail')
-            .where('twogisDetail.id IS NOT NULL')
-            // .where('twogisDetail.cabinetLogin IS NOT NULL')
-            // .andWhere('twogisDetail.cabinetPassword IS NOT NULL')
+            // Просто присоединяем отношение, давая ему четкий псевдоним.
+            // TypeORM сам сгенерирует условие ON на основе @JoinColumn.
+            .leftJoinAndSelect('placement.twogisDetail', 'twogisDetailAlias')
+            // Теперь применяем условие WHERE к ПРАВИЛЬНОМУ столбцу
+            .where('twogisDetailAlias.placementId IS NOT NULL')
+            // Если вам нужен и этот фильтр:
+            // .andWhere('twogisDetailAlias.cabinetPassword IS NOT NULL')
             .getMany();
 
         return entities.map(this.toDomain);
@@ -84,19 +87,17 @@ export class PlacementOrmRepository implements IPlacementRepository {
         entity.id = placement.id.toString();
         entity.organizationId = placement.organizationId.toString();
         entity.platform = placement.platform;
+        entity.externalId = placement.externalId
 
         if (placement.placementDetail instanceof TwogisPlacementDetail) {
             const twogisDetailEntity = new TwogisPlacementDetailEntity();
             const detail = placement.getTwogisPlacementDetail();
             twogisDetailEntity.placementId = placement.id.toString()
-            twogisDetailEntity.externalId = placement.externalId;
             twogisDetailEntity.type = detail.type;
             entity.twogisDetail = twogisDetailEntity;
         } else if (placement.placementDetail instanceof YandexPlacementDetail) {
             const yandexDetailEntity = new YandexPlacementDetailEntity();
             yandexDetailEntity.placementId = placement.id.toString();
-            yandexDetailEntity.externalId = placement.externalId;
-            // const detail = placement.getYandexPlacementDetail()
             entity.yandexDetail = yandexDetailEntity;
         } else {
             throw new Error("Unsupported Placement Detail Type");

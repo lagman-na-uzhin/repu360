@@ -9,7 +9,7 @@ import {
     UpdateDateColumn
 } from 'typeorm';
 import { ReviewEntity } from '@infrastructure/entities/review/review.entity';
-import {ProfileId} from "@domain/review/profile";
+import {ProfileId} from "@domain/review/model/profile/profile";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 import {ReplyId} from "@domain/review/model/review/reply/reply";
 import {ProfileEntity} from "@infrastructure/entities/profile/profile.entity";

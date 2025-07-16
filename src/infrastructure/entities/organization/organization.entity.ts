@@ -9,6 +9,9 @@ import {
     UpdateDateColumn
 } from 'typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
+import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule.entity";
+import {ContactPointEntity} from "@infrastructure/entities/organization/contact-point.entity";
+import {OrganizationGroupEntity} from "@infrastructure/entities/organization/group.entity";
 
 @Entity('organization')
 export class OrganizationEntity {
@@ -22,7 +25,10 @@ export class OrganizationEntity {
     public companyId: string;
 
     @Column()
-    address: string;
+    public address: string
+
+    @Column()
+    public isTemporarilyClosed: boolean;
 
     @OneToMany(() => OrganizationPlacementEntity, orgPlacement => orgPlacement.organization, {cascade: ["soft-remove"]})
     placements: OrganizationPlacementEntity[];
@@ -31,7 +37,18 @@ export class OrganizationEntity {
     @JoinColumn({ name: "company_id"})
     company: CompanyEntity;
 
+    @OneToMany(
+        () => WorkingScheduleEntryEntity,
+        workingSchedules => workingSchedules.organization,
+        {cascade: ["soft-remove", "recover", "insert", "update"], eager: true}
+    )
+    workingSchedules: WorkingScheduleEntryEntity[];
 
+    @OneToMany(() => ContactPointEntity, contactPoint => contactPoint.organization)
+    contactPoints: ContactPointEntity[];
+
+    @ManyToOne(() => OrganizationGroupEntity, group => group.organization)
+    group: OrganizationGroupEntity[];
 
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })

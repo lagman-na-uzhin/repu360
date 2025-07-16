@@ -12,7 +12,7 @@ import {RequestService} from "@infrastructure/services/request/request.service";
 import {CacheRepository} from "@infrastructure/repositories/cache/cache.repository";
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {Review} from "@domain/review/review";
-import {Profile} from "@domain/review/profile";
+import {Profile} from "@domain/review/model/profile/profile";
 import {
     IReviewFromCabinet
 } from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
@@ -104,7 +104,7 @@ export class TwogisSession implements ITwogisSession {
         placementId: PlacementId,
         externalId: string,
         payload: GetOrganizationReviewsInDto,
-    ): Promise<{ review: Review; profile: Profile }[] | null> {
+    ): Promise<Review[] | null> {
         return this.repo.getOrganizationReviews(placementId, externalId, payload, this.proxy)
     }
 

@@ -10,7 +10,7 @@ import {
     GetOrganizationReviewsInDto
 } from "@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
 import {Review} from "@domain/review/review";
-import {Profile} from "@domain/review/profile";
+import {Profile} from "@domain/review/model/profile/profile";
 import {
     ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
@@ -25,6 +25,6 @@ export interface ITwogisSession {
         placementId: PlacementId,
         externalId: string,
         payload: GetOrganizationReviewsInDto,
-    ): Promise<{ review: Review; profile: Profile }[] | null>;
+    ): Promise<Review[] | null>;
 
 }

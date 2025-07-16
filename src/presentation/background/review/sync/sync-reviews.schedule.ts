@@ -15,6 +15,7 @@ export class SyncReviewsSchedule {
 
   @Interval(10000)
   async syncTwogisReviews() {
+    console.log("syncTwogisReviews")
     return this.syncTwogisReviewScheduleUseCaseProxy.getInstance().execute();
   }
 

@@ -16,6 +16,7 @@ export class SyncTwogisReviewsScheduleUseCase {
     const twogisPlacements =
       await this.placementRepo.getActiveTwogisPlacements();
 
+    console.log(twogisPlacements, "twogisPlacements")
     const now = Date.now();
     for (let i = 0; i < twogisPlacements.length; i++) {
       const twogisPlacementId = twogisPlacements[i].id;

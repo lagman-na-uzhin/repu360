@@ -24,13 +24,13 @@ export class ProfileEntity {
   public firstname: string;
 
   @Column({ nullable: true })
-  public surname: string;
+  public lastName: string;
 
   @Column({ nullable: true, type: "text" })
   public avatar: string | null;
 
   @Column({ type: 'enum', enum: PLATFORMS })
-  public placement: PLATFORMS
+  public platform: PLATFORMS
 
   @OneToMany(() => ReviewEntity, (review) => review.profile, {cascade: ['soft-remove']})
   reviews: ReviewEntity[];

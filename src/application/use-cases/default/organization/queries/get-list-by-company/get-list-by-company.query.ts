@@ -19,6 +19,7 @@ export class GetOrganizationListQuery extends BaseQuery {
         search?: string
     }, actor: Actor
     ) {
+        console.log(dto, "dtooooo")
         return new GetOrganizationListQuery(
             dto.filter,
             dto.pagination,

@@ -1,24 +1,36 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { IReviewRepository } from '@domain/review/repositories/review-repository.interface';
 import { ReviewEntity } from 'src/infrastructure/entities/review/review.entity';
 import {Review, ReviewId, ReviewPlacementDetail} from '@domain/review/review';
 import { TwogisReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/twogis-review.entity';
 import { YandexReviewPlacementDetailEntity } from '@infrastructure/entities/review/placement-details/yandex-review.entity';
-import { ReviewMediaEntity } from '@infrastructure/entities/review/review-media.entity';
 import {PlacementId} from "@domain/placement/placement";
 import {TwogisReviewPlacementDetail} from "@domain/review/model/review/twogis-review-placement-detail";
 import {YandexReviewPlacementDetail} from "@domain/review/model/review/yandex-review-placement-detail";
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {Reply} from "@domain/review/model/review/reply/reply";
-import {AutoReplyEntity} from "@infrastructure/entities/autoreply/autoreply.entity";
 import {ReviewReplyEntity} from "@infrastructure/entities/review/review-reply.entity";
+import {GetReviewListFilterParams, GetReviewListParams} from "@domain/review/repositories/params/get-list.params";
+import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {BaseRepository} from "@infrastructure/repositories/base-repository";
+import {Profile, ProfileId} from "@domain/review/model/profile/profile";
+import {ProfileEntity} from "@infrastructure/entities/profile/profile.entity";
+import {TwogisProfilePlacementDetail} from "@domain/review/model/profile/twogis-profile-placement-detail";
+import {YandexProfilePlacementDetail} from "@domain/review/model/profile/yandex-profile-placement-detail";
+import {
+  TwogisProfilePlacementDetailEntity
+} from "@infrastructure/entities/profile/placement-details/twogis-profile.entity";
+import {
+  YandexProfilePlacementDetailEntity
+} from "@infrastructure/entities/profile/placement-details/yandex-profile.entity";
 
 @Injectable()
-export class ReviewOrmRepository implements IReviewRepository {
+export class ReviewOrmRepository extends BaseRepository<ReviewEntity> implements IReviewRepository {
   constructor(
       @InjectEntityManager() private readonly manager: EntityManager,
-  ) {}
+  ) {
+    super();}
 
   async getReviewsByOrganizationPlacementId(placementId: PlacementId): Promise<Review[]> {
     const entities = await this.manager.find(ReviewEntity, {
@@ -41,7 +53,7 @@ export class ReviewOrmRepository implements IReviewRepository {
     const entity = new ReviewEntity();
     entity.id = review.id.toString();
     entity.placementId = review.placementId.toString();
-    entity.profileId = review.profileId.toString();
+    entity.profileId = review.profile.id.toString();
     entity.platform = review.platform;
     entity.text = review.text;
     entity.rating = review.rating;
@@ -140,15 +152,94 @@ export class ReviewOrmRepository implements IReviewRepository {
     await this.manager.getRepository(ReviewEntity).save(entity);
   }
 
-  private async toDomain(entity: ReviewEntity): Promise<Review> {
-    const placementDetail = this.toDomainPlacementDetail(entity);
+  async getReviewList(params: GetReviewListParams): Promise<PaginatedResult<Review>> {
+    const qb = this.createQb();
+    qb.leftJoin('review.placement', 'placement').leftJoin('placement.organization', 'organization').leftJoin('organization.group', 'group')
+
+    qb.andWhere('organization.companyId = :companyId', { companyId: params.filter!.companyId.toString() });
+
+    if (params.filter?.groupId) {
+      qb.andWhere('group.id = :groupId', {groupId: params.filter.groupId.toString()})
+    }
+
+    if (params.filter?.organizationId) {
+      qb.andWhere('organization.id = :organizationId', {organizationId: params.filter.organizationId.toString()})
+    }
+
+    if (params.filter?.tone === "positive") {
+      qb.andWhere('review.rating > 3');
+    } else if (params.filter?.tone === "negative") {
+      qb.andWhere('review.rating < 4');
+    }
+
+    return this.getList<Review>(
+        qb,
+        this.toDomain.bind(this),
+        params.pagination,
+        params.sort
+    );
+  }
+
+  private createQb() {
+    return this.manager
+        .getRepository(ReviewEntity)
+        .createQueryBuilder('review')
+        .leftJoinAndSelect('review.profile', 'profile')
+        .leftJoinAndSelect('review.twogisDetail', 'twogisDetail')
+        .leftJoinAndSelect('review.yandexDetail', 'yandexDetail')
+        .leftJoinAndSelect('review.media', 'media')
+        .leftJoinAndSelect('review.replies', 'replies')
+  }
+
+  private toDomain(entity: ReviewEntity): Review {
+    const platformMappings = {
+      twogis: {
+        details: entity.twogisDetail,
+        repository: this.manager.getRepository(TwogisProfilePlacementDetailEntity),
+        getModel: (details: TwogisProfilePlacementDetailEntity) =>
+            TwogisProfilePlacementDetail.fromPersistence(details.externalId),
+      },
+      yandex: {
+        details: entity.yandexDetail,
+        repository: this.manager.getRepository(YandexProfilePlacementDetailEntity),
+        getModel: (details: YandexProfilePlacementDetailEntity) =>
+            YandexProfilePlacementDetail.fromPersistence(details.externalId),
+      },
+    };
+
+    const platformKey = entity.platform.toLowerCase();
+    const platform = platformMappings[platformKey];
+
+    if (!platform) {
+      throw new Error(`Unsupported platform: ${entity.platform} for profile ${entity.id}`);
+    }
+
+    const detail = platform.getModel(platform.details);
+    console.log(detail, 'DETAIL')
+    console.log(entity.profile, "ENTITY PROFILE")
+    const profile = Profile.fromPersistence(
+        entity.profile.id,
+        entity.profile.platform,
+        entity.profile.firstname,
+        entity.profile.lastName,
+        entity.profile.avatar,
+        detail,
+    );
+
+    console.log(profile, "PROFILE")
+
+    const placementDetail = entity.twogisDetail
+        ? TwogisReviewPlacementDetail.fromPersistence(entity.twogisDetail.externalId)
+        : YandexReviewPlacementDetail.fromPersistence(entity.yandexDetail!.externalId)
+
+    console.log(placementDetail, "PLACEMENT DETAIL")
     const replies = entity.replies?.length > 0
         ? entity.replies.map(replyEntity => this.toDomainReply(replyEntity))
         : [];
     return Review.fromPersistence(
         entity.id,
         entity.placementId,
-        entity.profileId,
+        profile,
         entity.platform,
         entity.text,
         entity.rating,
@@ -157,17 +248,49 @@ export class ReviewOrmRepository implements IReviewRepository {
         replies
     );
   }
-
     private toDomainReply(entity: ReviewReplyEntity): Reply {
       return Reply.fromPersistence(entity.id, entity.externalId, entity.text, entity.isOfficial, entity.profileId, entity.type);
     }
 
-  private toDomainPlacementDetail(entity: ReviewEntity): ReviewPlacementDetail {
-    console.log(entity.twogisDetail, "toDomainPlacementDetail")
-      if (entity.twogisDetail) {
-        return TwogisReviewPlacementDetail.fromPersistence(entity.twogisDetail.externalId);
-      } else {
-        return YandexReviewPlacementDetail.fromPersistence(entity.yandexDetail!.externalId);
-      }
+
+  private toProfileDomain(entity: ProfileEntity): Profile {
+    const detail = this.toProfileDetail(entity);
+    return Profile.fromPersistence(
+        entity.id,
+        entity.platform,
+        entity.firstname,
+        entity.lastName,
+        entity.avatar,
+        detail,
+    );
+  }
+  private toProfileDetail(entity: ProfileEntity): TwogisProfilePlacementDetail | YandexProfilePlacementDetail {
+    const platformMappings = {
+      twogis: {
+        details: entity.twogisDetail,
+        repository: this.manager.getRepository(TwogisProfilePlacementDetailEntity),
+        getModel: (details: TwogisProfilePlacementDetailEntity) =>
+            TwogisProfilePlacementDetail.fromPersistence(details.externalId),
+      },
+      yandex: {
+        details: entity.yandexDetail,
+        repository: this.manager.getRepository(YandexProfilePlacementDetailEntity),
+        getModel: (details: YandexProfilePlacementDetailEntity) =>
+            YandexProfilePlacementDetail.fromPersistence(details.externalId),
+      },
+    };
+
+    const platformKey = entity.platform.toLowerCase();
+    const platform = platformMappings[platformKey];
+
+    if (!platform) {
+      throw new Error(`Unsupported platform: ${entity.platform} for profile ${entity.id}`);
     }
+
+    if (platform.details) {
+      return platform.getModel(platform.details);
+    } else {
+        throw new Error(`Profile detail not found for platform ${entity.platform} and profile ${entity.id}`);
+      }
+  }
 }

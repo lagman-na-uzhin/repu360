@@ -16,6 +16,7 @@ import {IGenerateReply} from "@application/interfaces/integrations/twogis/client
 import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";
 
 export interface ITwogisClient {
+    getById(externalId: string): Promise<any> //TODO
     getCabinetAccessToken(placement: Placement): Promise<string>
     getReviewFromCabinet(externalId: string, accessToken: string, proxy: IProxy): Promise<IReviewFromCabinet>
     sendOfficialReply(accessToken: string, reviewExternalId: string, text: string, proxy: IProxy): Promise<ISendReply>

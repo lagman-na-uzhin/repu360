@@ -61,16 +61,17 @@ export class OrganizationOrmRepository
     return this.manager
         .getRepository(OrganizationEntity)
         .createQueryBuilder('organization')
-        .leftJoinAndSelect('organization.address', 'address'); //replaced eager true
   }
 
-  private toDomain(entity: OrganizationEntity): Organization {
-    return Organization.fromPersistence(
-        entity.id,
-        entity.companyId,
-        entity.name,
-        entity.address
-    );
+  private toDomain(entity: OrganizationEntity): Organization  { //TODO any
+    // return Organization.fromPersistence(
+    //     entity.id,
+    //     entity.companyId,
+    //     entity.name,
+    //     entity.address
+    // );
+
+    return {} as Organization;
   }
   private toEntity(organization: Organization): OrganizationEntity {
     const entity = new OrganizationEntity();

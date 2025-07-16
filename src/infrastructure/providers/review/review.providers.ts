@@ -39,6 +39,7 @@ import {ProxySessionProxy} from "@infrastructure/providers/proxy-session/proxy-s
 import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
 import {CompanyOrmRepository} from "@infrastructure/repositories/company/company.repository";
+import {GetReviewListUseCase} from "@application/use-cases/default/review/get-list/get-list-review.usecase";
 
 export const reviewProxyProviders = [
   {
@@ -126,6 +127,14 @@ export const reviewProxyProviders = [
           languageDetectorService,
           templateService
           ))
+    }
+  },
+
+  {
+    inject: [ReviewOrmRepository,],
+    provide: ReviewProxy.GET_LIST,
+    useFactory: (reviewRepo: IReviewRepository,) => {
+      return new UseCaseProxy(new GetReviewListUseCase(reviewRepo))
     }
   }
 ]

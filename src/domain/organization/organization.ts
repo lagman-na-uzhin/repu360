@@ -20,12 +20,51 @@ export class Organization {
     private _is_temporarily_closed: boolean
   ) {}
 
-  static create(companyId: CompanyId, name: string, address: string): Organization {
-    return new Organization(new OrganizationId(), companyId, name, address);
+  static create(
+      companyId: CompanyId,
+      groupId: GroupId,
+      name: string,
+      address: string,
+      workingSchedule: WorkingSchedule,
+      contactPoints: ContactPoint[],
+      rubrics: string[],
+      isTemporarilyClosed: boolean
+  ): Organization | any {
+    return new Organization(
+        new OrganizationId(),
+        companyId,
+        groupId,
+        name,
+        address,
+        workingSchedule,
+        contactPoints,
+        rubrics,
+        isTemporarilyClosed
+    );
   }
 
-  static fromPersistence(id: string, companyId: string, name: string, address: string) {
-    return new Organization(new OrganizationId(id), new CompanyId(companyId), name, address);
+  static fromPersistence(
+      id: string,
+      companyId: string,
+      name: string,
+      address: string,
+      groupId: string,
+      workingHours: WorkingSchedule,
+      contactPoints: ContactPoint[],
+      rubrics: string[],
+      isTemporarilyClosed: boolean
+      ) {
+    return new Organization(
+        new OrganizationId(id),
+        new CompanyId(companyId),
+        new GroupId(groupId),
+        name,
+        address,
+        workingHours,
+        contactPoints,
+        rubrics,
+        isTemporarilyClosed
+    );
   }
 
   set name(newName: string) {
@@ -36,7 +75,7 @@ export class Organization {
   }
 
 
-  get id(): UniqueID {
+  get id(): OrganizationId {
     return this._id;
   }
 

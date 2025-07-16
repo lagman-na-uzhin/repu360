@@ -3,26 +3,20 @@ import {
     Column,
     OneToOne,
     JoinColumn,
-    PrimaryColumn,
     CreateDateColumn,
     UpdateDateColumn,
-    DeleteDateColumn
+    DeleteDateColumn, PrimaryColumn
 } from 'typeorm';
 import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/organization-placement.entity";
 
 @Entity('yandex_placement_detail')
 export class YandexPlacementDetailEntity {
-    @PrimaryColumn({ type: 'varchar', unique: true })
-    externalId: string;
-
-    @Column({type: "uuid"})
-    placementId: string;
+    @PrimaryColumn({type: "uuid", unique: true})
+    placementId: string
 
     @OneToOne(() => OrganizationPlacementEntity, placement => placement.yandexDetail)
     @JoinColumn({ name: 'placement_id'})
     placement: OrganizationPlacementEntity;
-
-
 
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })

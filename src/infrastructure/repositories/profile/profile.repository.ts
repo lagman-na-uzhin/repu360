@@ -1,5 +1,5 @@
 import { IProfileRepository } from '@domain/review/repositories/profile-repository.interface';
-import { Profile, ProfileId } from '@domain/review/profile';
+import { Profile, ProfileId } from '@domain/review/model/profile/profile';
 import {EntityManager, In, Repository} from 'typeorm';
 import { ProfileEntity } from 'src/infrastructure/entities/profile/profile.entity';
 import { TwogisProfilePlacementDetailEntity } from '@infrastructure/entities/profile/placement-details/twogis-profile.entity';
@@ -56,9 +56,9 @@ export class ProfileOrmRepository implements IProfileRepository {
         const detail = await this.toDetail(entity);
         return Profile.fromPersistence(
             entity.id,
-            entity.placement,
+            entity.platform,
             entity.firstname,
-            entity.surname,
+            entity.lastName,
             entity.avatar,
             detail,
         );
@@ -80,11 +80,11 @@ export class ProfileOrmRepository implements IProfileRepository {
             },
         };
 
-        const platformKey = entity.placement.toLowerCase();
+        const platformKey = entity.platform.toLowerCase();
         const platform = platformMappings[platformKey];
 
         if (!platform) {
-            throw new Error(`Unsupported platform: ${entity.placement} for profile ${entity.id}`);
+            throw new Error(`Unsupported platform: ${entity.platform} for profile ${entity.id}`);
         }
 
         if (platform.details) {
@@ -93,7 +93,7 @@ export class ProfileOrmRepository implements IProfileRepository {
             const detailEntity = await platform.repository.findOne({ where: { profileId: entity.id } });
 
             if (!detailEntity) {
-                throw new Error(`Profile detail not found for platform ${entity.placement} and profile ${entity.id}`);
+                throw new Error(`Profile detail not found for platform ${entity.platform} and profile ${entity.id}`);
             }
             return platform.getModel(detailEntity);
         }
@@ -105,9 +105,9 @@ export class ProfileOrmRepository implements IProfileRepository {
         const entity = new ProfileEntity();
         entity.id = profile.id.toString();
         entity.firstname = profile.firstname;
-        entity.surname = profile.surname;
+        entity.lastName = profile.lastName;
         entity.avatar = profile.avatar;
-        entity.placement = profile.platform;
+        entity.platform = profile.platform;
         entity.twogisDetail = twogisDetailEntity;
         entity.yandexDetail = yandexDetailEntity;
         return entity;

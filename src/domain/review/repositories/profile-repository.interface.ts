@@ -1,4 +1,4 @@
-import {Profile, ProfileId} from '@domain/review/profile';
+import {Profile, ProfileId} from '@domain/review/model/profile/profile';
 
 
 export interface IProfileRepository {

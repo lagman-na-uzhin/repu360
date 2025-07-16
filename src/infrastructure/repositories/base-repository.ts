@@ -11,6 +11,7 @@ export class BaseRepository<Entity extends ObjectLiteral> {
       pagination: PaginationParams,
       sort?: SortParams
   ): Promise<PaginatedResult<Domain>> {
+    console.log("get list base repo")
     if (sort) {
       const { direction, sortField } = this.getSort(sort);
       qb.orderBy(`${qb.alias}.${sortField}`, direction);

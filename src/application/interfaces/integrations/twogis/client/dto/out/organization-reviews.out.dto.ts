@@ -1,6 +1,6 @@
 export interface ITwogisReviewsMeta {
     code: number;
-    url: string;
+    next_link: string;
     branch_rating: number;
     branch_reviews_count?: number;
     geo_reviews_count?: number;

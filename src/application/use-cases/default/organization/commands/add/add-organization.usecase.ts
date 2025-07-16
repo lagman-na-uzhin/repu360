@@ -12,13 +12,21 @@ import {YandexPlacementDetail} from "@domain/placement/model/yandex-placement-de
 import {PlacementDetail} from "@domain/placement/types/placement-detail.types";
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
 import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-work.interface";
+import {ITwogisClient} from "@application/interfaces/integrations/twogis/client/twogis-client.interface";
+import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
+import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
+import {DailyWorkingHours} from "@domain/organization/value-objects/working-hours/daily-working-hours.vo";
+import {OrgByIdOutDto, OrgSchedule} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {Time} from "@domain/organization/value-objects/working-hours/time.vo";
+import {TimeRange} from "@domain/organization/value-objects/working-hours/time-range.vo";
 
 export class AddOrganizationUseCase {
     constructor(
         private readonly companyRepo: ICompanyRepository,
         private readonly organizationRepo: IOrganizationRepository,
         private readonly placementRepo: IPlacementRepository,
-        private readonly uof: IUnitOfWork
+        private readonly uof: IUnitOfWork,
+        private readonly twogisClient: ITwogisClient
     ) {
     }
 
@@ -26,9 +34,9 @@ export class AddOrganizationUseCase {
         const company = await this.companyRepo.getById(command.companyId);
         if (!company) throw new Error(EXCEPTION.COMPANY.NOT_FOUND);
 
-        console.log(company, "company")
-        const organization = Organization.create(company.id, command.name, command.address);
+        const twogisPlacementInfo = await this.twogisClient.getById(command.placements.find(placement => placement.platform == "TWOGIS")?.externalId);
 
+        const organization = Organization.create(company.id, command.name, command.address);
         console.log(organization, "oreganizatuion")
         const createdPlacements: Placement[] = [];
         for (const p of command.placements) {
@@ -47,6 +55,51 @@ export class AddOrganizationUseCase {
             await ctx.placementRepo.batchSave(createdPlacements);
         })
     }
+
+    private createOrganization(orgInfo: OrgByIdOutDto) {
+        const workingSchedule = this.createWorkingSchedule(orgInfo.items[0].schedule);
+        const contactPoints = this.createContactPoints()
+        const organization = Organization.create(
+            company.id,
+            command.name,
+            command.address,
+            workingSchedule,
+
+        );
+
+    }
+
+    private createWorkingSchedule(rawSchedule: OrgSchedule) {
+        const dayMap: Record<string, DayOfWeek> = {
+            Mon: DayOfWeek.MONDAY,
+            Tue: DayOfWeek.TUESDAY,
+            Wed: DayOfWeek.WEDNESDAY,
+            Thu: DayOfWeek.THURSDAY,
+            Fri: DayOfWeek.FRIDAY,
+            Sat: DayOfWeek.SATURDAY,
+            Sun: DayOfWeek.SUNDAY,
+        };
+
+        function parseTime(str: string): Time {
+            const [hour, minute] = str.split(":").map(Number);
+            return new Time(hour, minute);
+        }
+
+        const dailyHoursMap = new Map<DayOfWeek, DailyWorkingHours>();
+
+        for (const [dayShort, { working_hours }] of Object.entries(rawSchedule)) {
+            const dayOfWeek = dayMap[dayShort];
+            if (!dayOfWeek || !working_hours || working_hours.length === 0) continue;
+
+            const { from, to } = working_hours[0];
+            const workingHours = new TimeRange(parseTime(from), parseTime(to));
+
+            const dailyHours = new DailyWorkingHours(dayOfWeek, workingHours);
+            dailyHoursMap.set(dayOfWeek, dailyHours);
+        }
+
+        return  new WorkingSchedule(dailyHoursMap);
+    }
     private async createAndValidatePlacement(
         organizationId: OrganizationId,
         externalId: string,
@@ -62,7 +115,7 @@ export class AddOrganizationUseCase {
                 if (existingPlacement) {
                     throw new Error(EXCEPTION.PLACEMENT.ALREADY_EXIST);
                 }
-                placementDetail = TwogisPlacementDetail.create(externalId, type, null);
+                placementDetail = TwogisPlacementDetail.create(type, null);
                 break;
 
             case "YANDEX":
@@ -77,6 +130,6 @@ export class AddOrganizationUseCase {
                 throw new Error(EXCEPTION.PLACEMENT.UNSUPPORTED_PLATFORM);
         }
 
-        return Placement.create(organizationId, platform, placementDetail);
+        return Placement.create(organizationId, platform, externalId, placementDetail);
     }
 }

@@ -11,8 +11,8 @@ export class Profile {
     private constructor(
       private readonly _id: ProfileId,
       private readonly _platform: PLATFORMS,
-      private _firstname: string,
-      private _surname: string,
+      private _first_name: string,
+      private _last_name: string,
       private _avatar: string | null,
       private _detail: ProfileDetail,
 
@@ -36,15 +36,15 @@ export class Profile {
       id: string,
       platform: PLATFORMS,
       firstname: string,
-      surname: string,
+      lastName: string,
       avatar: string | null,
       detail: ProfileDetail
     ): Profile {
-        return new Profile(new ProfileId(id), platform, firstname, surname, avatar, detail);
+        return new Profile(new ProfileId(id), platform, firstname, lastName, avatar, detail);
     }
 
-    update(surname: string, firstname: string, avatar: string | null): void {
-        this.surname = surname;
+    update(lastName: string, firstname: string, avatar: string | null): void {
+        this.lastName = lastName;
         this.firstname = firstname;
         this.avatar = avatar;
     }
@@ -81,25 +81,25 @@ export class Profile {
     }
 
     get firstname(): string {
-        return this._firstname;
+        return this._first_name;
     }
 
     set firstname(value: string) {
         if (!value.trim()) {
             throw new Error("Firstname cannot be empty");
         }
-        this._firstname = value;
+        this._first_name = value;
     }
 
-    get surname(): string {
-        return this._surname;
+    get lastName(): string {
+        return this._last_name;
     }
 
-    set surname(value: string) {
+    set lastName(value: string) {
         if (!value.trim()) {
             throw new Error("Surname cannot be empty");
         }
-        this._surname = value;
+        this._last_name = value;
     }
 
     get avatar(): string | null {
@@ -117,6 +117,20 @@ export class Profile {
     set detail(value: ProfileDetail) {
         Profile.validateProfileDetail(this._platform, value);
         this._detail = value;
+    }
+
+    toPlainObject() {
+        return {
+            id: this._id.toString(),
+            platform: this._platform,
+            firstName: this._first_name,
+            lastName: this._last_name,
+            avatar: this._avatar,
+            detail: this._detail,
+            createdAt: this._createdAt,
+            updatedAt: this._updatedAt,
+            deletedAt: this._deletedAt
+        }
     }
 }
 

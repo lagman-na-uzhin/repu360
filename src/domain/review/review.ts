@@ -4,7 +4,7 @@ import { ReviewMedia } from '@domain/review/model/review/review-media';
 import { PlacementId } from "@domain/placement/placement";
 import { TwogisReviewPlacementDetail } from "@domain/review/model/review/twogis-review-placement-detail";
 import { YandexReviewPlacementDetail } from "@domain/review/model/review/yandex-review-placement-detail";
-import { ProfileId } from "@domain/review/profile";
+import {Profile, ProfileId} from "@domain/review/model/profile/profile";
 import { Complaint } from "@domain/review/model/review/complaint/complaint";
 import {Reply} from "@domain/review/model/review/reply/reply";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
@@ -17,7 +17,7 @@ export class Review {
     private constructor(
       private readonly _id: ReviewId,
       private readonly _placementId: PlacementId,
-      private readonly _profileId: ProfileId,
+      private readonly _profile: Profile,
       private readonly _platform: PLATFORMS,
       private _text: string,
       private _rating: number,
@@ -29,7 +29,7 @@ export class Review {
 
     static create(
         placementId: PlacementId,
-        profileId: ProfileId,
+        profile: Profile,
         platform: PLATFORMS,
         text: string,
         rating: number,
@@ -40,13 +40,13 @@ export class Review {
     ): Review {
         Review.validatePlacementDetail(platform, placementDetail);
 
-        return new Review(new ReviewId(), placementId, profileId, platform, text, rating, media, placementDetail, replies);
+        return new Review(new ReviewId(), placementId, profile, platform, text, rating, media, placementDetail, replies);
     }
 
     static fromPersistence(
       reviewId: string,
       placementId: string,
-      profileId: string,
+      profile: Profile,
       platform: PLATFORMS,
       text: string,
       rating: number,
@@ -58,7 +58,7 @@ export class Review {
         return new Review(
           new ReviewId(reviewId),
           new PlacementId(placementId),
-          new ProfileId(profileId),
+          profile,
           platform,
           text,
           rating,
@@ -113,8 +113,8 @@ export class Review {
         return this._placementId;
     }
 
-    get profileId(): ProfileId {
-        return this._profileId;
+    get profile(): Profile {
+        return this._profile;
     }
 
     get platform(): PLATFORMS {
@@ -167,5 +167,20 @@ export class Review {
     }
 
 
+    toPlainObject() {
+        return {
+            id: this._id.toString(),
+            placementId: this._placementId.toString(),
+            profile: this._profile.toPlainObject(),
+            platform: this._platform,
+            text: this._text,
+            rating: this._rating,
+            media: this._media.map(m => m.toPlainObject()),
+            placementDetail: this._placementDetail,
+            replies: this._replies.map(r => r.toPlainObject()),
+            detail: this.placementDetail
+
+        }
+    }
 }
 
