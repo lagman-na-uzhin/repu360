@@ -41,7 +41,15 @@ export interface OrgItem {
     address?: OrgAddress;
     contact_groups?: OrgContactGroup[];
     schedule?: OrgSchedule;
-    // ...другие поля
+    flags: Record<string | "temporary_closed", string | boolean>;
+    rubrics: {
+        alias: string,
+        "id": string,
+        "kind": "primary" | "additional",
+        "name": string,
+        "parent_id": string,
+        "short_id": number
+    }[]
 }
 export interface OrgAddress {
     components: OrgAddressComponent[];
