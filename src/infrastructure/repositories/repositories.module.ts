@@ -16,6 +16,7 @@ import {PROXY_ENTITIES} from "@infrastructure/entities/proxy";
 import {SUBSCRIPTION_ENTITIES} from "@infrastructure/entities/subscription";
 import {TARIFF_ENTITIES} from "@infrastructure/entities/tariff";
 import {LEAD_ENTITIES} from "@infrastructure/entities/lead";
+import {RequestService} from "@infrastructure/services/request/request.service";
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import {LEAD_ENTITIES} from "@infrastructure/entities/lead";
   ],
   providers: [
     BaseRepository,
+      RequestService,
     ...REPOSITORIES,
   ],
   exports: [BaseRepository, ...REPOSITORIES],
