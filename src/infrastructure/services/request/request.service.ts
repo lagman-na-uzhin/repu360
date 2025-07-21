@@ -17,27 +17,31 @@ import {ERR_REQUEST, RESPONSE_TYPE} from "@application/interfaces/services/reque
 export class RequestService {
   async request(
     request: RequestDto | any,
-    proxy: IProxy,
+    proxy: IProxy | null,
     retries = DEFAULT_RETRIES_AMOUNT,
   ) {
+    console.log('request method')
     return await this.retry(request, proxy, retries);
   }
 
   async retry(
     request: RequestDto,
-    proxy: IProxy,
+    proxy: IProxy | null,
     count: number,
   ) {
     const { axiosConfig } = await this.getModifiedConfig(request);
     try {
 
-      axiosConfig.httpsAgent = tunnel.httpsOverHttp({
-        proxy: {
-          host: proxy.ip,
-          port: proxy.port,
-          proxyAuth: `${proxy.login}:${proxy.password}`,
-        },
-      });
+      if (proxy) {
+        axiosConfig.httpsAgent = tunnel.httpsOverHttp({
+          proxy: {
+            host: proxy.ip,
+            port: proxy.port,
+            proxyAuth: `${proxy.login}:${proxy.password}`,
+          },
+        });
+      }
+      console.log("before send")
       return await this.send(axiosConfig, request.localConfig?.responseType);
     } catch ({ message }) {
       if (count <= 0 || !RequestService.isRetry(message))
@@ -51,6 +55,7 @@ export class RequestService {
     axiosConfig: AxiosRequestConfig,
     responseType = RESPONSE_TYPE.DATA,
   ) {
+    console.log("send")
     return await axios({ ...axiosConfig })
       .then((res) => {
         if (responseType === RESPONSE_TYPE.COOKIE) {

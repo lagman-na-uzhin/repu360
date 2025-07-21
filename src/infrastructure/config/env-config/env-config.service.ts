@@ -147,4 +147,10 @@ export class EnvConfigService
   getWhatsappApiKey(): string {
     return this.configService.get<string>('WHATSAPP_API_KEY') || '';
   }
-}
+
+
+  //GOOGLE
+  getGoogleApiKey(): string {
+    return this.configService.get<string>('GOOGLE_API_KEY') || '';
+  }
+ }

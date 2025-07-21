@@ -13,6 +13,7 @@ import {ReplyTemplateOrmRepository} from "@infrastructure/repositories/auto-repl
 import {SubscriptionOrmRepository} from "@infrastructure/repositories/subscription/subscription.repository";
 import {TariffOrmRepository} from "@infrastructure/repositories/subscription/tariff.repository";
 import {LeadOrmRepository} from "@infrastructure/repositories/lead/lead.repository";
+import {GoogleRepository} from "@infrastructure/integrations/google/google.repository";
 
 export const REPOSITORIES = [
   CacheRepository,
@@ -29,5 +30,6 @@ export const REPOSITORIES = [
   ReplyTemplateOrmRepository,
   SubscriptionOrmRepository,
   TariffOrmRepository,
-  LeadOrmRepository
+  LeadOrmRepository,
+  GoogleRepository
 ]

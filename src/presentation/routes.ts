@@ -44,6 +44,12 @@ export const DEFAULT_ROUTES = {
     BASE: 'managers',
 
     BY_ID: ':managerId', //GET
+  },
+
+  EXTERNAL: {
+    BASE: 'external',
+
+    GOOGLE_PLACES_SEARCH: 'google/places-search'
   }
 
 } as const;

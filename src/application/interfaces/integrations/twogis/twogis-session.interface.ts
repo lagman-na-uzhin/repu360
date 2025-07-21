@@ -14,9 +14,12 @@ import {Profile} from "@domain/review/model/profile/profile";
 import {
     ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
+import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 
 export interface ITwogisSession {
     init(companyId?: CompanyId): Promise<void>;
+    getByIdOrganization(externalId: string): Promise<OrgByIdOutDto>
     getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials): Promise<ILoginTwogisCabinetResponse>;
     generateReply(accessToken: string, authorName: string): Promise<IGenerateReply>;
     getReviewFromCabinet(reviewExternalId: string, accessToken: string): Promise<IReviewFromCabinet>;

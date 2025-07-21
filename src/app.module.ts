@@ -18,6 +18,7 @@ import {GeneralModule} from "@presentation/general/general.module";
 import {LanguageDetectorServiceModule} from "@infrastructure/services/language-detector/language-detector.module";
 import {TemplateServiceModule} from "@infrastructure/services/template/template.module";
 import {UnitOfWorkModule} from "@infrastructure/services/unit-of-work/unit-of-work.module";
+import {TwogisModule} from "@infrastructure/integrations/twogis/twogis.module";
 
 @Module({
   imports: [
@@ -71,7 +72,8 @@ import {UnitOfWorkModule} from "@infrastructure/services/unit-of-work/unit-of-wo
       GeneralModule,
     LanguageDetectorServiceModule,
     TemplateServiceModule,
-    UnitOfWorkModule
+    UnitOfWorkModule,
+    TwogisModule
   ],
   controllers: [],
   providers: [

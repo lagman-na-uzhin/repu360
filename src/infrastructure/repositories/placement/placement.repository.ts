@@ -138,8 +138,8 @@ export class PlacementOrmRepository implements IPlacementRepository {
 
     async getTwogisPlacementByExternalId(externalId: string): Promise<Placement | null> {
         const entity = await this.createQb()
-            .where('twogisDetail.externalId = :externalId', { externalId })
-            .getOne();
+            .where('placement.externalId = :externalId', { externalId })
+            .getOne()
 
         return entity ? this.toDomain(entity) : null;
     }

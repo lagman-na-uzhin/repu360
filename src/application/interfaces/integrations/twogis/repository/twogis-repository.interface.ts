@@ -1,7 +1,6 @@
 import {
     GetOrganizationReviewsInDto,
 } from "@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
-import { Profile } from '@domain/review/model/profile/profile';
 import { Review } from '@domain/review/review';
 import {PlacementId} from '@domain/placement/placement';
 import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
@@ -17,7 +16,7 @@ import {
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 
 export interface ITwogisRepository {
-    getById(externalId: string): Promise<OrgByIdOutDto>
+    getByIdOrganization(externalId: string, proxy: IProxy): Promise<OrgByIdOutDto>
     getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials, proxy: IProxy): Promise<ILoginTwogisCabinetResponse>
     generateReply(accessToken: string, authorName: string, proxy: IProxy): Promise<IGenerateReply>
     getOrganizationReviews(

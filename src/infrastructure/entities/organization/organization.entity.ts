@@ -12,6 +12,7 @@ import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule.entity";
 import {ContactPointEntity} from "@infrastructure/entities/organization/contact-point.entity";
 import {OrganizationGroupEntity} from "@infrastructure/entities/organization/group.entity";
+import {OrganizationRubricsEntity} from "@infrastructure/entities/organization/rubrics.entity";
 
 @Entity('organization')
 export class OrganizationEntity {
@@ -43,6 +44,13 @@ export class OrganizationEntity {
         {cascade: ["soft-remove", "recover", "insert", "update"], eager: true}
     )
     workingSchedules: WorkingScheduleEntryEntity[];
+
+    @OneToMany(
+        () => OrganizationRubricsEntity,
+        rubrics => rubrics.organization,
+        {cascade: ["soft-remove", "recover", "insert", "update"], eager: true}
+    )
+    rubrics: OrganizationRubricsEntity[];
 
     @OneToMany(() => ContactPointEntity, contactPoint => contactPoint.organization)
     contactPoints: ContactPointEntity[];

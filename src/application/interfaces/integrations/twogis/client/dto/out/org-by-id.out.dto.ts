@@ -1,6 +1,9 @@
 import {IBaseTwogisResponse} from "@application/interfaces/integrations/twogis/client/dto/out/base.out.dto";
 
 export interface OrgByIdOutDto extends IBaseTwogisResponse {
+    result: OrgByIdResult
+}
+export interface OrgByIdResult extends IBaseTwogisResponse {
     context_rubrics: OrgContextRubric[];
     total: number;
     search_attributes: OrgSearchAttributes;
@@ -35,12 +38,13 @@ export interface OrgItem {
         status: number;
     };
     employees_org_count?: string;
-    address_name?: string;
+    address_name: string;
+    name: string;
     full_name?: string;
     full_address_name?: string;
-    address?: OrgAddress;
+    address: OrgAddress;
     contact_groups?: OrgContactGroup[];
-    schedule?: OrgSchedule;
+    schedule: OrgSchedule;
     flags: Record<string | "temporary_closed", string | boolean>;
     rubrics: {
         alias: string,

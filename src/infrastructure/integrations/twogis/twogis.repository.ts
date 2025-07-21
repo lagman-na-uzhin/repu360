@@ -23,7 +23,7 @@ import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 import {ProxyService} from "@infrastructure/services/request/proxy.service";
 import {
   ACCOUNT_2GIS_AUTH,
-  GENERATE_REVIEW_REPLY_CONFIG,
+  GENERATE_REVIEW_REPLY_CONFIG, GET_BY_ID_ORG,
   GET_ORGANIZATION_REVIEWS_CONFIG,
   GET_ORGANIZATION_REVIEWS_NEXT_CONFIG,
   GET_REVIEW_CONFIG,
@@ -36,12 +36,22 @@ import {ISendReply} from "@application/interfaces/integrations/twogis/client/dto
 import {
   ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
+import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 
 export class TwogisRepository implements ITwogisRepository {
   constructor(
       private readonly proxyService: ProxyService,
       private readonly requestService: RequestService,
   ) {}
+
+  async getByIdOrganization(externalId: string, proxy: IProxy): Promise<OrgByIdOutDto> {
+    console.log("get by id repo",  externalId)
+    return this.requestService.request(
+        GET_BY_ID_ORG(externalId),
+        proxy,
+        1,
+    );
+  }
 
 
   async getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials, proxy: IProxy): Promise<ILoginTwogisCabinetResponse> {

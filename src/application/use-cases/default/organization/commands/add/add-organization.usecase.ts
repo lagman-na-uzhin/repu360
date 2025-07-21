@@ -16,10 +16,18 @@ import {ITwogisClient} from "@application/interfaces/integrations/twogis/client/
 import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
 import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
 import {DailyWorkingHours} from "@domain/organization/value-objects/working-hours/daily-working-hours.vo";
-import {OrgByIdOutDto, OrgSchedule} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {
+    OrgByIdOutDto,
+    OrgItem,
+    OrgSchedule
+} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 import {Time} from "@domain/organization/value-objects/working-hours/time.vo";
 import {TimeRange} from "@domain/organization/value-objects/working-hours/time-range.vo";
-import {ContactPoint} from "@domain/organization/value-objects/contact.point.vo";
+import {CompanyId} from "@domain/company/company";
+import {GroupId} from "@domain/organization/group";
+import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
+import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
+import {Rubric, RubricId} from "@domain/organization/model/organization-rubrics";
 
 export class AddOrganizationUseCase {
     constructor(
@@ -27,53 +35,50 @@ export class AddOrganizationUseCase {
         private readonly organizationRepo: IOrganizationRepository,
         private readonly placementRepo: IPlacementRepository,
         private readonly uof: IUnitOfWork,
-        private readonly twogisClient: ITwogisClient
+        private readonly twogisSession: ITwogisSession,
     ) {
     }
 
     async execute(command: AddOrganizationCommand): Promise<void> {
+        await this.twogisSession.init(command.companyId);
+
         const company = await this.companyRepo.getById(command.companyId);
         if (!company) throw new Error(EXCEPTION.COMPANY.NOT_FOUND);
 
-        const twogisPlacementInfo = await this.twogisClient.getById(command.placements.find(placement => placement.platform == "TWOGIS")?.externalId);
-
-        const organization = Organization.create(company.id, command.name, command.address);
-        console.log(organization, "oreganizatuion")
-        const createdPlacements: Placement[] = [];
-        for (const p of command.placements) {
-            const placement = await this.createAndValidatePlacement(
+        const twogisPlacementInfo = (await this.twogisSession.getByIdOrganization(command.externalId)).result.items[0];
+        const organization = this.createOrganization(company.id, twogisPlacementInfo);
+        const placement = await this.createAndValidatePlacement(
                 organization.id,
-                p.externalId,
-                p.platform,
-                p.type
-            );
-            createdPlacements.push(placement);
-        }
+                command.externalId,
+                command.platform,
+                twogisPlacementInfo.type
+        );
 
-        console.log(createdPlacements, "createdPlacements")
         await this.uof.run(async (ctx) => {
             await ctx.organizationRepo.save(organization);
-            await ctx.placementRepo.batchSave(createdPlacements);
+            await ctx.placementRepo.save(placement);
         })
     }
 
-    private createOrganization(orgInfo: OrgByIdOutDto) {
-        const workingSchedule = this.createWorkingSchedule(orgInfo.items[0].schedule);
-        const rubrics = orgInfo.items[0].rubrics.map((r) => r.alias)
+    private createOrganization(companyId: CompanyId, orgInfo: OrgItem) {
+        const workingSchedule = this.createWorkingSchedule(orgInfo.schedule);
+        const rubrics = this.createRubrics(orgInfo.rubrics)
+        console.log(orgInfo.rubrics, "rubrics")
         return Organization.create(
-            company.id,
-            command.name,
-            command.address,
+            companyId,
+            new GroupId(), //TODO TESt
+            orgInfo.name,
+            orgInfo.address_name,
             workingSchedule,
             [],
             rubrics,
-            orgInfo.items[0].flags["temporary_closed"] ? true : false
+            orgInfo.flags["temporary_closed"] ? true : false
 
         );
 
     }
 
-    private createWorkingSchedule(rawSchedule: OrgSchedule) {
+    private createWorkingSchedule(rawSchedule: OrgSchedule): WorkingSchedule {
         const dayMap: Record<string, DayOfWeek> = {
             Mon: DayOfWeek.MONDAY,
             Tue: DayOfWeek.TUESDAY,
@@ -89,20 +94,52 @@ export class AddOrganizationUseCase {
             return new Time(hour, minute);
         }
 
-        const dailyHoursMap = new Map<DayOfWeek, DailyWorkingHours>();
+        const dailyHoursArray: DailyWorkingHours[] = []; // Изменили на массив
 
-        for (const [dayShort, { working_hours }] of Object.entries(rawSchedule)) {
-            const dayOfWeek = dayMap[dayShort];
-            if (!dayOfWeek || !working_hours || working_hours.length === 0) continue;
+        // Обработка круглосуточного режима, если есть
+        if (rawSchedule.is_24x7) {
+            const fullDayHours = new TimeRange(new Time(0, 0), new Time(24, 0)); // Или new Time(0,0), new Time(24,0) в зависимости от вашей логики
 
-            const { from, to } = working_hours[0];
-            const workingHours = new TimeRange(parseTime(from), parseTime(to));
+            for (const dayShort of Object.keys(dayMap)) {
+                const dayOfWeek = dayMap[dayShort];
+                if (dayOfWeek) {
+                    dailyHoursArray.push(new DailyWorkingHours(dayOfWeek, fullDayHours));
+                }
+            }
+        } else {
+            // Если не 24/7, обрабатываем обычное расписание
+            for (const [dayShort, dayData] of Object.entries(rawSchedule)) {
+                // Проверяем, что dayData не null/undefined и содержит working_hours
+                if (!dayData || !dayData.working_hours || dayData.working_hours.length === 0) {
+                    // Если нет рабочих часов для дня, это означает выходной или неизвестно
+                    // Можно добавить DailyWorkingHours с пустыми часами или просто пропустить
+                    continue;
+                }
 
-            const dailyHours = new DailyWorkingHours(dayOfWeek, workingHours);
-            dailyHoursMap.set(dayOfWeek, dailyHours);
+                const dayOfWeek = dayMap[dayShort];
+                if (!dayOfWeek) continue; // Пропускаем, если день не найден в dayMap
+
+                // В 2ГИС schedule.working_hours - это массив, но обычно там один диапазон
+                // Если диапазонов несколько, нужно будет обрабатывать их все
+                const { from, to } = dayData.working_hours[0];
+                const workingHours = new TimeRange(parseTime(from), parseTime(to));
+
+                dailyHoursArray.push(new DailyWorkingHours(dayOfWeek, workingHours));
+            }
         }
 
-        return  new WorkingSchedule(dailyHoursMap);
+        return new WorkingSchedule(dailyHoursArray); // Передаем массив
+    }
+
+    private createRubrics(rubricsRaw: {
+        alias: string,
+        "id": string,
+        "kind": "primary" | "additional",
+        "name": string,
+        "parent_id": string,
+        "short_id": number
+    }[]) {
+        return rubricsRaw.map(raw => Rubric.create(raw.alias, raw.name, raw.kind));
     }
     private async createAndValidatePlacement(
         organizationId: OrganizationId,
@@ -115,7 +152,9 @@ export class AddOrganizationUseCase {
 
         switch (platform) {
             case "TWOGIS":
+                console.log("existingPlacement before")
                 existingPlacement = await this.placementRepo.getTwogisPlacementByExternalId(externalId);
+                console.log(existingPlacement, "existingPlacement")
                 if (existingPlacement) {
                     throw new Error(EXCEPTION.PLACEMENT.ALREADY_EXIST);
                 }

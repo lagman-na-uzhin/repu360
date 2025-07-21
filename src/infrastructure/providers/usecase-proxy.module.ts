@@ -27,6 +27,10 @@ import {subscriptionProxyExports} from "@application/use-case-proxies/subscripti
 import {leadProxyProviders} from "@infrastructure/providers/lead/lead.provider";
 import {leadProxyExports} from "@application/use-case-proxies/lead/lead.proxy";
 import {managerProxyExports} from "@application/use-case-proxies/manager/manager.proxy";
+import {TwogisModule} from "@infrastructure/integrations/twogis/twogis.module";
+import {externalProxyExports} from "@application/use-case-proxies/external/external.proxy";
+import {externalProxyProviders} from "@infrastructure/providers/external/external.providet";
+import {GoogleModule} from "@infrastructure/integrations/google/google.module";
 
 @Module({
   imports: [
@@ -39,7 +43,9 @@ import {managerProxyExports} from "@application/use-case-proxies/manager/manager
     BullServiceModule,
     LanguageDetectorServiceModule,
     TemplateServiceModule,
-    UnitOfWorkModule
+    UnitOfWorkModule,
+      TwogisModule,
+    GoogleModule
   ],
 })
 export class UsecaseProxyModule {
@@ -55,7 +61,8 @@ export class UsecaseProxyModule {
         ...authProxyProviders,
         ...proxySessionProviders,
         ...subscriptionProxyProviders,
-        ...leadProxyProviders
+        ...leadProxyProviders,
+        ...externalProxyProviders
       ],
       exports: [
         ...reviewProxyExports,
@@ -66,7 +73,8 @@ export class UsecaseProxyModule {
         ...authProxyExports,
         ...proxySessionProxyExports,
         ...subscriptionProxyExports,
-        ...leadProxyExports
+        ...leadProxyExports,
+        ...externalProxyExports
       ],
     };
   }

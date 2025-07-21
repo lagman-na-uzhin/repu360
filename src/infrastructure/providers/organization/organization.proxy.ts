@@ -17,6 +17,12 @@ import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-w
 import {CompanyOrmRepository} from "@infrastructure/repositories/company/company.repository";
 import {PlacementOrmRepository} from "@infrastructure/repositories/placement/placement.repository";
 import {UnitOfWork} from "@infrastructure/services/unit-of-work/unit-of-work.service";
+import {ITwogisClient} from "@application/interfaces/integrations/twogis/client/twogis-client.interface";
+import {TwogisRepository} from "@infrastructure/integrations/twogis/twogis.repository";
+import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
+import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
+import {TwogisSession} from "@infrastructure/integrations/twogis/twogis.session";
+import {ProxySessionProxy} from "@infrastructure/providers/proxy-session/proxy-session.providers";
 
 
 export const organizationProxyProviders = [
@@ -37,19 +43,21 @@ export const organizationProxyProviders = [
     },
 
     {
-        inject: [CompanyOrmRepository, OrganizationOrmRepository, PlacementOrmRepository, UnitOfWork],
+        inject: [CompanyOrmRepository, OrganizationOrmRepository, PlacementOrmRepository, UnitOfWork,   ProxySessionProxy.TWOGIS_SESSION],
         provide: OrganizationProxy.ADD,
         useFactory: (
             companyRepo: ICompanyRepository,
             organizationRepo: IOrganizationRepository,
             placementRepo: IPlacementRepository,
-            uof: IUnitOfWork
+            uof: IUnitOfWork,
+            twogisSession: ITwogisSession
         ) => {
             return new UseCaseProxy(new AddOrganizationUseCase(
                 companyRepo,
                 organizationRepo,
                 placementRepo,
-                uof
+                uof,
+                twogisSession
             ))
         }
     },

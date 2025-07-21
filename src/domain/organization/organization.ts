@@ -4,6 +4,7 @@ import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
 import {ContactPoint} from "@domain/organization/value-objects/contact.point.vo";
 import {GroupId} from "@domain/organization/group";
+import {Rubric} from "@domain/organization/model/organization-rubrics";
 
 export class OrganizationId extends UniqueID {}
 
@@ -16,7 +17,7 @@ export class Organization {
     private _address: string,
     private _working_schedule: WorkingSchedule,
     private _contact_points: ContactPoint[],
-    private _rubrics: string[],
+    private _rubrics: Rubric[],
     private _is_temporarily_closed: boolean
   ) {}
 
@@ -27,7 +28,7 @@ export class Organization {
       address: string,
       workingSchedule: WorkingSchedule,
       contactPoints: ContactPoint[],
-      rubrics: string[],
+      rubrics: Rubric[],
       isTemporarilyClosed: boolean
   ): Organization | any {
     return new Organization(
@@ -51,7 +52,7 @@ export class Organization {
       groupId: string,
       workingHours: WorkingSchedule,
       contactPoints: ContactPoint[],
-      rubrics: string[],
+      rubrics: Rubric[],
       isTemporarilyClosed: boolean
       ) {
     return new Organization(
@@ -89,6 +90,18 @@ export class Organization {
 
   get address(): string {
     return this._address;
+  }
+
+  get isTemporarilyClosed() {
+    return this._is_temporarily_closed;
+  }
+
+  get workingSchedule() {
+    return this._working_schedule;
+  }
+
+  get rubrics() {
+    return this._rubrics;
   }
 
   toPlainObject() {

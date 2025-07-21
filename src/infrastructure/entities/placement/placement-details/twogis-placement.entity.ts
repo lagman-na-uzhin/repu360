@@ -12,11 +12,11 @@ import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/or
 
 @Entity('twogis_placement_detail')
 export class TwogisPlacementDetailEntity {
+    @PrimaryColumn({type: "uuid", unique: true})
+    placementId: string;
+
     @Column()
     type: string;
-
-    @PrimaryColumn({type: "uuid", unique: true})
-    placementId: string
 
     @Column({ nullable: true })
     cabinetLogin: string;
@@ -27,7 +27,6 @@ export class TwogisPlacementDetailEntity {
     @OneToOne(() => OrganizationPlacementEntity, placement => placement.twogisDetail)
     @JoinColumn({ name: 'placement_id' })
     placement: OrganizationPlacementEntity;
-
 
 
 

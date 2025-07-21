@@ -7,6 +7,10 @@ import { Organization, OrganizationId } from '@domain/organization/organization'
 import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
+import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
+import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule.entity";
+import {Rubric} from "@domain/organization/model/organization-rubrics";
+import {OrganizationRubricsEntity} from "@infrastructure/entities/organization/rubrics.entity";
 
 @Injectable()
 export class OrganizationOrmRepository
@@ -78,7 +82,33 @@ export class OrganizationOrmRepository
     entity.id = organization.id.toString();
     entity.name = organization.name;
     entity.companyId = organization.companyId.toString();
-    entity.address = organization.address
+    entity.address = organization.address;
+    entity.isTemporarilyClosed = organization.isTemporarilyClosed;
+    entity.rubrics = organization.rubrics.map(r => this.toRubricsEntity(r, organization.id))
+    entity.workingSchedules = this.toWorkingScheduleEntity(organization.workingSchedule, organization.id);
+    return entity;
+  }
+
+  private toWorkingScheduleEntity(domain: WorkingSchedule, organizationId: OrganizationId) {
+      return domain.getAllDailyHours().map(daily => {
+        const entry = new WorkingScheduleEntryEntity();
+        entry.organizationId = organizationId.toString();
+        entry.dayOfWeek = daily.dayOfWeek;
+        entry.startTime = daily.workingHours.start.toString();
+        entry.endTime = daily.workingHours.end.toString();
+        entry.breakStartTime = daily.breakTime?.start.toString() ?? null;
+        entry.breakEndTime = daily.breakTime?.end.toString() ?? null;
+        return entry;
+      });
+  }
+
+  private toRubricsEntity(domain: Rubric, organizationId: OrganizationId) {
+    const entity = new OrganizationRubricsEntity();
+    entity.id = domain.id.toString();
+    entity.organizationId = organizationId.toString()
+    entity.name = domain.name;
+    entity.alias = domain.alias;
+    entity.type = domain.type;
     return entity;
   }
 }

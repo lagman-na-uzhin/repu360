@@ -19,6 +19,7 @@ import {
 import {
     ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
+import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 
 // export class TwogisSession implements ITwogisSession{
 //     private proxy: IProxy;
@@ -81,7 +82,9 @@ export class TwogisSession implements ITwogisSession {
     ) {}
 
     async init(companyId?: CompanyId): Promise<void> {
+        console.log("init")
         this.proxy = await this.getProxy(companyId);
+        console.log('proxy')
         this.repo = new TwogisRepository(this.proxyService, this.requestService);
     }
 
@@ -108,10 +111,16 @@ export class TwogisSession implements ITwogisSession {
         return this.repo.getOrganizationReviews(placementId, externalId, payload, this.proxy)
     }
 
+    async getByIdOrganization(externalId: string): Promise<OrgByIdOutDto> {
+        console.log(externalId, "sessionj")
+        return this.repo.getByIdOrganization(externalId, this.proxy)
+    }
+
     private async getProxy(companyId?: CompanyId) {
         let proxy: IProxy | null;
-        console.log(companyId, "companyid")
+        console.log(companyId, "        console.log()\n")
         if (companyId) {
+            console.log(this.proxyService, "proxy srvice")
             proxy = await this.proxyService.getCompanyIndividualProxy(companyId);
         } else {
             proxy = await this.proxyService.getSharedProxy();

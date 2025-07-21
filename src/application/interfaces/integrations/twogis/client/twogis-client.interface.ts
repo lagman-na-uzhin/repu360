@@ -14,9 +14,10 @@ import {IProxyService} from "@application/interfaces/services/proxy/proxy-servic
 import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";
+import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 
 export interface ITwogisClient {
-    getById(externalId: string): Promise<any> //TODO
+    getById(externalId: string): Promise<OrgByIdOutDto> //TODO
     getCabinetAccessToken(placement: Placement): Promise<string>
     getReviewFromCabinet(externalId: string, accessToken: string, proxy: IProxy): Promise<IReviewFromCabinet>
     sendOfficialReply(accessToken: string, reviewExternalId: string, text: string, proxy: IProxy): Promise<ISendReply>
