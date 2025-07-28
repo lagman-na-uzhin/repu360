@@ -21,7 +21,7 @@ export const DEFAULT_ROUTES = {
     BASE: 'employees',
 
     CREATE: '', //POST
-    LIST: ':companyId', //GET
+    LIST: '', //GET
     BY_ID: ':employeeId', //GET
     UPDATE: ':employeeId', //PATCH
     DELETE: ':employeeId', //DELETE

@@ -7,6 +7,9 @@ import {RequestQuery} from "@infrastructure/common/decorators/request-query.deco
 import {GetEmployeeListQueryDto} from "@presentation/default/employee/dto/get-employee-list-query.request";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
 import {EmployeeProxy} from "@application/use-case-proxies/employee/employee.proxy";
+import {PaginatedResultDto} from "@presentation/dtos/paginated-response";
+import {ReviewResponseDto} from "@presentation/dtos/review.response";
+import {EmployeeResponseDto} from "@presentation/dtos/employee.response";
 
 @Controller(DEFAULT_ROUTES.EMPLOYEE.BASE)
 export class EmployeeController {
@@ -22,6 +25,9 @@ export class EmployeeController {
     ) {
         const query = GetListEmployeeQuery.of(dto, actor);
 
-        return this.getListProxy.getInstance().execute(query);
+        const result = await this.getListProxy.getInstance().execute(query);
+
+        return PaginatedResultDto.fromDomain(result, EmployeeResponseDto.fromDomain)
+
     }
 }

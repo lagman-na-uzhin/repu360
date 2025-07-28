@@ -6,6 +6,8 @@ export enum ProxyPrefix {
   LEAD_PROXY = 'LEAD_PROXY',
   SUBSCRIPTION_PROXY = 'SubscriptionProxy',
   EXTERNAL_PROXY = 'ExternalProxy',
+  EMPLOYEE_PROXY = 'EmployeeProxy',
+
   YANDEX_REVIEW_PROXY = 'YandexReviewProxy',
   PROFILE_PROXY = 'ProfileProxy',
   YANDEX_PROFILE_PROXY = 'YandexProfileProxy',

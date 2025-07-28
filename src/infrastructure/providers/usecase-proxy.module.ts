@@ -31,6 +31,7 @@ import {TwogisModule} from "@infrastructure/integrations/twogis/twogis.module";
 import {externalProxyExports} from "@application/use-case-proxies/external/external.proxy";
 import {externalProxyProviders} from "@infrastructure/providers/external/external.providet";
 import {GoogleModule} from "@infrastructure/integrations/google/google.module";
+import {employeeProxyExports} from '@application/use-case-proxies/employee/employee.proxy'
 
 @Module({
   imports: [
