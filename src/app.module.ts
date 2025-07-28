@@ -19,6 +19,7 @@ import {LanguageDetectorServiceModule} from "@infrastructure/services/language-d
 import {TemplateServiceModule} from "@infrastructure/services/template/template.module";
 import {UnitOfWorkModule} from "@infrastructure/services/unit-of-work/unit-of-work.module";
 import {TwogisModule} from "@infrastructure/integrations/twogis/twogis.module";
+import {TestController} from "@presentation/test.controller";
 
 @Module({
   imports: [
@@ -75,7 +76,7 @@ import {TwogisModule} from "@infrastructure/integrations/twogis/twogis.module";
     UnitOfWorkModule,
     TwogisModule
   ],
-  controllers: [],
+  controllers: [TestController], //TODO TEST
   providers: [
     JwtStrategy,
     {

@@ -3,7 +3,7 @@ import { EnvConfigModule } from '../config/env-config/env-config.module';
 import { WinstonModule } from '../services/logger/winston.module';
 import { reviewProxyExports } from '@application/use-case-proxies/review/review.proxy';
 import { companyProxyProviders } from '@infrastructure/providers/company/company.proxy';
-import {employeeProxyExports, employeeProxyProviders} from "@infrastructure/providers/employee/employee.proxy";
+import { employeeProxyProviders} from "@infrastructure/providers/employee/employee.provider";
 import { RepositoriesModule } from '@infrastructure/repositories/repositories.module';
 import { BcryptModule } from '@infrastructure/services/hash/bcrypt.module';
 import { JwtServiceModule } from '@infrastructure/services/jwt/jwt.module';
@@ -62,19 +62,20 @@ export class UsecaseProxyModule {
         ...proxySessionProviders,
         ...subscriptionProxyProviders,
         ...leadProxyProviders,
-        ...externalProxyProviders
+        ...externalProxyProviders,
+
       ],
       exports: [
         ...reviewProxyExports,
         ...companyProxyExports,
-        ...employeeProxyExports,
         ...managerProxyExports,
         ...organizationProxyExports,
         ...authProxyExports,
         ...proxySessionProxyExports,
         ...subscriptionProxyExports,
         ...leadProxyExports,
-        ...externalProxyExports
+        ...externalProxyExports,
+        ...employeeProxyExports
       ],
     };
   }

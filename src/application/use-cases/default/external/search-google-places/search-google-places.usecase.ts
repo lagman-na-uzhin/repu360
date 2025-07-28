@@ -5,9 +5,11 @@ export class SearchGooglePlacesUseCase {
         private readonly googleRepo: IGoogleRepository,
     ) {}
 
-    async execute(text: string): Promise<void> {
+    async execute(text: string): Promise<any> { //TODO
         console.log("execurte", text)
-        return this.googleRepo.searchPlaces(text);
+        const res = await this.googleRepo.searchPlaces(text);
+        console.log(res, "res")
+        return res
 
     }
 }

@@ -32,7 +32,7 @@ export class RequestService {
     const { axiosConfig } = await this.getModifiedConfig(request);
     try {
 
-      if (proxy) {
+      if (proxy != null) {
         axiosConfig.httpsAgent = tunnel.httpsOverHttp({
           proxy: {
             host: proxy.ip,
@@ -139,12 +139,13 @@ export class RequestService {
     modifiedConfig.timeout = requestConfig?.timeout || DEFAULT_REQUEST_TIMEOUT;
     modifiedConfig.withCredentials = true;
 
-    modifiedConfig.headers = {
-      ...requestConfig.headers,
-      'User-Agent': !requestConfig.headers['User-Agent']
-        ? randomUseragent.getRandom()
-        : requestConfig.headers['User-Agent'],
-    };
+    //TODO
+    // modifiedConfig.headers = {
+    //   ...requestConfig.headers,
+    //   'User-Agent': !requestConfig?.headers['User-Agent']
+    //     ? undefined
+    //     : requestConfig.headers['User-Agent']
+    // };
 
     modifiedConfig.httpsAgent = new https.Agent({
       rejectUnauthorized: false,
