@@ -14,7 +14,7 @@ import {PLATFORMS} from '@domain/common/platfoms.enum';
 import {TwogisReviewPlacementDetail} from '@domain/review/model/review/twogis-review-placement-detail';
 import {TwogisProfilePlacementDetail} from '@domain/review/model/profile/twogis-profile-placement-detail';
 import {ReviewMedia} from '@domain/review/model/review/review-media';
-import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {RequestService} from "@infrastructure/services/request/request.service";
 import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";

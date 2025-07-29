@@ -4,12 +4,12 @@ import { IJwtServicePayload } from '@application/interfaces/services/jwt/jwt-ser
 import { EnvConfigService } from '@infrastructure/config/env-config/env-config.service';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { RedisService } from '@liaoliaots/nestjs-redis';
-import { CACHE_KEY } from '@application/interfaces/repositories/cache/cache-key.const';
+import { CACHE_KEY } from '@application/interfaces/services/cache/cache-key.const';
 import { FastifyRequest } from 'fastify';
-import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/types/employee-auth-data.type";
+import {EmployeeAuthDataType} from "@application/interfaces/services/cache/types/employee-auth-data.type";
 import {Actor} from "@domain/policy/actor";
 import {Role} from "@domain/policy/model/role";
-import {ManagerAuthDataType} from "@application/interfaces/repositories/cache/types/manager-auth-data.type";
+import {ManagerAuthDataType} from "@application/interfaces/services/cache/types/manager-auth-data.type";
 import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
 import {EmployeePermissions} from "@domain/policy/model/employee-permissions";
 import {RoleType} from "@domain/policy/value-object/role/type.vo";

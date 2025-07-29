@@ -1,7 +1,7 @@
 import {IHashService} from "@application/interfaces/services/hash/hash-service.interface";
 import {EmployeeLoginCommand} from "@application/use-cases/default/auth/commands/login/login.command";
 import {IJwtService, IJwtServicePayload} from "@application/interfaces/services/jwt/jwt-service.interface";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/services/cache/cache-repository.interface";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {LoginOutput} from "@application/use-cases/default/auth/commands/login/login.output";
 import {Employee} from "@domain/employee/employee";

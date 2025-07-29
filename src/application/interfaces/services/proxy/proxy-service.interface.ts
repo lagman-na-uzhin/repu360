@@ -1,4 +1,4 @@
-import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {CompanyId} from "@domain/company/company";
 
 export interface IProxyService {

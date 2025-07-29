@@ -11,7 +11,7 @@ import {
 } from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
 import {ISendReply} from "@application/interfaces/integrations/twogis/client/dto/out/send-reply-response.out.dto";
 import {IProxyService} from "@application/interfaces/services/proxy/proxy-service.interface";
-import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";

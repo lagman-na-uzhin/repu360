@@ -1,14 +1,14 @@
 import { Redis } from 'ioredis';
 import {Injectable} from "@nestjs/common";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/services/cache/cache-repository.interface";
 import {RedisService} from "@liaoliaots/nestjs-redis";
-import {CACHE_KEY} from "@application/interfaces/repositories/cache/cache-key.const";
-import {CACHE_TTL} from "@application/interfaces/repositories/cache/cache-ttl.const";
+import {CACHE_KEY} from "@application/interfaces/services/cache/cache-key.const";
+import {CACHE_TTL} from "@application/interfaces/services/cache/cache-ttl.const";
 import {Employee} from "@domain/employee/employee";
 import {Manager} from "@domain/manager/manager";
-import {EmployeeAuthDataType} from "@application/interfaces/repositories/cache/types/employee-auth-data.type";
+import {EmployeeAuthDataType} from "@application/interfaces/services/cache/types/employee-auth-data.type";
 import {Role} from "@domain/policy/model/role";
-import {ManagerAuthDataType} from "@application/interfaces/repositories/cache/types/manager-auth-data.type";
+import {ManagerAuthDataType} from "@application/interfaces/services/cache/types/manager-auth-data.type";
 import {PlacementId} from "@domain/placement/placement";
 import {
   ILoginTwogisCabinetResult

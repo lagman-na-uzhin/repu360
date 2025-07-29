@@ -1,6 +1,6 @@
 import {Lead, LeadId} from "@domain/lead/lead";
 import {GetLeadListParams} from "@domain/lead/repositories/params/get-lead-list.params";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 
 export interface ILeadRepository {
     getById(id: LeadId): Promise<Lead | null>;

@@ -16,7 +16,7 @@ import {UnitOfWork} from "@infrastructure/services/unit-of-work/unit-of-work.ser
 import {
   TwogisCreateSendReplyTaskScheduleUseCase
 } from "@application/use-cases/background/review/twogis/reply/create-reply-task-sh.usecase";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/services/cache/cache-repository.interface";
 import {BullService} from "@infrastructure/services/bull/bull.service";
 import {CacheRepository} from "@infrastructure/repositories/cache/cache.repository";
 import {

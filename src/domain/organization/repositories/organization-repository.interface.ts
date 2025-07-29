@@ -1,7 +1,7 @@
 import {Organization, OrganizationId} from "@domain/organization/organization";
 import {Placement} from "@domain/placement/placement";
 import {CompanyId} from "@domain/company/company";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
 
 export interface IOrganizationRepository {

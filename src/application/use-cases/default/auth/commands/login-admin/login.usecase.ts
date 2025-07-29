@@ -1,6 +1,6 @@
 import {IHashService} from "@application/interfaces/services/hash/hash-service.interface";
 import {IJwtService} from "@application/interfaces/services/jwt/jwt-service.interface";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/services/cache/cache-repository.interface";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
 import {IManagerRepository} from "@domain/manager/repositories/manager-repository.interface";

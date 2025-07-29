@@ -1,6 +1,6 @@
 import {Actor} from "@domain/policy/actor";
 import {BaseQuery} from "@application/common/base-query";
-import {PaginationParams, SortParams} from "@domain/common/repositories/get-list.interface";
+import {PaginationParams, SortParams} from "@application/interfaces/query-services/common/get-list.interface";
 import {GetOrganizationListByCompanyFilter} from "@domain/organization/repositories/params/get-list-by-company.params";
 
 export class GetOrganizationListQuery extends BaseQuery {

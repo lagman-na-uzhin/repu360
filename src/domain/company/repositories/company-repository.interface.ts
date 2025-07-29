@@ -1,5 +1,5 @@
 import {Company, CompanyId} from "@domain/company/company";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {GetCompanyListParams} from "@domain/company/repositories/types/get-company-list.params";
 import {PlacementId} from "@domain/placement/placement";
 

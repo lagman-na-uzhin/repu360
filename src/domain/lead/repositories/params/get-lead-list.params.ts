@@ -1,4 +1,4 @@
-import {FilterParams, GetListParams} from "@domain/common/repositories/get-list.interface";
+import {FilterParams, GetListParams} from "@application/interfaces/query-services/common/get-list.interface";
 
 export interface GetLeadListFilter extends FilterParams{
     readonly status?: "NOT_ASSIGNED" | "PROCESSING" | "PROCESSED"

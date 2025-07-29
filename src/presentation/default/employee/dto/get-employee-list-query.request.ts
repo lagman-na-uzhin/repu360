@@ -1,7 +1,7 @@
 import {IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested} from "class-validator";
 import {Transform, Type} from "class-transformer";
 import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.request";
-import {GetListParams} from "@domain/common/repositories/get-list.interface";
+import {GetListParams} from "@application/interfaces/query-services/common/get-list.interface";
 import {CompanyId} from "@domain/company/company";
 import {GetEmployeeListFilterParams} from "@domain/employee/repositories/params/get-employee-list.params";
 

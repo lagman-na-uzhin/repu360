@@ -1,6 +1,6 @@
 import {IsString, IsInt, Min, Max, IsBoolean} from 'class-validator';
 import {Transform} from 'class-transformer';
-import {PaginationParams, SortParams} from "@domain/common/repositories/get-list.interface";
+import {PaginationParams, SortParams} from "@application/interfaces/query-services/common/get-list.interface";
 
 export class PaginationParamsDto implements PaginationParams {
     @IsInt({ message: 'Page must be an integer' })

@@ -12,7 +12,7 @@ import {InjectEntityManager} from "@nestjs/typeorm";
 import {Reply} from "@domain/review/model/review/reply/reply";
 import {ReviewReplyEntity} from "@infrastructure/entities/review/review-reply.entity";
 import {GetReviewListFilterParams, GetReviewListParams} from "@domain/review/repositories/params/get-list.params";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {Profile, ProfileId} from "@domain/review/model/profile/profile";
 import {ProfileEntity} from "@infrastructure/entities/profile/profile.entity";

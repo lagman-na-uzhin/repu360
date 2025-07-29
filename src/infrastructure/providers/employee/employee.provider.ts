@@ -1,15 +1,15 @@
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 import {GetEmployeeListUseCase} from "@application/use-cases/default/employee/get-list/get-employee-list.usecase";
-import {IEmployeeRepository} from "@domain/employee/repositories/employee-repository.interface";
-import {EmployeeOrmRepository} from "@infrastructure/repositories/employee/employee.repository";
 import {EmployeeProxy} from "@application/use-case-proxies/employee/employee.proxy";
+import {IEmployeeQs} from "@application/interfaces/query-services/employee-qs/employee-qs.interface";
+import {EmployeeQueryService} from "@infrastructure/query-services/employee/employee-query.service";
 
 export const employeeProxyProviders = [
     {
-        inject: [EmployeeOrmRepository],
+        inject: [EmployeeQueryService],
         provide: EmployeeProxy.GET_LIST_EMPLOYEE_USE_CASE,
-        useFactory: (employeeRepo: IEmployeeRepository) => {
-            return new UseCaseProxy(new GetEmployeeListUseCase(employeeRepo))
+        useFactory: (employeeQueryService: IEmployeeQs) => {
+            return new UseCaseProxy(new GetEmployeeListUseCase(employeeQueryService))
         }
     },
 ]

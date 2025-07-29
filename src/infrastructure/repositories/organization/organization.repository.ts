@@ -4,7 +4,7 @@ import {InjectEntityManager} from '@nestjs/typeorm';
 import { OrganizationEntity } from '@infrastructure/entities/organization/organization.entity';
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
 import { Organization, OrganizationId } from '@domain/organization/organization';
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
 import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";

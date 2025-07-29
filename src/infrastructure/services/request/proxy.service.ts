@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import {IProxyService} from "@application/interfaces/services/proxy/proxy-service.interface";
-import {IProxy, IProxyRepository} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {IProxy, IProxyRepository} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {CompanyId} from "@domain/company/company";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/services/cache/cache-repository.interface";
 import {ProxyOrmRepository} from "@infrastructure/repositories/proxy/proxy.repository";
 import {CacheRepository} from "@infrastructure/repositories/cache/cache.repository";
 

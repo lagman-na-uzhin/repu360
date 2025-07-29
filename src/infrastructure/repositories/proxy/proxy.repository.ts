@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {IProxy, IProxyRepository} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {IProxy, IProxyRepository} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {EntityManager, Equal} from "typeorm";
 import {ProxyEntity} from "@infrastructure/entities/proxy/proxy.entity";

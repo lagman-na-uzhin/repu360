@@ -2,7 +2,7 @@
 import { SECOND } from 'time-constants';
 import {IReviewRepository} from "@domain/review/repositories/review-repository.interface";
 import {ITaskService, QUEUES} from "@application/interfaces/services/task/task-service.interface";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/services/cache/cache-repository.interface";
 import {Review} from "@domain/review/review";
 import {TwogisSendReplyCommand} from "@application/use-cases/background/review/twogis/reply/send-reply.command";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";

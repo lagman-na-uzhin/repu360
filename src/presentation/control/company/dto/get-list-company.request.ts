@@ -2,7 +2,7 @@ import {IsOptional, IsString, ValidateNested} from "class-validator";
 import {Transform, Type} from "class-transformer";
 import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.request";
 import {ManagerId} from "@domain/manager/manager";
-import {GetListParams} from "@domain/common/repositories/get-list.interface";
+import {GetListParams} from "@application/interfaces/query-services/common/get-list.interface";
 import {GetCompanyListFilterParams} from "@domain/company/repositories/types/get-company-list.params";
 
 class GetCompanyListFilterDto implements GetCompanyListFilterParams {

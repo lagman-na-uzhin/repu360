@@ -3,7 +3,7 @@ import {Organization} from "@domain/organization/organization";
 import {
     GetOrganizationListQuery
 } from "@application/use-cases/default/organization/queries/get-list-by-company/get-list-by-company.query";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 
 export class GetOrganizationListUseCase {
     constructor(

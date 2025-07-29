@@ -7,8 +7,9 @@ import {UserEntity} from "@infrastructure/entities/user/user.entity";
 import {EmployeePhone} from "@domain/employee/value-object/employee-phone.vo";
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {GetEmployeeListParams} from "@domain/employee/repositories/params/get-employee-list.params";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {BaseRepository} from "@infrastructure/repositories/base-repository";
+import {CompanyId} from "@domain/company/company";
 
 @Injectable()
 export class EmployeeOrmRepository extends BaseRepository<UserEntity> implements IEmployeeRepository {
@@ -16,19 +17,6 @@ export class EmployeeOrmRepository extends BaseRepository<UserEntity> implements
       @InjectEntityManager() private readonly manager: EntityManager,
   ) {
     super();}
-
-  async getEmployeeList(params: GetEmployeeListParams): Promise<PaginatedResult<Employee>> {
-    const qb = this.createQb().leftJoin('employee.role', 'role');
-
-    qb.where('employee.companyId = :companyId', {companyId: params.filter!.companyId})
-
-    return this.getList<Employee>(
-        qb,
-        this.toDomain.bind(this),
-        params.pagination,
-        params.sort
-    );
-  }
 
   async getByEmail(email: EmployeeEmail): Promise<Employee | null> {
     const entity = await this.manager.getRepository(UserEntity).findOne({

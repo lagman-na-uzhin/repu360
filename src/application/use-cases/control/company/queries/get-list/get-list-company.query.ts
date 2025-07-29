@@ -1,5 +1,5 @@
 import {BaseQuery} from "@application/common/base-query";
-import {PaginationParams, SortParams} from "@domain/common/repositories/get-list.interface";
+import {PaginationParams, SortParams} from "@application/interfaces/query-services/common/get-list.interface";
 import {GetCompanyListFilterParams} from "@domain/company/repositories/types/get-company-list.params";
 import {Actor} from "@domain/policy/actor";
 

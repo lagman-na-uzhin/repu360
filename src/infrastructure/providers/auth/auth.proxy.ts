@@ -11,7 +11,7 @@ import {CacheRepository} from "@infrastructure/repositories/cache/cache.reposito
 import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
 import {IHashService} from "@application/interfaces/services/hash/hash-service.interface";
 import {IJwtService} from "@application/interfaces/services/jwt/jwt-service.interface";
-import {ICacheRepository} from "@application/interfaces/repositories/cache/cache-repository.interface";
+import {ICacheRepository} from "@application/interfaces/services/cache/cache-repository.interface";
 import {EmployeeLoginUseCase} from "@application/use-cases/default/auth/commands/login/login.usecase";
 import {ManagerLoginUseCase} from "@application/use-cases/default/auth/commands/login-admin/login.usecase";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";

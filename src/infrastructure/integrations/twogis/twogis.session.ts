@@ -1,4 +1,4 @@
-import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";
 import {PlacementId} from "@domain/placement/placement";
 import {

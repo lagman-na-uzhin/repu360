@@ -3,7 +3,7 @@ import {
 } from "@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
 import { Review } from '@domain/review/review';
 import {PlacementId} from '@domain/placement/placement';
-import {IProxy} from "@application/interfaces/repositories/proxy/proxy-repository.interface";
+import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";
 import {

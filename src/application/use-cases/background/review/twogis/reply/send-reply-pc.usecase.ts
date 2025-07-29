@@ -1,4 +1,4 @@
-import { ICacheRepository } from "@application/interfaces/repositories/cache/cache-repository.interface";
+import { ICacheRepository } from "@application/interfaces/services/cache/cache-repository.interface";
 import { IReviewRepository } from "@domain/review/repositories/review-repository.interface";
 import { IPlacementRepository } from "@domain/placement/repositories/placement-repository.interface";
 import { Placement, PlacementId } from "@domain/placement/placement";

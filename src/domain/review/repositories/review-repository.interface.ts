@@ -1,6 +1,6 @@
 import {Review, ReviewId} from '@domain/review/review';
 import {PlacementId} from "@domain/placement/placement";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {GetReviewListParams} from "@domain/review/repositories/params/get-list.params";
 
 export interface IReviewRepository {

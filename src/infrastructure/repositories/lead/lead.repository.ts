@@ -16,7 +16,7 @@ import {CompanyEntity} from "@infrastructure/entities/company/company.entity";
 import {ILeadRepository} from "@domain/lead/repositories/lead-repository.interface";
 import {Lead, LeadId} from "@domain/lead/lead";
 import {GetLeadListParams} from "@domain/lead/repositories/params/get-lead-list.params";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {LeadEntity} from "@infrastructure/entities/lead/lead.entity";
 import {LeadContactEntity} from "@infrastructure/entities/lead/lead-contact.entity";
 import {LeadContact} from "@domain/lead/model/lead-contact";

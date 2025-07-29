@@ -1,6 +1,6 @@
 import {ObjectLiteral, Repository, SelectQueryBuilder} from "typeorm";
-import {PaginatedResult} from "@domain/common/repositories/paginated-result.interface";
-import {PaginationParams, SortParams} from "@domain/common/repositories/get-list.interface";
+import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
+import {PaginationParams, SortParams} from "@application/interfaces/query-services/common/get-list.interface";
 
 export class BaseRepository<Entity extends ObjectLiteral> {
   constructor() {}
