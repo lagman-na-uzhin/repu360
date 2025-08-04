@@ -11,9 +11,8 @@ import {YandexReviewPlacementDetail} from "@domain/review/model/review/yandex-re
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {Reply} from "@domain/review/model/review/reply/reply";
 import {ReviewReplyEntity} from "@infrastructure/entities/review/review-reply.entity";
-import {GetReviewListFilterParams, GetReviewListParams} from "@domain/review/repositories/params/get-list.params";
+import {GetReviewListParams} from "@domain/review/repositories/params/get-list.params";
 import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
-import {BaseRepository} from "@infrastructure/repositories/base-repository";
 import {Profile, ProfileId} from "@domain/review/model/profile/profile";
 import {ProfileEntity} from "@infrastructure/entities/profile/profile.entity";
 import {TwogisProfilePlacementDetail} from "@domain/review/model/profile/twogis-profile-placement-detail";
@@ -26,11 +25,10 @@ import {
 } from "@infrastructure/entities/profile/placement-details/yandex-profile.entity";
 
 @Injectable()
-export class ReviewOrmRepository extends BaseRepository<ReviewEntity> implements IReviewRepository {
+export class ReviewOrmRepository implements IReviewRepository {
   constructor(
       @InjectEntityManager() private readonly manager: EntityManager,
-  ) {
-    super();}
+  ) {}
 
   async getReviewsByOrganizationPlacementId(placementId: PlacementId): Promise<Review[]> {
     const entities = await this.manager.find(ReviewEntity, {
@@ -42,7 +40,6 @@ export class ReviewOrmRepository extends BaseRepository<ReviewEntity> implements
 
   async saveAll(reviews: Review[]): Promise<void> {
     const reviewEntities = reviews.map((review) => this.fromDomain(review));
-    console.log(reviewEntities[0], 'review entities')
     await this.manager.getRepository(ReviewEntity).save(reviewEntities);
     console.log("AFTER PROG SAVE")
   }
@@ -150,34 +147,6 @@ export class ReviewOrmRepository extends BaseRepository<ReviewEntity> implements
   async save(review: Review): Promise<void> {
     const entity = this.fromDomain(review);
     await this.manager.getRepository(ReviewEntity).save(entity);
-  }
-
-  async getReviewList(params: GetReviewListParams): Promise<PaginatedResult<Review>> {
-    const qb = this.createQb();
-    qb.leftJoin('review.placement', 'placement').leftJoin('placement.organization', 'organization').leftJoin('organization.group', 'group')
-
-    qb.andWhere('organization.companyId = :companyId', { companyId: params.filter!.companyId.toString() });
-
-    if (params.filter?.groupId) {
-      qb.andWhere('group.id = :groupId', {groupId: params.filter.groupId.toString()})
-    }
-
-    if (params.filter?.organizationId) {
-      qb.andWhere('organization.id = :organizationId', {organizationId: params.filter.organizationId.toString()})
-    }
-
-    if (params.filter?.tone === "positive") {
-      qb.andWhere('review.rating > 3');
-    } else if (params.filter?.tone === "negative") {
-      qb.andWhere('review.rating < 4');
-    }
-
-    return this.getList<Review>(
-        qb,
-        this.toDomain.bind(this),
-        params.pagination,
-        params.sort
-    );
   }
 
   private createQb() {

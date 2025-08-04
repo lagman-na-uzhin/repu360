@@ -40,6 +40,8 @@ import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
 import {CompanyOrmRepository} from "@infrastructure/repositories/company/company.repository";
 import {GetReviewListUseCase} from "@application/use-cases/default/review/get-list/get-list-review.usecase";
+import {IReviewQs} from "@application/interfaces/query-services/review-qs/review-qs.interface";
+import {ReviewQueryService} from "@infrastructure/query-services/review-query.service";
 
 export const reviewProxyProviders = [
   {
@@ -131,10 +133,10 @@ export const reviewProxyProviders = [
   },
 
   {
-    inject: [ReviewOrmRepository,],
+    inject: [ReviewQueryService],
     provide: ReviewProxy.GET_LIST,
-    useFactory: (reviewRepo: IReviewRepository,) => {
-      return new UseCaseProxy(new GetReviewListUseCase(reviewRepo))
+    useFactory: (reviewQs: IReviewQs,) => {
+      return new UseCaseProxy(new GetReviewListUseCase(reviewQs))
     }
   }
 ]

@@ -9,7 +9,8 @@ export class GetListLeadUseCase {
     ) {}
 
     async execute(qy: GetLeadListQuery): Promise<PaginatedResult<Lead>> {
-        return this.leadRepo.getLeadList(qy);
+        // return this.leadRepo.getLeadList(qy);
+        throw Error("dsd") //TODO mock
     }
 
 }

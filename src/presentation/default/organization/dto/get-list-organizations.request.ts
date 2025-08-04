@@ -10,6 +10,13 @@ class GetOrganizationListFilterDto implements GetOrganizationListByCompanyFilter
     @IsString({ message: 'Company Id must be a string' })
     @Transform(({ value }) => new CompanyId(value))
     readonly companyId: CompanyId;
+
+
+    @IsOptional()
+    readonly isActive?: boolean;
+
+    @IsOptional()
+    readonly isTemporarilyClosed?: boolean
 }
 
 

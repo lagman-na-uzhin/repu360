@@ -9,6 +9,7 @@ export class GetListCompanyUseCase {
     ) {}
 
     async execute(query: GetListCompanyQuery): Promise<PaginatedResult<Company>> {
-        return this.companyRepo.getCompanyList(query);
+        // return this.companyRepo.getCompanyList(query);
+        throw Error("fdf") //TODO mock
     }
 }

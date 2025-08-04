@@ -1,13 +1,11 @@
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {Placement, PlacementId} from "@domain/placement/placement";
 import {InjectEntityManager} from "@nestjs/typeorm";
-import {EntityManager, Equal} from "typeorm";
+import {EntityManager} from "typeorm";
 import {OrganizationPlacementEntity} from "@infrastructure/entities/placement/organization-placement.entity";
 import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {TwogisPlacementDetail} from "@domain/placement/model/twogis-placement-detail";
 import {YandexPlacementDetail} from "@domain/placement/model/yandex-placement-detail";
-import {BaseRepository} from "@infrastructure/repositories/base-repository";
-import {CompanyEntity} from "@infrastructure/entities/company/company.entity";
 import {
     TwogisPlacementDetailEntity
 } from "@infrastructure/entities/placement/placement-details/twogis-placement.entity";

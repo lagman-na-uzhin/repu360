@@ -6,13 +6,14 @@ import {CompanyId} from "@domain/company/company";
 import {OrganizationId} from "@domain/organization/organization";
 import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {GetReviewListFilterParams} from "@domain/review/repositories/params/get-list.params";
+import {PlacementId} from "@domain/placement/placement";
 
 
 class GetReviewListFilterDto implements GetReviewListFilterParams {
-    @IsNotEmpty({ message: 'Company Id is required' })
-    @IsString({ message: 'Company Id must be a string' })
-    @Transform(({ value }) => new CompanyId(value))
-    readonly companyId: CompanyId;
+    @IsNotEmpty({ message: 'Placement Id is required' })
+    @IsString({ message: 'Placement Id must be a string' })
+    @Transform(({ value }) => new PlacementId(value))
+    readonly placementId: PlacementId;
 
     @IsOptional()
     @Transform(({ value }) => value ? new CompanyId(value) : null)

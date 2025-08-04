@@ -8,7 +8,6 @@ import { COMPANY_ENTITIES } from 'src/infrastructure/entities/company';
 import { REVIEW_ENTITIES } from 'src/infrastructure/entities/review';
 import { RequestModule } from 'src/infrastructure/services/request/request.module';
 import { USER_ENTITIES } from '@infrastructure/entities/user';
-import { BaseRepository } from '@infrastructure/repositories/base-repository';
 import {AUTO_REPLY_ENTITIES} from "@infrastructure/entities/autoreply";
 import {PLACEMENT_ENTITIES} from "@infrastructure/entities/placement";
 import {PROFILE_ENTITIES} from "@infrastructure/entities/profile";
@@ -17,6 +16,7 @@ import {SUBSCRIPTION_ENTITIES} from "@infrastructure/entities/subscription";
 import {TARIFF_ENTITIES} from "@infrastructure/entities/tariff";
 import {LEAD_ENTITIES} from "@infrastructure/entities/lead";
 import {RequestService} from "@infrastructure/services/request/request.service";
+import {QUERY_SERVICES} from "@infrastructure/query-services";
 
 @Module({
   imports: [
@@ -38,10 +38,10 @@ import {RequestService} from "@infrastructure/services/request/request.service";
     EnvConfigModule,
   ],
   providers: [
-    BaseRepository,
       RequestService,
     ...REPOSITORIES,
+      ...QUERY_SERVICES
   ],
-  exports: [BaseRepository, ...REPOSITORIES],
+  exports: [...REPOSITORIES],
 })
 export class RepositoriesModule {}

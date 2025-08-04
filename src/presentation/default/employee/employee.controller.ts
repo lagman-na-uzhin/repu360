@@ -27,7 +27,7 @@ export class EmployeeController {
 
         const result = await this.getListProxy.getInstance().execute(query);
 
-        return PaginatedResultDto.fromDomain(result, EmployeeResponseDto.fromDomain)
+        // return PaginatedResultDto.fromDomain(result, EmployeeResponseDto.fromDomain)
 
     }
 }

@@ -12,7 +12,6 @@ import { ReviewMediaEntity } from '@infrastructure/entities/review/review-media.
 import {ReviewComplaintEntity} from "@infrastructure/entities/review/complaint/review-complaint.entity";
 import {ReviewReplyEntity} from "@infrastructure/entities/review/review-reply.entity";
 
-
 @Entity('review')
 export class ReviewEntity {
     @PrimaryColumn("uuid")

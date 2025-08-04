@@ -2,7 +2,7 @@ import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 import {GetEmployeeListUseCase} from "@application/use-cases/default/employee/get-list/get-employee-list.usecase";
 import {EmployeeProxy} from "@application/use-case-proxies/employee/employee.proxy";
 import {IEmployeeQs} from "@application/interfaces/query-services/employee-qs/employee-qs.interface";
-import {EmployeeQueryService} from "@infrastructure/query-services/employee/employee-query.service";
+import {EmployeeQueryService} from "@infrastructure/query-services/employee-query.service";
 
 export const employeeProxyProviders = [
     {

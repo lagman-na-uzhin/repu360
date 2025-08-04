@@ -32,6 +32,7 @@ import {externalProxyExports} from "@application/use-case-proxies/external/exter
 import {externalProxyProviders} from "@infrastructure/providers/external/external.providet";
 import {GoogleModule} from "@infrastructure/integrations/google/google.module";
 import {employeeProxyExports} from '@application/use-case-proxies/employee/employee.proxy'
+import {QueryServicesModule} from "@infrastructure/query-services/query-services.module";
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import {employeeProxyExports} from '@application/use-case-proxies/employee/emplo
     TemplateServiceModule,
     UnitOfWorkModule,
       TwogisModule,
-    GoogleModule
+    GoogleModule,
+    QueryServicesModule
   ],
 })
 export class UsecaseProxyModule {

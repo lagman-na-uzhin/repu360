@@ -4,23 +4,16 @@ import {InjectEntityManager} from '@nestjs/typeorm';
 import { OrganizationEntity } from '@infrastructure/entities/organization/organization.entity';
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
 import { Organization, OrganizationId } from '@domain/organization/organization';
-import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
-import {BaseRepository} from "@infrastructure/repositories/base-repository";
-import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
 import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
 import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule.entity";
 import {Rubric} from "@domain/organization/model/organization-rubrics";
 import {OrganizationRubricsEntity} from "@infrastructure/entities/organization/rubrics.entity";
 
 @Injectable()
-export class OrganizationOrmRepository
-    extends BaseRepository<OrganizationEntity>
-    implements IOrganizationRepository {
+export class OrganizationOrmRepository implements IOrganizationRepository {
   constructor(
       @InjectEntityManager() private readonly manager: EntityManager,
-  ) {
-    super()
-  }
+  ) {}
 
   async getById(id: OrganizationId): Promise<Organization | null> {
     const entity = await this.manager.getRepository(OrganizationEntity).findOneBy({id: Equal(id.toString())});
@@ -43,13 +36,6 @@ export class OrganizationOrmRepository
     return await Promise.all(entities.map(this.toDomain));
   }
 
-  async getListByCompanyId(params: GetOrganizationListByCompanyParams): Promise<PaginatedResult<Organization>> {
-
-    const qb = this.createQb();
-    qb.andWhere('organization.companyId = :companyId', { companyId: params.filter!.companyId });
-
-    return this.getList<Organization>(qb, this.toDomain, params.pagination,  params.sort);
-  }
 
   async getByIds(ids: OrganizationId[]): Promise<Organization[]> {
     const entities = await this.manager.getRepository(OrganizationEntity).find({

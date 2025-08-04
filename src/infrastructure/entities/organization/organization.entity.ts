@@ -28,6 +28,9 @@ export class OrganizationEntity {
     @Column()
     public address: string
 
+    @Column({default: true})
+    public isActive: boolean;
+
     @Column()
     public isTemporarilyClosed: boolean;
 

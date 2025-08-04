@@ -13,8 +13,6 @@ export const DEFAULT_ROUTES = {
 
     GET_LIST: '',
 
-    USER_PERMITTED_GET_LIST: 'user'
-
   },
 
   EMPLOYEE: {

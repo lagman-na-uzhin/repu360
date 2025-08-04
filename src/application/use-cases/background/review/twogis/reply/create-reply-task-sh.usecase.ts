@@ -47,17 +47,13 @@ export class TwogisCreateSendReplyTaskScheduleUseCase {
         console.log(review, 'has review')
         if (!review || review.hasOfficialReply()) return;
 
-        const company = await this.companyRepo.getCompanyByPlacementId(placement.id);
-        if (!company) throw new Error(EXCEPTION.COMPANY.NOT_FOUND);
-
-        await this.sendTask(placement, review, company.id);
+        await this.sendTask(placement, review);
         console.log(`SENT TASK FOR SENDING REPLY ${placement.id}_${review.id}`);
     }
 
     private async sendTask(
         placement: Placement,
         review: Review,
-        companyId: CompanyId
     ) {
         const jobId = `${placement.id}_${review.id}`;
         const isJobExists = await this.taskService.isJobExists(
@@ -66,7 +62,7 @@ export class TwogisCreateSendReplyTaskScheduleUseCase {
         );
 
         if (!isJobExists) {
-            const command = TwogisSendReplyCommand.of(placement.id.toString(), review.id.toString(), companyId.toString());
+            const command = TwogisSendReplyCommand.of(placement.id.toString(), review.id.toString(), 'new CompanyId()'); //TODO mock
 
             await this.taskService.addTask({
                 queue: QUEUES.SEND_REPLY_QUEUE,
