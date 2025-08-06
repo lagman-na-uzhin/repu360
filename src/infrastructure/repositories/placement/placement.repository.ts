@@ -43,6 +43,9 @@ export class PlacementOrmRepository implements IPlacementRepository {
     }
 
     async save(placement: Placement): Promise<void> {
+        await this.manager
+            .getRepository(OrganizationPlacementEntity)
+            .save(this.fromDomain(placement));
     }
 
     async batchSave(placements: Placement[]): Promise<void> {
