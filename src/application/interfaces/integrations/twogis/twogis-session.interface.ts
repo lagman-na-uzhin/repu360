@@ -10,12 +10,15 @@ import {
     GetOrganizationReviewsInDto
 } from "@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
 import {Review} from "@domain/review/review";
-import {Profile} from "@domain/review/model/profile/profile";
+import {Profile} from "@domain/review/profile";
 import {
     ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
 import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {
+    ISearchedRubricsResult
+} from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
 
 export interface ITwogisSession {
     init(companyId?: CompanyId): Promise<void>;
@@ -29,5 +32,6 @@ export interface ITwogisSession {
         externalId: string,
         payload: GetOrganizationReviewsInDto,
     ): Promise<Review[] | null>;
+    searchRubrics(accessToken: string, query: string): Promise<ISearchedRubricsResult>
 
 }

@@ -16,25 +16,35 @@ export class ReviewQueryService extends BaseQueryService implements IReviewQs {
 
     async getList(query: GetListReviewQuery): Promise<PaginatedResult<QSReviewDto>> {
         const { filter, pagination, sort, search } = query;
-
         let queryBuilder = this.manager.getRepository(ReviewEntity)
             .createQueryBuilder('review')
             .leftJoinAndSelect('review.profile', 'profile')
-            .leftJoinAndSelect('review.yandexDetail', 'yandexDetail')
-            .leftJoinAndSelect('review.twogisDetail', 'twogisDetail')
-            .leftJoinAndSelect('review.media', 'media')
-            .leftJoinAndSelect('review.replies', 'replies');
+            .leftJoin('review.placement', "placement")
+            .leftJoin('placement.organization', "organization")
+            .where('organization.companyId = :companyId', { companyId: filter.companyId.toString() });
 
-        if (filter?.placementId) {
-            queryBuilder = queryBuilder.andWhere('review.placementId = :placementId', { placementId: filter.placementId });
+        if (filter?.groupIds && filter.groupIds.length > 0) {
+            queryBuilder.leftJoin('organization.group', "group");
+            queryBuilder.andWhere('group.id = ANY(:groupIds)', { groupIds: filter.groupIds.map(i => i.toString()) });
         }
+
+        if (filter?.cities && filter.cities.length > 0) {
+            queryBuilder.leftJoin('organization.address', "address");
+            queryBuilder.andWhere('address.city = ANY(:cities)', { cities: filter.cities });
+        }
+
+        if (filter?.organizationIds && filter.organizationIds.length > 0) {
+            queryBuilder.andWhere('organization.id = ANY(:organizationIds)', { organizationIds: filter.organizationIds.map(i => i.toString()) });
+        }
+
         if (filter?.platform) {
-            queryBuilder = queryBuilder.andWhere('review.platform = :platform', { platform: filter.platform });
+            queryBuilder.andWhere('review.platform = :platform', { platform: filter.platform });
         }
+
         if (filter?.tone === 'positive') {
-            queryBuilder = queryBuilder.andWhere('review.rating > 3');
+            queryBuilder.andWhere('review.rating >= 4');
         } else if (filter?.tone === 'negative') {
-            queryBuilder = queryBuilder.andWhere('review.rating < 4');
+            queryBuilder.andWhere('review.rating <= 3');
         }
         // if (filter?.hasReplies !== undefined) {
         //     if (filter.hasReplies) {
@@ -61,6 +71,7 @@ export class ReviewQueryService extends BaseQueryService implements IReviewQs {
             .take(pagination.limit)
             .getManyAndCount();
 
+        console.log(reviews, "reviews")
         const totalPages = Math.ceil(total / pagination.limit);
 
         const list: QSReviewDto[] = reviews.map(review => ({

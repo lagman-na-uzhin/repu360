@@ -3,9 +3,21 @@ import {BaseQueryService} from "@infrastructure/query-services/base-query.servic
 import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {InjectEntityManager} from "@nestjs/typeorm";
 import {IOrganizationQs} from "@application/interfaces/query-services/organization-qs/organization-qs.interface";
-import {GetOrganizationListByCompanyParams} from "@domain/organization/repositories/params/get-list-by-company.params";
 import {OrganizationEntity} from "@infrastructure/entities/organization/organization.entity";
 import {QSOrganizationDto} from "@application/interfaces/query-services/organization-qs/dto/response/organization.dto";
+import {
+    QSOrganizationCompactDto
+} from "@application/interfaces/query-services/organization-qs/dto/response/organization-compact.dto";
+import {
+    GetOrganizationListQuery
+} from "@application/use-cases/default/organization/queries/get-list-by-company/get-list-by-company.query";
+import {
+    GetCompactOrganizationQuery
+} from "@application/use-cases/default/organization/queries/get-organization-compact/get-compact-organization.query";
+import {
+    QSOrganizationSummaryDto
+} from "@application/interfaces/query-services/organization-qs/dto/response/organizarion-summaty.dto";
+import {GetSummaryQuery} from "@application/use-cases/default/organization/queries/get-summary/get-summary.query";
 
 
 export class OrganizationQueryService extends BaseQueryService implements IOrganizationQs {
@@ -15,14 +27,16 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
         super();
     }
 
-    async getList(dto: GetOrganizationListByCompanyParams): Promise<PaginatedResult<QSOrganizationDto>> {
-        const { filter, pagination, sort, search } = dto;
+    async getList(query: GetOrganizationListQuery): Promise<PaginatedResult<QSOrganizationDto>> {
+        const { filter, pagination, sort, search } = query;
 
         let queryBuilder = this.manager.getRepository(OrganizationEntity)
             .createQueryBuilder('org')
-            .leftJoinAndSelect('org.workingSchedules', 'schedules')
+            .leftJoinAndSelect('org.workingSchedule', 'schedule')
             .leftJoinAndSelect('org.rubrics', 'rubrics')
-            .leftJoinAndSelect('org.placements', 'placements');
+            .leftJoinAndSelect('org.placements', 'placements')
+            .leftJoinAndSelect('org.address', 'address')
+            .leftJoinAndSelect('org.group', 'group');
 
         queryBuilder = queryBuilder.andWhere('org.companyId = :companyId', { companyId: filter!.companyId });
 
@@ -41,11 +55,11 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
         const allowedSortFieldsMap: Record<string, string> = {
             'id': 'org.id',
             'name': 'org.name',
-            'address': 'org.address',
             'isTemporarilyClosed': 'org.isTemporarilyClosed',
             'companyId': 'org.companyId',
             'createdAt': 'org.createdAt',
             'updatedAt': 'org.updatedAt',
+            'city': 'org.address.city',
         };
         queryBuilder = this.applySorting(queryBuilder, sort, allowedSortFieldsMap);
 
@@ -56,22 +70,32 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
 
         const totalPages = Math.ceil(total / pagination.limit);
 
+
         const list: QSOrganizationDto[] = organizations.map(org => ({
             id: org.id,
             name: org.name,
-            address: org.address,
-            isTemporarilyClosed: org.isTemporarilyClosed,
+            group: org.group?.id ? {id: org.group.id, name: org.group.name} : null,
+            address: {
+                city: org.address.city,
+                address: org.address.address,
+                latitude: org.address.latitude,
+                longitude: org.address.longitude
+            },
             companyId: org.companyId,
             createdAt: org.createdAt,
             updatedAt: org.updatedAt,
 
-            workingSchedules: org.workingSchedules?.map(schedule => ({
-                dayOfWeek: schedule.dayOfWeek,
-                startTime: schedule.startTime,
-                endTime: schedule.endTime,
-                breakStartTime: schedule.breakStartTime,
-                breakEndTime: schedule.breakEndTime,
-            })) ?? [],
+            workingSchedule: {
+                id: org.workingSchedule?.id,
+                isTemporaryClosed: org.workingSchedule?.isTemporaryClosed,
+                entries: org.workingSchedule?.entries.map(schedule => ({
+                    dayOfWeek: schedule.dayOfWeek,
+                    startTime: schedule.startTime,
+                    endTime: schedule.endTime,
+                    breakStartTime: schedule.breakStartTime,
+                    breakEndTime: schedule.breakEndTime,
+                })) ?? [],
+            },
             rubrics: org.rubrics?.map(rubric => ({
                 alias: rubric.alias,
                 name: rubric.name,
@@ -81,6 +105,7 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
                 id: placement.id,
                 externalId: placement.externalId,
                 platform: placement.platform,
+                rating: placement.rating
             })) ?? [],
         }));
 
@@ -90,6 +115,61 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
             totalPages,
             currentPage: pagination.page,
             limit: pagination.limit,
+        };
+    }
+
+    async getCompactOrganizations(query: GetCompactOrganizationQuery): Promise<QSOrganizationCompactDto[]> {
+        const { companyId } = query;
+
+        const organizations = await this.manager.getRepository(OrganizationEntity)
+            .createQueryBuilder('org')
+            .leftJoinAndSelect('org.address', 'address')
+            .leftJoinAndSelect('org.group', 'group')
+            .where('org.companyId = :companyId', { companyId: companyId.toString() })
+            .select([
+                'org.id',
+                'org.name',
+                'org.companyId',
+                'group.id',
+                'group.name',
+                'address.city',
+                'address.address',
+                'address.latitude',
+                'address.longitude',
+            ])
+            .getMany();
+
+        return organizations.map(org => ({
+            id: org.id,
+            name: org.name,
+            group: org.group?.id ? {id: org.group.id, name: org.group.name} : null,
+            companyId: org.companyId,
+            address: {
+                city: org.address.city,
+                address: org.address.address,
+                latitude: org.address.latitude,
+                longitude: org.address.longitude,
+            },
+        }));
+    }
+
+    async getSummary(query: GetSummaryQuery): Promise<QSOrganizationSummaryDto> {
+        const { companyId } = query;
+
+        const baseQuery = this.manager
+            .getRepository(OrganizationEntity)
+            .createQueryBuilder('organization')
+            .where('organization.companyId = :companyId', { companyId });
+
+        const total = await baseQuery.getCount();
+
+        const active = await baseQuery
+            .andWhere('organization.isActive = :isActive', { isActive: true })
+            .getCount();
+
+        return {
+            total,
+            active,
         };
     }
 }

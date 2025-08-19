@@ -179,34 +179,19 @@ export const SEND_REVIEW_CONFIG = (
     };
 };
 
-export const EDIT_REVIEW_CONFIG = (
+export const SEARCH_RUBRICS_CONFIG = (
     token: string,
-    rating: string,
-    text: string,
-    reviewId: string,
-    photos: string[] = [],
-    newPhotos: string[] = [],
+    query: string,
 ) => {
-    const formData = new FormData2();
-
-    photos.push(...newPhotos);
-    formData.append('rating', rating);
-    formData.append('text', text);
-    formData.append('photos', photos.join(','));
-    formData.append('new_photos', newPhotos.join(','));
-    formData.append('fields', 'reviews.hiding_reason');
-
     return {
         requestConfig: {
-            url: `https://public-api.reviews.2gis.com/2.0/reviews/${reviewId}?key=b0209295-ae15-48b2-acb2-58309b333c37&locale=ru_KZ`,
-            method: REQUEST_METHOD.PATCH,
-            data: formData,
+            url: `https://api.account.2gis.com/api/1.0/regions/67/rubrics/search?q=${query}`,
+            method: REQUEST_METHOD.GET,
             headers: {
                 Authorization: `Bearer ${token}`,
                 Accept: '*/*',
-                Origin: 'https://2gis.kz',
-                Referer: 'https://2gis.kz/',
-                ...formData.getHeaders(),
+                Origin: 'https://account.2gis.com',
+                Referer: 'https://account.2gis.com/',
             },
         },
         localConfig: {
@@ -215,28 +200,6 @@ export const EDIT_REVIEW_CONFIG = (
     };
 };
 
-export const SAVE_IMAGE_CONFIG = (token: string, image: Buffer) => {
-    const formData = new FormData2();
-
-    formData.append('images[]', image, getFileName());
-
-    return {
-        requestConfig: {
-            method: REQUEST_METHOD.POST,
-            url: 'https://public-api.reviews.2gis.com/2.0/photos?key=b0209295-ae15-48b2-acb2-58309b333c37&locale=ru_KZ',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type':
-                    'multipart/form-data; boundary=----WebKitFormBoundarylmxMVBzYhJ18HSD5',
-            },
-            data: formData,
-            timeout: 45000,
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.DATA,
-        },
-    };
-};
 
 export const SET_AVATAR_FIRST_CONFIG = (token: string, externalId: string) => {
     const formData3 = new FormData2();

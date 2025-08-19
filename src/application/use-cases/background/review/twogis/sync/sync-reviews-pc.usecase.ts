@@ -2,7 +2,7 @@ import {Review} from "@domain/review/review";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import { IReviewRepository } from '@domain/review/repositories/review-repository.interface';
 import { IProfileRepository } from '@domain/review/repositories/profile-repository.interface';
-import { Profile } from '@domain/review/model/profile/profile';
+import { Profile } from '@domain/review/profile';
 import {Placement, PlacementId} from "@domain/placement/placement";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-work.interface";
@@ -22,12 +22,15 @@ export class SyncTwogisReviewsProcessUseCase {
     await this.twogisSession.init()
 
     const placement = await this.getPlacementOrFail(placementId);
+    console.log(placement, 'placement')
     const unSyncedReviews = await this.getUnSyncedReviewObj(placement);
 
+    console.log(unSyncedReviews, "unSyncedReviews")
     if (!unSyncedReviews) {
       return;
     }
     const { reviewsToSave, profilesToSave } = await this.handleUnSyncedReviews(unSyncedReviews!);
+    console.log(reviewsToSave, "reviewsToSave")
 
     await this.saveEntities(reviewsToSave, profilesToSave);
   }

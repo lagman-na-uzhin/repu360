@@ -1,6 +1,6 @@
 import { Actor } from "@domain/policy/actor"; // Путь к Actor
 import {OrganizationId} from "@domain/organization/organization";
-import {RoleType} from "@domain/policy/value-object/role/type.vo";
+import {RoleType} from "@domain/policy/types/role-type.enum";
 import {ManagerLeadPermission} from "@domain/policy/model/manager/manager-lead-permission.enum"; // Путь к ManagerLeadPermission
 
 export class LeadPolicy {

@@ -1,5 +1,5 @@
 import { IProfileRepository } from '@domain/review/repositories/profile-repository.interface';
-import { Profile, ProfileId } from '@domain/review/model/profile/profile';
+import { Profile, ProfileId } from '@domain/review/profile';
 import {EntityManager, In, Repository} from 'typeorm';
 import { ProfileEntity } from 'src/infrastructure/entities/profile/profile.entity';
 import { TwogisProfilePlacementDetailEntity } from '@infrastructure/entities/profile/placement-details/twogis-profile.entity';

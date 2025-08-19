@@ -1,5 +1,5 @@
 import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
-import {GetListEmployeeQuery} from "@application/use-cases/default/employee/get-list/get-employee-list.query";
+import {GetListEmployeeQuery} from "@application/use-cases/default/employee/queries/get-list/get-employee-list.query";
 import {IEmployeeQs} from "@application/interfaces/query-services/employee-qs/employee-qs.interface";
 import {
     QSEmployeeWithRoleDto

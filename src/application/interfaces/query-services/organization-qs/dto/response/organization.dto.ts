@@ -1,5 +1,5 @@
 import {
-    QSWorkingScheduleEntryDto
+    QSWorkingScheduleDto,
 } from "@application/interfaces/query-services/organization-qs/dto/response/working-schedule.dto";
 import {
     QSOrganizationRubricsDto
@@ -7,17 +7,23 @@ import {
 import {
     QSOrganizationPlacementDto
 } from "@application/interfaces/query-services/organization-qs/dto/response/organization-placement.dto";
+import {
+    QSOrganizationAddressDto
+} from "@application/interfaces/query-services/organization-qs/dto/response/organization-address.dto";
+import {
+    QsOrganizationGroup
+} from "@application/interfaces/query-services/organization-qs/dto/response/organization-group.dto";
 
 export interface QSOrganizationDto {
     id: string;
     name: string;
-    address: string;
-    isTemporarilyClosed: boolean;
+    group: QsOrganizationGroup | null;
+    address: QSOrganizationAddressDto;
     companyId: string;
     createdAt: Date;
     updatedAt: Date;
 
-    workingSchedules: QSWorkingScheduleEntryDto[];
+    workingSchedule: QSWorkingScheduleDto;
     rubrics: QSOrganizationRubricsDto[];
     placements: QSOrganizationPlacementDto[];
 }

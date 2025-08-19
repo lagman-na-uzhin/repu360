@@ -77,7 +77,6 @@ export class CacheRepository implements ICacheRepository {
         },
       }
     };
-    console.log(data, "cache data")
 
     await this.client.set(key, JSON.stringify(data), 'EX', CACHE_TTL.ONE_DAY);
   }

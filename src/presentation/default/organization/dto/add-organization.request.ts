@@ -1,16 +1,22 @@
-import {IsArray, IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested} from "class-validator";
-import {Transform, Type} from "class-transformer";
-import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.request";
-import {GetListParams} from "@application/interfaces/query-services/common/get-list.interface";
+import {IsEnum, IsNotEmpty, IsString} from "class-validator";
+import {Transform} from "class-transformer";
 import {CompanyId} from "@domain/company/company";
-import {GetOrganizationListByCompanyFilter} from "@domain/organization/repositories/params/get-list-by-company.params";
 import {PLATFORMS} from "@domain/common/platfoms.enum";
+import {GroupId} from "@domain/organization/group";
 
 export class AddOrganizationRequestDto {
     @IsNotEmpty({ message: 'Company Id is required' })
     @IsString({ message: 'Company Id must be a string' })
     @Transform(({ value }) => new CompanyId(value))
     readonly companyId: CompanyId;
+
+    @IsNotEmpty({ message: 'City is required' })
+    @IsString({ message: 'City must be a string' })
+    readonly city: string;
+
+    @IsString({ message: 'Group Id must be a string' })
+    @Transform(({ value }) =>{value ? new GroupId(value) : null})
+    readonly groupId: GroupId | null;
 
     @IsNotEmpty({ message: 'External ID is required' })
     @IsString({ message: 'External ID must be a string' })

@@ -4,15 +4,16 @@ import {
     CreateDateColumn, DeleteDateColumn,
     Entity, JoinColumn,
     ManyToOne,
-    OneToMany,
+    OneToMany, OneToOne,
     PrimaryColumn,
     UpdateDateColumn
 } from 'typeorm';
 import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
-import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule.entity";
+import {WorkingScheduleEntity} from "@infrastructure/entities/organization/working-schedule.entity";
 import {ContactPointEntity} from "@infrastructure/entities/organization/contact-point.entity";
 import {OrganizationGroupEntity} from "@infrastructure/entities/organization/group.entity";
 import {OrganizationRubricsEntity} from "@infrastructure/entities/organization/rubrics.entity";
+import {OrganizationAddressEntity} from "@infrastructure/entities/organization/organization-address.entity";
 
 @Entity('organization')
 export class OrganizationEntity {
@@ -26,13 +27,7 @@ export class OrganizationEntity {
     public companyId: string;
 
     @Column()
-    public address: string
-
-    @Column({default: true})
     public isActive: boolean;
-
-    @Column()
-    public isTemporarilyClosed: boolean;
 
     @OneToMany(() => OrganizationPlacementEntity, orgPlacement => orgPlacement.organization, {cascade: ["soft-remove"]})
     placements: OrganizationPlacementEntity[];
@@ -41,12 +36,12 @@ export class OrganizationEntity {
     @JoinColumn({ name: "company_id"})
     company: CompanyEntity;
 
-    @OneToMany(
-        () => WorkingScheduleEntryEntity,
-        workingSchedules => workingSchedules.organization,
+    @OneToOne(
+        () => WorkingScheduleEntity,
+        workingSchedule => workingSchedule.organization,
         {cascade: ["soft-remove", "recover", "insert", "update"], eager: true}
     )
-    workingSchedules: WorkingScheduleEntryEntity[];
+    workingSchedule: WorkingScheduleEntity;
 
     @OneToMany(
         () => OrganizationRubricsEntity,
@@ -59,8 +54,14 @@ export class OrganizationEntity {
     contactPoints: ContactPointEntity[];
 
     @ManyToOne(() => OrganizationGroupEntity, group => group.organization)
-    group: OrganizationGroupEntity[];
+    group: OrganizationGroupEntity;
 
+    @OneToOne(
+        () => OrganizationAddressEntity,
+        address => address.organization,
+        {cascade: ["soft-remove", "recover", "insert", "update"], eager: true}
+    )
+    address: OrganizationAddressEntity;
 
     @CreateDateColumn({ name: 'created_at', type: 'timestamp with time zone', default: () => 'CURRENT_TIMESTAMP' })
     public createdAt: Date;

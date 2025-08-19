@@ -1,13 +1,13 @@
 import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 
 export class EmployeePassword {
-  private readonly value: string;
+  private readonly _value: string;
 
   constructor(password: string) {
     if (!this.isValid(password)) {
       throw new Error(EXCEPTION.EMPLOYEE.WEAK_PASSWORD);
     }
-    this.value = password;
+    this._value = password;
   }
 
   private isValid(password: string): boolean {
@@ -16,6 +16,6 @@ export class EmployeePassword {
   }
 
   toString(): string {
-    return this.value;
+    return this._value;
   }
 }

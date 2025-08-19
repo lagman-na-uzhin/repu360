@@ -1,5 +1,5 @@
 import {UniqueID} from "@domain/common/unique-id";
-import {ProfileId} from "@domain/review/model/profile/profile";
+import {ProfileId} from "@domain/review/profile";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 

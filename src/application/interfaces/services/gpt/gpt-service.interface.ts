@@ -24,7 +24,7 @@ export interface IGptCustomParams {
   maxTokens?: number;
   temperature?: number;
   responseFormat?: 'json' | 'text';
-  // model?: ChatModel;
+  // value-object?: ChatModel;
   cacheKey?: string;
 }
 

@@ -18,6 +18,10 @@ import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis
 import {ProxySessionProxy} from "@infrastructure/providers/proxy-session/proxy-session.providers";
 import {IOrganizationQs} from "@application/interfaces/query-services/organization-qs/organization-qs.interface";
 import {OrganizationQueryService} from "@infrastructure/query-services/organization-query.service";
+import {
+    GetCompactOrganizationsUseCase
+} from "@application/use-cases/default/organization/queries/get-organization-compact/get-compact-organizations.usecase";
+import {GetSummaryUseCase} from "@application/use-cases/default/organization/queries/get-summary/get-summary.usecase";
 
 
 export const organizationProxyProviders = [
@@ -46,6 +50,22 @@ export const organizationProxyProviders = [
                 uof,
                 twogisSession
             ))
+        }
+    },
+
+    {
+        inject: [OrganizationQueryService],
+        provide: OrganizationProxy.COMPACT_ORGANIZATIONS,
+        useFactory: (organizationQs: IOrganizationQs) => {
+            return new UseCaseProxy(new GetCompactOrganizationsUseCase(organizationQs))
+        }
+    },
+
+    {
+        inject: [OrganizationQueryService],
+        provide: OrganizationProxy.GET_SUMMARY,
+        useFactory: (organizationQs: IOrganizationQs) => {
+            return new UseCaseProxy(new GetSummaryUseCase(organizationQs))
         }
     },
 ]

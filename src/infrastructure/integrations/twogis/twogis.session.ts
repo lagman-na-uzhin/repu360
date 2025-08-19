@@ -12,7 +12,7 @@ import {RequestService} from "@infrastructure/services/request/request.service";
 import {CacheRepository} from "@infrastructure/repositories/cache/cache.repository";
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {Review} from "@domain/review/review";
-import {Profile} from "@domain/review/model/profile/profile";
+import {Profile} from "@domain/review/profile";
 import {
     IReviewFromCabinet
 } from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
@@ -20,6 +20,10 @@ import {
     ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {extractBaseId} from "@infrastructure/integrations/twogis/twogis.utils";
+import {
+    ISearchedRubricsResult
+} from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
 
 // export class TwogisSession implements ITwogisSession{
 //     private proxy: IProxy;
@@ -99,8 +103,12 @@ export class TwogisSession implements ITwogisSession {
         return this.repo.getReviewFromCabinet(reviewExternalId, accessToken, this.proxy);
     }
 
-    sendOfficialReply(accessToken: string, text: string, reviewExternalId: string) {
+    async sendOfficialReply(accessToken: string, text: string, reviewExternalId: string) {
         return this.repo.sendOfficialReply(accessToken, text, reviewExternalId, this.proxy);
+    }
+
+    async searchRubrics(accessToken: string, query: string): Promise<ISearchedRubricsResult> {
+        return this.repo.searchRubrics(accessToken, query, this.proxy);
     }
 
     async getOrganizationReviews(
@@ -108,13 +116,15 @@ export class TwogisSession implements ITwogisSession {
         externalId: string,
         payload: GetOrganizationReviewsInDto,
     ): Promise<Review[] | null> {
-        return this.repo.getOrganizationReviews(placementId, externalId, payload, this.proxy)
+        const baseId = extractBaseId(externalId);
+        return this.repo.getOrganizationReviews(placementId, baseId, payload, this.proxy)
     }
 
     async getByIdOrganization(externalId: string): Promise<OrgByIdOutDto> {
         console.log(externalId, "sessionj")
         return this.repo.getByIdOrganization(externalId, this.proxy)
     }
+
 
     private async getProxy(companyId?: CompanyId) {
         let proxy: IProxy | null;

@@ -1,8 +1,7 @@
 import {UniqueID} from "@domain/common/unique-id";
 import {EmployeePermissions} from "@domain/policy/model/employee-permissions";
 import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
-import {RoleType} from "@domain/policy/value-object/role/type.vo";
-
+import {RoleType} from "@domain/policy/types/role-type.enum";
 
 
 export class RoleId extends UniqueID {}
@@ -10,22 +9,22 @@ export class RoleId extends UniqueID {}
 export class Role {
     private constructor(
        private readonly _id: RoleId,
-       private _name: string | null,
+       private _name: string,
        private _type: RoleType,
        private _permissions: EmployeePermissions | ManagerPermissions
     ) {}
 
-    static create(type: RoleType, permissions: EmployeePermissions, name?: string) {
-        return new Role(new RoleId(), name || null, type, permissions);
+    static create(type: RoleType, permissions: EmployeePermissions, name: string) {
+        return new Role(new RoleId(), name, type, permissions);
     }
 
-    static fromPersistence(id: string, name: string | null, type: string, permissions: EmployeePermissions | ManagerPermissions) {
-        return new Role(new RoleId(id), name, new RoleType(type), permissions);
+    static fromPersistence(id: string, name: string, type: string, permissions: EmployeePermissions | ManagerPermissions) {
+        return new Role(new RoleId(id), name, type as RoleType, permissions);
     }
 
     static createCompanyOwnerRole() {
         const ownerPermissions = EmployeePermissions.owner();
-        return new Role(new RoleId(), 'Owner', new RoleType("OWNER"), ownerPermissions)
+        return new Role(new RoleId(), 'Owner', RoleType.OWNER, ownerPermissions)
     }
 
     get employeePermissions(): EmployeePermissions {
@@ -58,19 +57,19 @@ export class Role {
     get type() {return this._type}
 
     public isManager(): boolean {
-        return this._type.equals(RoleType.type.MANAGER);
+        return this._type === RoleType.MANAGER;
     }
 
     public isAdmin(): boolean {
-        return this._type.equals(RoleType.type.ADMIN);
+        return this._type === RoleType.ADMIN;
     }
 
     public isOwner(): boolean {
-        return this._type.equals(RoleType.type.OWNER);
+        return this._type === RoleType.OWNER;
     }
 
     public isEmployee(): boolean {
-        return this._type.equals(RoleType.type.EMPLOYEE);
+        return this._type === RoleType.EMPLOYEE;
     }
 
 

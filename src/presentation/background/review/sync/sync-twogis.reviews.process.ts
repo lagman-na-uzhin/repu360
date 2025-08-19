@@ -24,7 +24,6 @@ export class SyncTwogisReviewsProcess {
   ) {}
   @Process({ concurrency: 1 })
   private async process(job: Job) {
-    console.log("process,", job.data)
     return this.syncTwogisReviewsProcessUseCaseProxy.getInstance().execute(new PlacementId(job.data.placementId));
   }
 

@@ -1,32 +1,37 @@
-import {Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, Unique, PrimaryGeneratedColumn} from 'typeorm';
+import {
+    Entity,
+    PrimaryColumn,
+    Column,
+    ManyToOne,
+    JoinColumn,
+    Unique,
+    PrimaryGeneratedColumn,
+    OneToMany,
+    OneToOne
+} from 'typeorm';
 import { OrganizationEntity } from './organization.entity';
 import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
+import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule-entries.entity";
 
-@Entity('organization_working_schedules')
-@Unique(['organizationId', 'dayOfWeek'])
-export class WorkingScheduleEntryEntity {
+@Entity('working_schedules')
+export class WorkingScheduleEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({ name: 'organization_id' })
     organizationId: string;
 
-    @Column({ type: 'enum', enum: DayOfWeek })
-    dayOfWeek: DayOfWeek;
+    @Column()
+    isTemporaryClosed: boolean;
 
-    @Column({ type: 'time' })
-    startTime: string;
+    @OneToMany(
+        () => WorkingScheduleEntryEntity,
+            entries => entries.schedule,
+        { cascade: ['update', 'insert', 'recover', 'remove', 'soft-remove'] }
+    )
+    entries: WorkingScheduleEntryEntity[];
 
-    @Column({ type: 'time' })
-    endTime: string;
-
-    @Column({ type: 'time', nullable: true })
-    breakStartTime: string | null;
-
-    @Column({ type: 'time', nullable: true })
-    breakEndTime: string | null;
-
-    @ManyToOne(() => OrganizationEntity, organization => organization.workingSchedules, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'organization_id' })
+    @OneToOne(() => OrganizationEntity)
+    @JoinColumn({name: 'organization_id'})
     organization: OrganizationEntity;
 }

@@ -1,13 +1,13 @@
 import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 
 export class EmployeeEmail {
-  private readonly value: string;
+  private readonly _value: string;
 
   constructor(email: string) {
     if (!this.isValid(email)) {
       throw new Error(EXCEPTION.EMPLOYEE.INVALID_EMAIL);
     }
-    this.value = email;
+    this._value = email;
   }
 
   static of(email: string) {
@@ -20,6 +20,6 @@ export class EmployeeEmail {
   }
 
   toString(): string {
-    return this.value;
+    return this._value;
   }
 }

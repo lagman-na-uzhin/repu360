@@ -2,12 +2,19 @@ import { EntityManager } from 'typeorm';
 import { UserEntity } from '@infrastructure/entities/user/user.entity';
 import {BaseQueryService} from "@infrastructure/query-services/base-query.service";
 import {IEmployeeQs} from "@application/interfaces/query-services/employee-qs/employee-qs.interface";
-import {GetListEmployeeQuery} from "@application/use-cases/default/employee/get-list/get-employee-list.query";
+import {GetListEmployeeQuery} from "@application/use-cases/default/employee/queries/get-list/get-employee-list.query";
 import {PaginatedResult} from "@application/interfaces/query-services/common/paginated-result.interface";
 import {
     QSEmployeeWithRoleDto
 } from "@application/interfaces/query-services/employee-qs/dtos/response/employees-with-role.dto";
 import {InjectEntityManager} from "@nestjs/typeorm";
+import {QSOrganizationDto} from "@application/interfaces/query-services/organization-qs/dto/response/organization.dto";
+import {CompanyId} from "@domain/company/company";
+import {
+    QSEmployeeRoleDto,
+    QSEmployeeRolePermission
+} from "@application/interfaces/query-services/employee-qs/dtos/response/employee-role.dto";
+import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
 
 
 export class EmployeeQueryService extends BaseQueryService implements IEmployeeQs {
@@ -22,15 +29,9 @@ export class EmployeeQueryService extends BaseQueryService implements IEmployeeQ
 
         let queryBuilder = this.manager.getRepository(UserEntity)
             .createQueryBuilder('employee')
-            .leftJoin('employee.role', 'role')
-            .select([
-                'employee.id AS id', 'employee.name AS name', 'employee.email AS email', 'employee.phone AS phone',
-                'employee.avatar AS avatar', 'employee.companyId AS companyId', 'employee.roleId AS roleId',
-                'employee.createdAt AS createdAt', 'employee.updatedAt AS updatedAt', 'employee.deletedAt AS deletedAt',
-                'role.name AS roleName', 'role.name AS roleDescription',
-            ]);
+            .leftJoinAndSelect('employee.role', 'role')
+            .leftJoinAndSelect('role.permissions', 'permissions')
 
-        // Применяем фильтры
         if (filter.companyId) {
             queryBuilder = queryBuilder.andWhere('employee.companyId = :companyId', { companyId: filter.companyId });
         }
@@ -44,11 +45,68 @@ export class EmployeeQueryService extends BaseQueryService implements IEmployeeQ
         };
         queryBuilder = this.applySorting(queryBuilder, sort, allowedSortFieldsMap);
 
-        // Передаем QueryBuilder<UserEntity> и тип DTO в paginate
-        return this.paginate<UserEntity, QSEmployeeWithRoleDto>( // <--- Явно указываем Entity и DTO
-            queryBuilder,
-            pagination.page,
-            pagination.limit
-        );
+        const [employees, total] = await queryBuilder
+            .skip((pagination.page - 1) * pagination.limit)
+            .take(pagination.limit)
+            .getManyAndCount();
+
+        const totalPages = Math.ceil(total / pagination.limit);
+
+        const list: QSEmployeeWithRoleDto[] = employees.map(employee => ({
+            id: employee.id,
+            name: employee.name,
+            email: employee.email,
+            phone: employee.phone,
+            avatar: employee.avatar,
+            companyId: employee.companyId,
+
+            role: {
+                id: employee.role.id,
+                name: employee.role?.name || null,
+                type: employee.role.type as "OWNER" | "EMPLOYEE",
+                permissions: employee.role.permissions.map(p => ({
+                    id: p.id,
+                    module: p.module as "COMPANIES" | "REVIEWS" | "ORGANIZATIONS" | "EMPLOYEES",
+                    permission: p.permission,
+                })),
+            },
+            createdAt: employee.createdAt,
+            updatedAt: employee.updatedAt,
+            deletedAt: employee.deletedAt,
+        }));
+
+        return {
+            list,
+            total,
+            totalPages,
+            currentPage: pagination.page,
+            limit: pagination.limit,
+        };
+    }
+
+
+    async getEmployeeRoles(companyId: CompanyId): Promise<QSEmployeeRoleDto[]> {
+        const roles = await this.manager.getRepository(UserRoleEntity)
+            .createQueryBuilder('role')
+            .leftJoinAndSelect('role.permissions', 'permissions')
+            .leftJoin('role.users', 'employees')
+            .where('employees.companyId = :companyId', {companyId: companyId.toString()})
+            .getMany();
+
+        return roles.map(role => {
+            return {
+                id: role.id,
+                name: role.name,
+                type: role.type,
+                permissions: role.permissions.map(p => {
+                    return {
+                        id: p.id,
+                        module: p.module,
+                        permission: p.permission
+                    } as QSEmployeeRolePermission
+                })
+            } as QSEmployeeRoleDto
+        })
+
     }
 }

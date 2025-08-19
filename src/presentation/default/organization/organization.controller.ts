@@ -21,6 +21,15 @@ import {
     AddOrganizationCommand
 } from "@application/use-cases/default/organization/commands/add/add-organization.command";
 import {AddOrganizationRequestDto} from "@presentation/default/organization/dto/add-organization.request";
+import {
+    GetCompactOrganizationQuery
+} from "@application/use-cases/default/organization/queries/get-organization-compact/get-compact-organization.query";
+import {
+    GetCompactOrganizationsUseCase
+} from "@application/use-cases/default/organization/queries/get-organization-compact/get-compact-organizations.usecase";
+import {GetSummaryRequest} from "@presentation/default/organization/dto/get-summary.request";
+import {GetSummaryQuery} from "@application/use-cases/default/organization/queries/get-summary/get-summary.query";
+import {GetSummaryUseCase} from "@application/use-cases/default/organization/queries/get-summary/get-summary.usecase";
 
 @UseGuards(JwtAuthGuard)
 @Controller(DEFAULT_ROUTES.ORGANIZATION.BASE)
@@ -29,7 +38,11 @@ export class OrganizationController {
         @Inject(OrganizationProxy.ADD)
         private readonly addOrganizationProxy: UseCaseProxy<AddOrganizationUseCase>,
         @Inject(OrganizationProxy.GET_LIST)
-        private readonly getListUseCaseProxy: UseCaseProxy<GetOrganizationListUseCase>,
+        private readonly getListProxy: UseCaseProxy<GetOrganizationListUseCase>,
+        @Inject(OrganizationProxy.COMPACT_ORGANIZATIONS)
+        private readonly getCompactOrganizationsProxy: UseCaseProxy<GetCompactOrganizationsUseCase>,
+        @Inject(OrganizationProxy.GET_SUMMARY)
+        private readonly getSummaryProxy: UseCaseProxy<GetSummaryUseCase>,
     ) {}
 
     @Post(DEFAULT_ROUTES.ORGANIZATION.ADD)
@@ -49,7 +62,30 @@ export class OrganizationController {
     ) {
         const query = GetOrganizationListQuery.of(dto, actor);
 
-        return this.getListUseCaseProxy.getInstance().execute(query);
+        return this.getListProxy.getInstance().execute(query);
+
+    }
+
+
+    @Get(DEFAULT_ROUTES.ORGANIZATION.COMPACT_ORGANIZATIONS)
+    async getCompactOrganizations(
+        @RequestActor() actor
+    ) {
+        const query = GetCompactOrganizationQuery.of(actor);
+
+        return this.getCompactOrganizationsProxy.getInstance().execute(query);
+
+    }
+
+
+    @Get(DEFAULT_ROUTES.ORGANIZATION.SUMMARY)
+    async getOrganizationsSummary(
+        @RequestQuery() dto: GetSummaryRequest,
+        @RequestActor() actor
+    ) {
+        const query = GetSummaryQuery.of(dto, actor);
+
+        return this.getSummaryProxy.getInstance().execute(query);
 
     }
 }

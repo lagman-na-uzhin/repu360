@@ -13,8 +13,8 @@ export class Placement {
       private readonly _organization_id: OrganizationId,
       private readonly _external_id: string,
       private _platform: PLATFORMS,
+      private _rating: number,
       private _placement_detail: PlacementDetail,
-      private _rubrics?: any // TODO
       // private readonly _createdAt: Date = new Date(),
       // private _updatedAt: Date | null = null,
       // private _deletedAt: Date | null = null
@@ -24,11 +24,12 @@ export class Placement {
       organizationId: OrganizationId,
       platform: PLATFORMS,
       externalId: string,
+      rating: number,
       placementDetail: PlacementDetail
     ): Placement {
         Placement.validatePlacementDetail(platform, placementDetail);
 
-        return new Placement(new PlacementId(), organizationId, externalId, platform, placementDetail);
+        return new Placement(new PlacementId(), organizationId, externalId, platform, rating, placementDetail);
     }
 
     static fromPersistence(
@@ -36,11 +37,12 @@ export class Placement {
       organizationId: string,
       platform: PLATFORMS,
       externalId: string,
+      rating: number,
       placementDetail: PlacementDetail
     ): Placement {
         Placement.validatePlacementDetail(platform, placementDetail);
 
-        return new Placement(new PlacementId(id), new OrganizationId(organizationId), externalId, platform, placementDetail);
+        return new Placement(new PlacementId(id), new OrganizationId(organizationId), externalId, platform, rating, placementDetail);
     }
 
     getYandexPlacementDetail(): YandexPlacementDetail {
@@ -73,6 +75,10 @@ export class Placement {
     }
 
     get externalId() {return this._external_id}
+
+    get rating(): number {return this._rating;}
+
+    set rating(rating: number) {this._rating = rating;}
 
     set placementDetail(value: PlacementDetail) {
         Placement.validatePlacementDetail(this._platform, value);

@@ -32,6 +32,7 @@ export class SyncTwogisReviewsScheduleUseCase {
 
   private async initTask(placementId: PlacementId):Promise<void>  {
 
+    console.log(placementId, 'init task')
     await this.taskService.addTask({
       queue: QUEUES.SYNC_TWOGIS_REVIEWS,
       jobId: `sync_twogis_reviews_${placementId}`,

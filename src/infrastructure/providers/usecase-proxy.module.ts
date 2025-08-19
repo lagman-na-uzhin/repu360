@@ -19,7 +19,7 @@ import {
   proxySessionProxyExports
 } from "@infrastructure/providers/proxy-session/proxy-session.providers";
 import {managerProxyProviders} from "@infrastructure/providers/manager/manager.proxy";
-import {organizationProxyProviders} from "@infrastructure/providers/organization/organization.proxy";
+import {organizationProxyProviders} from "@infrastructure/providers/organization/organization.provider";
 import {authProxyExports, authProxyProviders} from "@infrastructure/providers/auth/auth.proxy";
 import {reviewProxyProviders} from "@infrastructure/providers/review/review.providers";
 import {subscriptionProxyProviders} from "@infrastructure/providers/subscription/subscription.providers";
@@ -33,6 +33,8 @@ import {externalProxyProviders} from "@infrastructure/providers/external/externa
 import {GoogleModule} from "@infrastructure/integrations/google/google.module";
 import {employeeProxyExports} from '@application/use-case-proxies/employee/employee.proxy'
 import {QueryServicesModule} from "@infrastructure/query-services/query-services.module";
+import {roleProxyProviders} from "@infrastructure/providers/role/role.providers";
+import {roleProxyExports} from "@application/use-case-proxies/role/role.proxy";
 
 @Module({
   imports: [
@@ -66,6 +68,7 @@ export class UsecaseProxyModule {
         ...subscriptionProxyProviders,
         ...leadProxyProviders,
         ...externalProxyProviders,
+        ...roleProxyProviders
 
       ],
       exports: [
@@ -78,7 +81,8 @@ export class UsecaseProxyModule {
         ...subscriptionProxyExports,
         ...leadProxyExports,
         ...externalProxyExports,
-        ...employeeProxyExports
+        ...employeeProxyExports,
+        ...roleProxyExports
       ],
     };
   }

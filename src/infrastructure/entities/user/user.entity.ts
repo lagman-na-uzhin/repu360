@@ -49,10 +49,9 @@ export class UserEntity {
   @JoinColumn({ name: "company_id" })
   company: CompanyEntity;
 
-  @OneToOne(() => UserRoleEntity, {cascade: ['insert', 'soft-remove', 'update'], eager: true })
-  @JoinColumn({name: "role_id"})
+  @ManyToOne(() => UserRoleEntity, role => role.users, {cascade: ['insert', 'soft-remove', 'update'], eager: true })
+  @JoinColumn({ name: "role_id" })
   role: UserRoleEntity;
-
 
 
 

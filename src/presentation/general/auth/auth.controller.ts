@@ -11,7 +11,6 @@ import {UserMeQuery} from "@application/use-cases/default/auth/queries/me/me.que
 import {MeUseCase} from "@application/use-cases/default/auth/queries/me/me.usecase";
 import {AuthProxy} from "@infrastructure/providers/auth/auth.proxy";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
-import {Actor} from "@domain/policy/actor";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
 import {UserMeResponseDto} from "@presentation/general/auth/dto/user-me.response";
 
@@ -29,11 +28,14 @@ export class AuthController {
     @Post(GENERAl_ROUTES.AUTH.EMPLOYEE_LOGIN)
     @HttpCode(HttpStatus.OK)
     async employeeLogin(
-        @Body() dto: EmployeeLoginDto,
+        // @Body() dto: EmployeeLoginDto, TODO error
+        @Body() dto: any,
         @Req() request: FastifyRequest,
         @Res() reply: FastifyReply
     ) {
-        const cmd = EmployeeLoginCommand.of(dto)
+        console.log(dto, 'dtoo')
+        const cmd = EmployeeLoginCommand.of(dto);
+        console.log(cmd, "cmd")
 
         const { token, expire } = await this.employeeLoginUseCaseProxy
             .getInstance()

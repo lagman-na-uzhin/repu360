@@ -12,6 +12,7 @@ import {
 import {
     YandexPlacementDetailEntity
 } from "@infrastructure/entities/placement/placement-details/yandex-placement.entity";
+import {OrganizationId} from "@domain/organization/organization";
 
 export class PlacementOrmRepository implements IPlacementRepository {
     constructor(
@@ -88,7 +89,8 @@ export class PlacementOrmRepository implements IPlacementRepository {
         entity.id = placement.id.toString();
         entity.organizationId = placement.organizationId.toString();
         entity.platform = placement.platform;
-        entity.externalId = placement.externalId
+        entity.externalId = placement.externalId;
+        entity.rating = placement.rating;
 
         if (placement.placementDetail instanceof TwogisPlacementDetail) {
             const twogisDetailEntity = new TwogisPlacementDetailEntity();
@@ -125,6 +127,7 @@ export class PlacementOrmRepository implements IPlacementRepository {
             entity.organizationId,
             entity.platform,
             entity.externalId,
+            entity.rating,
             placementDetail
         )
     }
@@ -150,6 +153,15 @@ export class PlacementOrmRepository implements IPlacementRepository {
             .where('yandexDetail.externalId = :externalId', { externalId })
             .getOne();
 
+        return entity ? this.toDomain(entity) : null;
+    }
+
+    async getTwogisByOrgId(organizationId: OrganizationId): Promise<Placement | null> {
+        const entity = await this.manager.getRepository(OrganizationPlacementEntity).findOne({
+            where: {
+                organizationId: organizationId.toString()
+            }
+        })
         return entity ? this.toDomain(entity) : null;
     }
 }

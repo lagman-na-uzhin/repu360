@@ -4,7 +4,8 @@ import { EXCEPTION } from '@domain/common/exceptions/exceptions.const';
 import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
 import {ContactPoint} from "@domain/organization/value-objects/contact.point.vo";
 import {GroupId} from "@domain/organization/group";
-import {Rubric} from "@domain/organization/model/organization-rubrics";
+import {RubricId} from "@domain/rubric/rubric";
+import {OrganizationAddress} from "@domain/organization/value-objects/organization-address.vo";
 
 export class OrganizationId extends UniqueID {}
 
@@ -12,24 +13,22 @@ export class Organization {
   private constructor(
     private readonly _id: OrganizationId,
     private readonly _companyId: CompanyId,
-    private _groupId: GroupId,
+    private _groupId: GroupId | null,
     private _name: string,
-    private _address: string,
+    private _address: OrganizationAddress,
     private _working_schedule: WorkingSchedule,
     private _contact_points: ContactPoint[],
-    private _rubrics: Rubric[],
-    private _is_temporarily_closed: boolean
+    private _rubrics: RubricId[],
   ) {}
 
   static create(
       companyId: CompanyId,
-      groupId: GroupId,
+      groupId: GroupId | null,
       name: string,
-      address: string,
+      address: OrganizationAddress,
       workingSchedule: WorkingSchedule,
       contactPoints: ContactPoint[],
-      rubrics: Rubric[],
-      isTemporarilyClosed: boolean
+      rubrics: RubricId[],
   ): Organization | any {
     return new Organization(
         new OrganizationId(),
@@ -40,7 +39,6 @@ export class Organization {
         workingSchedule,
         contactPoints,
         rubrics,
-        isTemporarilyClosed
     );
   }
 
@@ -48,23 +46,21 @@ export class Organization {
       id: string,
       companyId: string,
       name: string,
-      address: string,
-      groupId: string,
+      address: OrganizationAddress,
+      groupId: string | null,
       workingHours: WorkingSchedule,
       contactPoints: ContactPoint[],
-      rubrics: Rubric[],
-      isTemporarilyClosed: boolean
+      rubrics: RubricId[],
       ) {
     return new Organization(
         new OrganizationId(id),
         new CompanyId(companyId),
-        new GroupId(groupId),
+        groupId ? new GroupId(groupId) : null,
         name,
         address,
         workingHours,
         contactPoints,
         rubrics,
-        isTemporarilyClosed
     );
   }
 
@@ -88,20 +84,24 @@ export class Organization {
     return this._name;
   }
 
-  get address(): string {
+  get address(): OrganizationAddress {
     return this._address;
   }
 
-  get isTemporarilyClosed() {
-    return this._is_temporarily_closed;
-  }
 
   get workingSchedule() {
     return this._working_schedule;
   }
+  set workingSchedule(schedule: WorkingSchedule) {
+    this._working_schedule = schedule
+  }
 
   get rubrics() {
     return this._rubrics;
+  }
+
+  set rubrics(rubrics: RubricId[]) {
+    this._rubrics = rubrics;
   }
 
   toPlainObject() {

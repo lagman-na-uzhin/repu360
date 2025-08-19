@@ -4,6 +4,14 @@ import {EmployeeReviewPermission} from "@domain/policy/model/employee/employee-r
 import {EmployeeOrganizationPermission} from "@domain/policy/model/employee/employee-organization-permission.enum"; // Убедитесь в правильности пути
 
 const GLOBAL_ORGANIZATION_KEY = '*'; // Глобальный ключ, используемый для Map
+export const EMPLOYEE_PERMISSIONS_MODULE = {
+        COMPANIES: "COMPANIES",
+        EMPLOYEE: "EMPLOYEE",
+        ORGANIZATION: "ORGANIZATION",
+        PLACEMENT: "PLACEMENT",
+        REVIEW: "REVIEW",
+        SUBSCRIPTION: "SUBSCRIPTION"
+} as const;
 
 export class EmployeePermissions {
     constructor(
@@ -24,15 +32,10 @@ export class EmployeePermissions {
     static fromPersistence(
         companies: EmployeeCompanyPermission[],
         reviews: Map<string, EmployeeReviewPermission[]>,
-        organizations: Map<string, EmployeeOrganizationPermission[]> ,
+        organizations: Map<string, EmployeeOrganizationPermission[]>,
     ): EmployeePermissions {
-        // Преобразуем Record<string, T[]> в Map<string, T[]> для конструктора
-        const reviewsMap = new Map(Object.entries(reviews));
-        const organizationsMap = new Map(Object.entries(organizations));
-
-        return new EmployeePermissions(companies, reviewsMap, organizationsMap);
+        return new EmployeePermissions(companies, reviews, organizations);
     }
-
     /**
      * @method owner
      * @description Создает экземпляр EmployeePermissions с полными "владельческими" правами

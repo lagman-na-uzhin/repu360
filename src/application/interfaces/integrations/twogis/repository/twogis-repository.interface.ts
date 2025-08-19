@@ -14,6 +14,9 @@ import {
     ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {
+    ISearchedRubricsResult
+} from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
 
 export interface ITwogisRepository {
     getByIdOrganization(externalId: string, proxy: IProxy): Promise<OrgByIdOutDto>
@@ -28,5 +31,6 @@ export interface ITwogisRepository {
     generateReply(accessToken: string, authorName: string, proxy: IProxy): Promise<IGenerateReply>;
     getReviewFromCabinet(accessToken: string, reviewExternalId: string, proxy: IProxy): Promise<IReviewFromCabinet>;
     sendOfficialReply(accessToken: string, text: string, reviewExternalId: string, proxy: IProxy): Promise<ISendReply>;
+    searchRubrics(accessToken: string, query: string, proxy: IProxy): Promise<ISearchedRubricsResult>
 
 }

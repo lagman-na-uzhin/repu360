@@ -27,7 +27,8 @@ import {CompanyId} from "@domain/company/company";
 import {GroupId} from "@domain/organization/group";
 import {ITwogisRepository} from "@application/interfaces/integrations/twogis/repository/twogis-repository.interface";
 import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
-import {Rubric, RubricId} from "@domain/organization/model/organization-rubrics";
+import {Rubric, RubricId} from "@domain/rubric/rubric";
+import {OrganizationAddress} from "@domain/organization/value-objects/organization-address.vo";
 
 export class AddOrganizationUseCase {
     constructor(
@@ -46,39 +47,46 @@ export class AddOrganizationUseCase {
         if (!company) throw new Error(EXCEPTION.COMPANY.NOT_FOUND);
 
         const twogisPlacementInfo = (await this.twogisSession.getByIdOrganization(command.externalId)).result.items[0];
-        const organization = this.createOrganization(company.id, twogisPlacementInfo);
+        const organization = this.createOrganization(company.id, command.city, command.groupId, twogisPlacementInfo);
+
         const placement = await this.createAndValidatePlacement(
                 organization.id,
                 command.externalId,
                 command.platform,
-                twogisPlacementInfo.type
+                twogisPlacementInfo.type,
+                twogisPlacementInfo.reviews.general_rating
         );
 
+        console.log(organization, "organization")
+        console.log(placement, "placement")
         await this.uof.run(async (ctx) => {
             await ctx.organizationRepo.save(organization);
             await ctx.placementRepo.save(placement);
         })
     }
 
-    private createOrganization(companyId: CompanyId, orgInfo: OrgItem) {
-        const workingSchedule = this.createWorkingSchedule(orgInfo.schedule);
+    private createOrganization(companyId: CompanyId, city: string, groupId: GroupId | null, orgInfo: OrgItem) {
+        const workingSchedule = this.createWorkingSchedule(orgInfo.schedule, orgInfo.flags["temporary_closed"]);
         const rubrics = this.createRubrics(orgInfo.rubrics)
-        console.log(orgInfo.rubrics, "rubrics")
+        const address = OrganizationAddress.create(
+            city,
+            orgInfo.address_name,
+            orgInfo.point.lat,
+            orgInfo.point.lon
+        );
         return Organization.create(
             companyId,
-            new GroupId(), //TODO TESt
+            groupId,
             orgInfo.name,
-            orgInfo.address_name,
+            address,
             workingSchedule,
             [],
             rubrics,
-            orgInfo.flags["temporary_closed"] ? true : false
-
         );
 
     }
 
-    private createWorkingSchedule(rawSchedule: OrgSchedule): WorkingSchedule {
+    private createWorkingSchedule(rawSchedule: OrgSchedule, hasTemporaryClosedFlag): WorkingSchedule {
         const dayMap: Record<string, DayOfWeek> = {
             Mon: DayOfWeek.MONDAY,
             Tue: DayOfWeek.TUESDAY,
@@ -128,7 +136,7 @@ export class AddOrganizationUseCase {
             }
         }
 
-        return new WorkingSchedule(dailyHoursArray); // Передаем массив
+        return new WorkingSchedule(dailyHoursArray, hasTemporaryClosedFlag);
     }
 
     private createRubrics(rubricsRaw: {
@@ -139,13 +147,15 @@ export class AddOrganizationUseCase {
         "parent_id": string,
         "short_id": number
     }[]) {
-        return rubricsRaw.map(raw => Rubric.create(raw.alias, raw.name, raw.kind));
+        return [] as RubricId[] //TODO save rubrics
+        // return rubricsRaw.map(raw => Rubric.create(raw.alias, raw.name, raw.kind));
     }
     private async createAndValidatePlacement(
         organizationId: OrganizationId,
         externalId: string,
         platform: PLATFORMS,
-        type: string
+        type: string,
+        rating: number
     ): Promise < Placement > {
         let placementDetail: PlacementDetail;
         let existingPlacement: Placement | null = null;
@@ -161,18 +171,18 @@ export class AddOrganizationUseCase {
                 placementDetail = TwogisPlacementDetail.create(type, null);
                 break;
 
-            case "YANDEX":
-                existingPlacement = await this.placementRepo.getYandexPlacementByExternalId(externalId);
-                if (existingPlacement) {
-                    throw new Error(EXCEPTION.PLACEMENT.ALREADY_EXIST);
-                }
-                placementDetail = YandexPlacementDetail.create();
-                break;
+            // case "YANDEX":
+            //     existingPlacement = await this.placementRepo.getYandexPlacementByExternalId(externalId);
+            //     if (existingPlacement) {
+            //         throw new Error(EXCEPTION.PLACEMENT.ALREADY_EXIST);
+            //     }
+            //     placementDetail = YandexPlacementDetail.create();
+            //     break;
 
             default:
                 throw new Error(EXCEPTION.PLACEMENT.UNSUPPORTED_PLATFORM);
         }
 
-        return Placement.create(organizationId, platform, externalId, placementDetail);
+        return Placement.create(organizationId, platform, externalId, rating, placementDetail);
     }
 }

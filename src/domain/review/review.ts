@@ -4,7 +4,7 @@ import { ReviewMedia } from '@domain/review/model/review/review-media';
 import { PlacementId } from "@domain/placement/placement";
 import { TwogisReviewPlacementDetail } from "@domain/review/model/review/twogis-review-placement-detail";
 import { YandexReviewPlacementDetail } from "@domain/review/model/review/yandex-review-placement-detail";
-import {Profile, ProfileId} from "@domain/review/model/profile/profile";
+import {Profile, ProfileId} from "@domain/review/profile";
 import { Complaint } from "@domain/review/model/review/complaint/complaint";
 import {Reply} from "@domain/review/model/review/reply/reply";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";

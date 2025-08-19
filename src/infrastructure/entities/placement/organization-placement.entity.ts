@@ -26,6 +26,9 @@ export class OrganizationPlacementEntity {
     @Column({ type: 'enum', enum: PLATFORMS })
     public platform: PLATFORMS;
 
+    @Column('decimal', { precision: 3, scale: 1, default: 0.0 })
+    rating: number;
+
     @ManyToOne(() => OrganizationEntity, organization => organization.placements)
     organization: OrganizationEntity;
 

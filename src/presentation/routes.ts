@@ -13,6 +13,10 @@ export const DEFAULT_ROUTES = {
 
     GET_LIST: '',
 
+    COMPACT_ORGANIZATIONS: 'c',
+
+    SUMMARY: 'summary'
+
   },
 
   EMPLOYEE: {
@@ -42,6 +46,13 @@ export const DEFAULT_ROUTES = {
     BASE: 'managers',
 
     BY_ID: ':managerId', //GET
+  },
+
+  ROLE: {
+    BASE: 'roles',
+
+    EMPLOYEE_ROLES: 'employee',
+    CREATE_EMPLOYEE_ROLE: 'employee', //POST
   },
 
   EXTERNAL: {

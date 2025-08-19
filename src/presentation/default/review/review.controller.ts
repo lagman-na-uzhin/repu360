@@ -1,4 +1,4 @@
-import {Controller, Get, Inject, UseGuards} from '@nestjs/common';
+import {Controller, Get, Inject, Query, UseGuards} from '@nestjs/common';
 import {DEFAULT_ROUTES} from "@presentation/routes";
 import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
@@ -20,7 +20,7 @@ export class ReviewController {
 
     @Get(DEFAULT_ROUTES.REVIEW.LIST)
     async getList(
-        @RequestQuery() dto: GetReviewListQueryDto,
+        @Query() dto: GetReviewListQueryDto,
         @RequestActor() actor
     ) {
         const query = GetListReviewQuery.of(dto, actor)

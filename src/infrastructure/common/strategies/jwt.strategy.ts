@@ -12,7 +12,7 @@ import {Role} from "@domain/policy/model/role";
 import {ManagerAuthDataType} from "@application/interfaces/services/cache/types/manager-auth-data.type";
 import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
 import {EmployeePermissions} from "@domain/policy/model/employee-permissions";
-import {RoleType} from "@domain/policy/value-object/role/type.vo";
+import {RoleType} from "@domain/policy/types/role-type.enum";
 import {ManagerOrganizationPermission} from "@domain/policy/model/manager/manager-organization-permission.enum";
 import {ManagerLeadPermission} from "@domain/policy/model/manager/manager-lead-permission.enum";
 import {ManagerCompanyPermission} from "@domain/policy/model/manager/manager-company.permission.enum";
@@ -40,7 +40,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: IJwtServicePayload) {
-    console.log("validate")
     const { authId, ownerId } = payload;
 
     const redisClient = this.redisService.getOrThrow('default');
@@ -49,20 +48,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         ? await redisClient.get(CACHE_KEY.COMMON.MULTIPLE_AUTH_TOKEN(ownerId, authId))
         : await redisClient.get(CACHE_KEY.COMMON.AUTH_TOKEN(authId));
 
-    console.log(rawUserData, "rawUserData")
     if (!rawUserData) return false;
-    console.log(this.getActor(rawUserData), "raw user data")
     return this.getActor(rawUserData);
   }
 
   private getActor(raw: string): Actor {
     const persistence: ManagerAuthDataType | EmployeeAuthDataType = JSON.parse(raw);
-    console.log(persistence, " persistencepersistence persistencepersistence")
     let permissions: EmployeePermissions | ManagerPermissions;
 
-    const roleType = new RoleType(persistence.role.type);
-
-    if (roleType.equals(RoleType.type.ADMIN) || roleType.equals(RoleType.type.MANAGER)) {
+    if (persistence.role.type === RoleType.ADMIN || persistence.role.type === RoleType.MANAGER) {
       const managerData = persistence as ManagerAuthDataType;
 
       const managerCompanies = managerData.role.permissions.companies as ManagerCompanyPermission[];
@@ -72,9 +66,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       const managerLeads = managerData.role.permissions.leads as ManagerLeadPermission[];
 
       permissions = ManagerPermissions.fromPersistence(
-          managerCompanies,        // 1st arg: companies (ManagerCompanyPermission[])
-          managerOrganizationsMap, // 2nd arg: organizations (Map<string, ManagerOrganizationPermission[]>)
-          managerLeads             // 3rd arg: leads (ManagerLeadPermission[])
+          managerCompanies,
+          managerOrganizationsMap,
+          managerLeads
       );
 
       const role = Role.fromPersistence(
@@ -90,18 +84,15 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
       const employeeCompanies = employeeData.role.permissions.companies as EmployeeCompanyPermission[];
 
-      const employeeReviewsRecord: Record<string, EmployeeReviewPermission[]> = {};
+      const employeeReviewsMap = new Map<string, EmployeeReviewPermission[]>();
       employeeData.role.permissions.reviews.forEach(item => {
-        employeeReviewsRecord[item.organizationId] = item.permissions as EmployeeReviewPermission[];
+        employeeReviewsMap.set(item.organizationId, item.permissions as EmployeeReviewPermission[]);
       });
-      const employeeReviewsMap = new Map(Object.entries(employeeReviewsRecord)); // Convert to Map
 
-      const employeeOrganizationsRecord: Record<string, EmployeeOrganizationPermission[]> = {};
+      const employeeOrganizationsMap = new Map<string, EmployeeOrganizationPermission[]>();
       employeeData.role.permissions.organizations.forEach(item => {
-        employeeOrganizationsRecord[item.organizationId] = item.permissions as EmployeeOrganizationPermission[];
+        employeeOrganizationsMap.set(item.organizationId, item.permissions as EmployeeOrganizationPermission[]);
       });
-      const employeeOrganizationsMap = new Map(Object.entries(employeeOrganizationsRecord)); // Convert to Map
-
 
       permissions = EmployeePermissions.fromPersistence(
           employeeCompanies,
@@ -116,7 +107,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           permissions
       );
 
-      console.log(employeeData, " employeeData employeeData employeeData employeeData")
       return Actor.fromPersistence(employeeData.id, employeeData.companyId, role);
     }
   }

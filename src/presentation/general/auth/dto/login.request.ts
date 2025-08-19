@@ -5,10 +5,18 @@ import {ManagerEmail} from "@domain/manager/value-object/manager-email.vo";
 import {ManagerPassword} from "@domain/manager/value-object/manager-password.vo";
 
 export class EmployeeLoginDto {
-    @Transform(({ value }) => new EmployeeEmail(value.toLowerCase()))
+    @Transform(({ value }) => {
+        console.log(value, "value")
+        console.log(new EmployeeEmail(value.toLowerCase()), "new EmployeeEmail(value.toLowerCase())")
+        return new EmployeeEmail(value.toLowerCase())
+    })
     public email: EmployeeEmail;
 
-    @Transform(({ value }) => new EmployeePassword(value))
+    @Transform(({ value }) => {
+        console.log(value, "value")
+        console.log(new EmployeePassword(value), "new EmployeePassword(value.toLowerCase())")
+        return new EmployeePassword(value)
+    })
     public password: EmployeePassword;
 }
 

@@ -8,7 +8,7 @@ import {
   ITwogisReview,
 } from '@application/interfaces/integrations/twogis/client/dto/out/organization-reviews.out.dto';
 import {Review} from '@domain/review/review';
-import {Profile, ProfileId} from '@domain/review/model/profile/profile';
+import {Profile, ProfileId} from '@domain/review/profile';
 import {PlacementId} from '@domain/placement/placement';
 import {PLATFORMS} from '@domain/common/platfoms.enum';
 import {TwogisReviewPlacementDetail} from '@domain/review/model/review/twogis-review-placement-detail';
@@ -26,7 +26,7 @@ import {
   GENERATE_REVIEW_REPLY_CONFIG, GET_BY_ID_ORG,
   GET_ORGANIZATION_REVIEWS_CONFIG,
   GET_ORGANIZATION_REVIEWS_NEXT_CONFIG,
-  GET_REVIEW_CONFIG,
+  GET_REVIEW_CONFIG, SEARCH_RUBRICS_CONFIG,
   SEND_REVIEW_REPLY_CONFIG
 } from "@infrastructure/integrations/twogis/twogis.client.const";
 import {
@@ -37,6 +37,9 @@ import {
   ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {
+  ISearchedRubricsResult
+} from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
 
 export class TwogisRepository implements ITwogisRepository {
   constructor(
@@ -110,6 +113,14 @@ export class TwogisRepository implements ITwogisRepository {
     }
 
     return allReviews;
+  }
+
+  async searchRubrics(accessToken: string, query: string, proxy: IProxy): Promise<ISearchedRubricsResult> {
+    return this.requestService.request(
+        SEARCH_RUBRICS_CONFIG(accessToken, query),
+        proxy,
+        1,
+    );
   }
 
   private async fetchReviews(

@@ -1,50 +1,65 @@
-import {IsEnum, IsNotEmpty, IsOptional, IsString, ValidateNested} from "class-validator";
+import {IsArray, IsOptional, IsString, ValidateNested} from "class-validator";
 import {Transform, Type} from "class-transformer";
 import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.request";
 import {GetListParams} from "@application/interfaces/query-services/common/get-list.interface";
-import {CompanyId} from "@domain/company/company";
 import {OrganizationId} from "@domain/organization/organization";
 import {PLATFORMS} from "@domain/common/platfoms.enum";
-import {GetReviewListFilterParams} from "@domain/review/repositories/params/get-list.params";
-import {PlacementId} from "@domain/placement/placement";
+import {GroupId} from "@domain/organization/group";
 
 
-class GetReviewListFilterDto implements GetReviewListFilterParams {
-    @IsNotEmpty({ message: 'Placement Id is required' })
-    @IsString({ message: 'Placement Id must be a string' })
-    @Transform(({ value }) => new PlacementId(value))
-    readonly placementId: PlacementId;
+class GetReviewListFilterDto  {
+    @IsOptional()
+    @IsArray({ message: 'groupIds must be an array' })
+    @Transform(({ value }) => {
+        if (value === '') {
+            return null;
+        }
+        if (Array.isArray(value)) {
+            const validIds = value.filter(i => i && typeof i === 'string' && i.trim() !== '');
+            return validIds.length ? validIds.map(i => new GroupId(i)) : null;
+        }
+        return null;
+    })
+    readonly groupIds: GroupId[];
 
     @IsOptional()
-    @Transform(({ value }) => value ? new CompanyId(value) : null)
-    readonly groupId: CompanyId | null;
+    @IsArray({ message: 'organizationIds must be an array' })
+    @Transform(({ value }) => {
+        if (value === '') {
+            return null;
+        }
+        if (Array.isArray(value)) {
+            const validIds = value.filter(i => i && typeof i === 'string' && i.trim() !== '');
+            return validIds.length ? validIds.map(i => new OrganizationId(i)) : null;
+        }
+
+        return null;
+    })
+    readonly organizationIds: OrganizationId[];
 
     @IsOptional()
-    @Transform(({ value }) => value ? new OrganizationId(value) : null)
-    readonly organizationId: OrganizationId | null;
+    @IsArray({ message: 'cities must be an array' })
+    readonly cities: string[];
 
     @IsOptional()
-    @IsEnum(['positive', 'negative'], { message: 'Tone must be positive, negative, or not provided' })
-    readonly tone: 'positive' | 'negative' | null;
-
+    readonly tone?: 'positive' | 'negative';
 
     @IsOptional()
-    @IsEnum(PLATFORMS, { message: 'Platform must be a valid PLATFORMS value' })
-    readonly platform: PLATFORMS | null;
+    readonly platform?: PLATFORMS;
 }
 
 
 export class GetReviewListQueryDto implements GetListParams {
-    @ValidateNested()
+    @ValidateNested({ message: 'Filter parameters are invalid' })
     @Type(() => GetReviewListFilterDto)
     readonly filter: GetReviewListFilterDto;
 
-    @ValidateNested()
+    @ValidateNested({ message: 'Pagination parameters are invalid' })
     @Type(() => PaginationParamsDto)
     readonly pagination: PaginationParamsDto;
 
     @IsOptional()
-    @ValidateNested()
+    @ValidateNested({ message: 'Sort parameters are invalid' })
     @Type(() => SortParamsDto)
     readonly sort?: SortParamsDto;
 

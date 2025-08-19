@@ -46,6 +46,11 @@ export interface OrgItem {
     contact_groups?: OrgContactGroup[];
     schedule: OrgSchedule;
     flags: Record<string | "temporary_closed", string | boolean>;
+    reviews: {
+        general_rating: number,
+        general_review_count: number,
+        general_review_count_with_stars: number
+    }
     rubrics: {
         alias: string,
         "id": string,
@@ -53,7 +58,11 @@ export interface OrgItem {
         "name": string,
         "parent_id": string,
         "short_id": number
-    }[]
+    }[],
+    point: {
+        lat: number,
+        lon: number
+    },
 }
 export interface OrgAddress {
     components: OrgAddressComponent[];

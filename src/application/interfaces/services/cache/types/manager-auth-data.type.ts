@@ -1,7 +1,7 @@
 
 type Role = {
     id: string;
-    name: string | null;
+    name: string;
     type: string;
     permissions: {
         companies: string[];

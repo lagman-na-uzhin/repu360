@@ -33,13 +33,9 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, Response<T>> {
   }
 
   default(data: any) {
-    let result = data;
     return {
-      statusCode: 200,
-      message: 'SUCCESS',
-      data: {
-        ...result,
-      },
-    };
+      code: 200,
+      data: data
+    }
   }
 }

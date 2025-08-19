@@ -15,12 +15,16 @@ import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.in
 import {IGenerateReply} from "@application/interfaces/integrations/twogis/client/dto/out/generate-reply.out.dto";
 import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {
+    ISearchedRubricsResult
+} from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
 
 export interface ITwogisClient {
-    getById(externalId: string): Promise<OrgByIdOutDto> //TODO
+    getById(externalId: string): Promise<OrgByIdOutDto>
     getCabinetAccessToken(placement: Placement): Promise<string>
     getReviewFromCabinet(externalId: string, accessToken: string, proxy: IProxy): Promise<IReviewFromCabinet>
     sendOfficialReply(accessToken: string, reviewExternalId: string, text: string, proxy: IProxy): Promise<ISendReply>
     generateReply(accessToken: string, authorName: string, proxy: IProxy): Promise<IGenerateReply>
     loginCabinet(login: string, password: string, proxy: IProxy)
+    searchRubrics(accessToken: string, query: string): Promise<ISearchedRubricsResult>
 }

@@ -18,13 +18,13 @@ export class UserRoleEntity {
     public id: string;
 
     @Column({type: 'varchar'})
-    public name: string | null;
+    public name: string;
 
     @Column()
     public type: string;
 
-    @OneToOne(() => UserEntity)
-    user: UserEntity;
+    @OneToMany(() => UserEntity, user => user.role)
+    users: UserEntity[];
 
     @OneToMany(() => UserPermissionEntity, (permission) => permission.role, { eager: true })
     permissions: UserPermissionEntity[];

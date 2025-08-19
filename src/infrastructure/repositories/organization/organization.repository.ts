@@ -5,9 +5,12 @@ import { OrganizationEntity } from '@infrastructure/entities/organization/organi
 import { IOrganizationRepository } from '@domain/organization/repositories/organization-repository.interface';
 import { Organization, OrganizationId } from '@domain/organization/organization';
 import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
-import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule.entity";
-import {Rubric} from "@domain/organization/model/organization-rubrics";
+import {WorkingScheduleEntity} from "@infrastructure/entities/organization/working-schedule.entity";
+import {Rubric} from "@domain/rubric/rubric";
 import {OrganizationRubricsEntity} from "@infrastructure/entities/organization/rubrics.entity";
+import {OrganizationAddressEntity} from "@infrastructure/entities/organization/organization-address.entity";
+import {OrganizationAddress} from "@domain/organization/value-objects/organization-address.vo";
+import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule-entries.entity";
 
 @Injectable()
 export class OrganizationOrmRepository implements IOrganizationRepository {
@@ -68,17 +71,29 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     entity.id = organization.id.toString();
     entity.name = organization.name;
     entity.companyId = organization.companyId.toString();
-    entity.address = organization.address;
-    entity.isTemporarilyClosed = organization.isTemporarilyClosed;
-    entity.rubrics = organization.rubrics.map(r => this.toRubricsEntity(r, organization.id))
-    entity.workingSchedules = this.toWorkingScheduleEntity(organization.workingSchedule, organization.id);
+    entity.address = this.toAddressEntity(organization.address, organization.id);
+    entity.rubrics = [] //TODO MOCK
+    // entity.rubrics = organization.rubrics.map(r => this.toRubricsEntity(r, organization.id))
+    entity.workingSchedule = this.toWorkingScheduleEntity(organization.workingSchedule, organization.id);
+    console.log(entity, "ENTITTTT")
     return entity;
   }
 
+  private toAddressEntity(domain: OrganizationAddress, organizationId: OrganizationId) {
+    const entity = new OrganizationAddressEntity();
+    entity.organizationId = organizationId.toString();
+    entity.city = domain.city;
+    entity.address = domain.address;
+    entity.latitude = domain.latitude;
+    entity.longitude = domain.longitude;
+    return entity;
+  }
   private toWorkingScheduleEntity(domain: WorkingSchedule, organizationId: OrganizationId) {
-      return domain.getAllDailyHours().map(daily => {
+    const entity = new WorkingScheduleEntity();
+    entity.isTemporaryClosed = domain.isTemporarilyClosed;
+    entity.entries = domain.getAllDailyHours().map(daily => {
         const entry = new WorkingScheduleEntryEntity();
-        entry.organizationId = organizationId.toString();
+        entry.scheduleId = domain.id.toString();
         entry.dayOfWeek = daily.dayOfWeek;
         entry.startTime = daily.workingHours.start.toString();
         entry.endTime = daily.workingHours.end.toString();
@@ -86,6 +101,8 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
         entry.breakEndTime = daily.breakTime?.end.toString() ?? null;
         return entry;
       });
+
+    return entity;
   }
 
   private toRubricsEntity(domain: Rubric, organizationId: OrganizationId) {
@@ -93,8 +110,6 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
     entity.id = domain.id.toString();
     entity.organizationId = organizationId.toString()
     entity.name = domain.name;
-    entity.alias = domain.alias;
-    entity.type = domain.type;
     return entity;
   }
 }
