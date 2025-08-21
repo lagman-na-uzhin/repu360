@@ -12,7 +12,6 @@ import {MeUseCase} from "@application/use-cases/default/auth/queries/me/me.useca
 import {AuthProxy} from "@infrastructure/providers/auth/auth.proxy";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
-import {UserMeResponseDto} from "@presentation/general/auth/dto/user-me.response";
 
 @Controller(GENERAl_ROUTES.AUTH.BASE)
 export class AuthController {
@@ -28,8 +27,7 @@ export class AuthController {
     @Post(GENERAl_ROUTES.AUTH.EMPLOYEE_LOGIN)
     @HttpCode(HttpStatus.OK)
     async employeeLogin(
-        // @Body() dto: EmployeeLoginDto, TODO error
-        @Body() dto: any,
+        @Body() dto: any, //TDDO
         @Req() request: FastifyRequest,
         @Res() reply: FastifyReply
     ) {
@@ -56,7 +54,7 @@ export class AuthController {
         @Body() dto: ManagerLoginDto,
         @Req() request: FastifyRequest,
         @Res() reply: FastifyReply
-    ) {        console.log("manager login-admin")
+    ) {        console.log("control login-admin")
         const cmd = ManagerLoginCommand.of(dto)
         const { token, expireTime } = await this.managerLoginUseCaseProxy
             .getInstance()
@@ -76,11 +74,8 @@ export class AuthController {
     ) {
         const query = UserMeQuery.of(actor);
 
-        const {user, role} = await this.meUseCaseProxy
+        return this.meUseCaseProxy
             .getInstance()
             .execute(query);
-
-        console.log(user, role)
-        return UserMeResponseDto.fromDomain(user, role);
     }
 }

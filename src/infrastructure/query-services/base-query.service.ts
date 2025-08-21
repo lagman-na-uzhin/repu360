@@ -45,7 +45,7 @@ export abstract class BaseQueryService {
      *
      * @param queryBuilder Исходный QueryBuilder.
      * @param searchString Строка поиска.
-     * @param searchFields Поля сущности, по которым нужно выполнять поиск (например: ['user.name', 'user.email']).
+     * @param searchFields Поля сущности, по которым нужно выполнять поиск (например: ['user.name', 'user.mail']).
      * @returns Модифицированный QueryBuilder.
      */
     protected applySearch<T extends ObjectLiteral>( // <--- T ограничено ObjectLiteral

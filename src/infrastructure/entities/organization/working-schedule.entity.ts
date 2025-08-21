@@ -13,7 +13,7 @@ import { OrganizationEntity } from './organization.entity';
 import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
 import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule-entries.entity";
 
-@Entity('working_schedules')
+@Entity('organization_working_schedules')
 export class WorkingScheduleEntity {
     @PrimaryGeneratedColumn('uuid')
     id: string;

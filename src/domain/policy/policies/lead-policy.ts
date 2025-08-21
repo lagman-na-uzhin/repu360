@@ -1,7 +1,7 @@
 import { Actor } from "@domain/policy/actor"; // Путь к Actor
 import {OrganizationId} from "@domain/organization/organization";
 import {RoleType} from "@domain/policy/types/role-type.enum";
-import {ManagerLeadPermission} from "@domain/policy/model/manager/manager-lead-permission.enum"; // Путь к ManagerLeadPermission
+import {ManagerLeadPermission} from "@domain/policy/model/control/manager-lead-permission.enum"; // Путь к ManagerLeadPermission
 
 export class LeadPolicy {
     constructor() {}
@@ -17,7 +17,7 @@ export class LeadPolicy {
     static canAssignManager(actor: Actor, targetOrganizationId?: OrganizationId): boolean {
         if (actor.role.isManager() && actor.role.isAdmin()) return false;
 
-        const managerPermissions = actor.role.managerPermissions;
+        const managerPermissions = actor.role.controlPermissions;
 
         return managerPermissions.hasLeadPermission(
             targetOrganizationId || "*",
@@ -36,7 +36,7 @@ export class LeadPolicy {
     static canAssignHimselfAsManager(actor: Actor, targetOrganizationId?: OrganizationId): boolean {
         if (actor.role.isManager() && actor.role.isAdmin()) return false;
 
-        const managerPermissions = actor.role.managerPermissions;
+        const managerPermissions = actor.role.controlPermissions;
 
         return managerPermissions.hasLeadPermission(
             targetOrganizationId || "*",

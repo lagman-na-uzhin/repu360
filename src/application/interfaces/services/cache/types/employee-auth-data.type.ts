@@ -6,6 +6,7 @@ type Role = {
         reviews: { organizationId: string; permissions: string[] }[];
         organizations: { organizationId: string; permissions: string[] }[];
         companies: string[];
+        employees: string[];
     }
 }
 export type EmployeeAuthDataType = {

@@ -15,7 +15,7 @@ import {
 import {QUEUES} from "@application/interfaces/services/task/task-service.interface";
 
 @Injectable()
-@Processor(QUEUES.SEND_REPLY_QUEUE)
+// @Processor(QUEUES.SEND_REPLY_QUEUE)
 export class TwogisSendReplyPc {
     constructor(
         @Inject(ReviewProxy.TWOGIS_SEND_REPLY_PC_USE_CASE)

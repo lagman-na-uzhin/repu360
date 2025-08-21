@@ -36,7 +36,7 @@ export class ProfileOrmRepository implements IProfileRepository {
         for (const profile of profiles) {
             const detailEntity = await this.toDetailEntity(profile);
             if (detailEntity) {
-                await this.manager.save(detailEntity); // Сохраняем детали через manager
+                await this.manager.save(detailEntity); // Сохраняем детали через control
             }
         }
     }

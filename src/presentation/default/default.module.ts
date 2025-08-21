@@ -6,6 +6,7 @@ import {CompanyController} from "@presentation/default/company/company.controlle
 import {ManagerController} from "@presentation/default/manager/manager.controlller";
 import {ReviewController} from "@presentation/default/review/review.controller";
 import {ExternalController} from "@presentation/default/external/external.controller";
+import {RoleController} from "@presentation/default/role/role.controller";
 
 @Module({
   imports: [UsecaseProxyModule.register()],
@@ -16,7 +17,8 @@ import {ExternalController} from "@presentation/default/external/external.contro
       CompanyController,
       ManagerController,
       ReviewController,
-      ExternalController
+      ExternalController,
+      RoleController
   ],
 })
 export class DefaultModule {}

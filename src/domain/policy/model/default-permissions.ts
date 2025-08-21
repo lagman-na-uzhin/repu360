@@ -1,10 +1,11 @@
 import { OrganizationId } from "@domain/organization/organization";
-import {EmployeeCompanyPermission} from "@domain/policy/model/employee/employee-company-permission.enum";
-import {EmployeeReviewPermission} from "@domain/policy/model/employee/employee-review-permission.enum";
-import {EmployeeOrganizationPermission} from "@domain/policy/model/employee/employee-organization-permission.enum"; // Убедитесь в правильности пути
+import {DefaultCompanyPermission} from "@domain/policy/model/default/default-company-permission.enum";
+import {DefaultReviewPermission} from "@domain/policy/model/default/default-review-permission.enum";
+import {DefaultOrganizationPermission} from "@domain/policy/model/default/default-organization-permission.enum";
+import {DefaultEmployeePermission} from "@domain/policy/model/default/default-employee-permission.enum"; // Убедитесь в правильности пути
 
-const GLOBAL_ORGANIZATION_KEY = '*'; // Глобальный ключ, используемый для Map
-export const EMPLOYEE_PERMISSIONS_MODULE = {
+export const GLOBAL_ORGANIZATION_KEY = '*'; // Глобальный ключ, используемый для Map
+export const DEFAULT_PERMISSIONS_MODULE = {
         COMPANIES: "COMPANIES",
         EMPLOYEE: "EMPLOYEE",
         ORGANIZATION: "ORGANIZATION",
@@ -13,12 +14,12 @@ export const EMPLOYEE_PERMISSIONS_MODULE = {
         SUBSCRIPTION: "SUBSCRIPTION"
 } as const;
 
-export class EmployeePermissions {
+export class DefaultPermissions {
     constructor(
-        private readonly _companies: EmployeeCompanyPermission[] = [],
-        // Изменено на Map<string, T[]>
-        private readonly _reviews: Map<string, EmployeeReviewPermission[]> = new Map(),
-        private readonly _organizations: Map<string, EmployeeOrganizationPermission[]> = new Map(),
+        private readonly _companies: DefaultCompanyPermission[] = [],
+        private readonly _employees: DefaultEmployeePermission[] = [],
+        private readonly _reviews: Map<string, DefaultReviewPermission[]> = new Map(),
+        private readonly _organizations: Map<string, DefaultOrganizationPermission[]> = new Map(),
     ) {}
 
     /**
@@ -30,11 +31,12 @@ export class EmployeePermissions {
      * @returns Экземпляр EmployeePermissions.
      */
     static fromPersistence(
-        companies: EmployeeCompanyPermission[],
-        reviews: Map<string, EmployeeReviewPermission[]>,
-        organizations: Map<string, EmployeeOrganizationPermission[]>,
-    ): EmployeePermissions {
-        return new EmployeePermissions(companies, reviews, organizations);
+        companies: DefaultCompanyPermission[],
+        employees: DefaultEmployeePermission[],
+        reviews: Map<string, DefaultReviewPermission[]>,
+        organizations: Map<string, DefaultOrganizationPermission[]>,
+    ): DefaultPermissions {
+        return new DefaultPermissions(companies, employees, reviews, organizations);
     }
     /**
      * @method owner
@@ -42,53 +44,40 @@ export class EmployeePermissions {
      * по всем категориям, используя глобальный ключ для разрешений на уровне организаций и отзывов.
      * @returns Экземпляр EmployeePermissions с правами владельца.
      */
-    static owner(): EmployeePermissions {
-        const allCompanyPermissions: EmployeeCompanyPermission[] = Object.values(EmployeeCompanyPermission);
-        const allReviewPermissions: EmployeeReviewPermission[] = Object.values(EmployeeReviewPermission);
-        const allOrganizationPermissions: EmployeeOrganizationPermission[] = Object.values(EmployeeOrganizationPermission);
+    static owner(): DefaultPermissions {
+        const allCompanyPermissions: DefaultCompanyPermission[] = Object.values(DefaultCompanyPermission);
+        const allEmployeePermissions: DefaultEmployeePermission[] = Object.values(DefaultEmployeePermission);
+        const allReviewPermissions: DefaultReviewPermission[] = Object.values(DefaultReviewPermission);
+        const allOrganizationPermissions: DefaultOrganizationPermission[] = Object.values(DefaultOrganizationPermission);
 
         // Инициализируем Map'ы с глобальным ключом
-        const reviewsMap = new Map<string, EmployeeReviewPermission[]>([[GLOBAL_ORGANIZATION_KEY, allReviewPermissions]]);
-        const organizationsMap = new Map<string, EmployeeOrganizationPermission[]>([[GLOBAL_ORGANIZATION_KEY, allOrganizationPermissions]]);
+        const reviewsMap = new Map<string, DefaultReviewPermission[]>([[GLOBAL_ORGANIZATION_KEY, allReviewPermissions]]);
+        const organizationsMap = new Map<string, DefaultOrganizationPermission[]>([[GLOBAL_ORGANIZATION_KEY, allOrganizationPermissions]]);
 
-        return new EmployeePermissions(
+        return new DefaultPermissions(
             allCompanyPermissions,
+            allEmployeePermissions,
             reviewsMap,
             organizationsMap
         );
     }
 
-    /**
-     * @method toPlainObject
-     * @description Преобразует экземпляр EmployeePermissions в простой JS-объект (Record<string, string[]>)
-     * для сериализации (например, в JSON или для сохранения в БД).
-     * @returns Простой JS-объект, представляющий разрешения.
-     */
-    public toPlainObject(): {
-        companies: string[];
-        reviews: Record<string, string[]>;
-        organizations: Record<string, string[]>;
-    } {
-        return {
-            companies: this._companies,
-            // Преобразуем Map обратно в Record для сериализации
-            reviews: Object.fromEntries(this._reviews.entries()) as Record<string, string[]>,
-            organizations: Object.fromEntries(this._organizations.entries()) as Record<string, string[]>,
-        };
-    }
-
     // --- Геттеры для доступа к данным ---
     // Они теперь возвращают Map<string, T[]>
-    public get companies(): EmployeeCompanyPermission[] {
+    public get companies(): DefaultCompanyPermission[] {
         return this._companies;
     }
 
-    public get reviews(): Map<string, EmployeeReviewPermission[]> {
+    public get reviews(): Map<string, DefaultReviewPermission[]> {
         return this._reviews;
     }
 
-    public get organizations(): Map<string, EmployeeOrganizationPermission[]> {
+    public get organizations(): Map<string, DefaultOrganizationPermission[]> {
         return this._organizations;
+    }
+
+    public get employees(): DefaultEmployeePermission[] {
+        return this._employees;
     }
 
     // --- Методы проверки прав ---
@@ -99,10 +88,13 @@ export class EmployeePermissions {
      * @param permission Проверяемое разрешение.
      * @returns true, если разрешение есть, иначе false.
      */
-    public hasCompanyPermission(permission: EmployeeCompanyPermission): boolean {
+    public hasCompanyPermission(permission: DefaultCompanyPermission): boolean {
         return this._companies.includes(permission);
     }
 
+    public hasEmployeePermission(permission: DefaultEmployeePermission): boolean {
+        return this._employees.includes(permission);
+    }
     /**
      * @method hasOrganizationPermission
      * @description Проверяет, имеет ли сотрудник указанное разрешение для конкретной организации.
@@ -111,7 +103,7 @@ export class EmployeePermissions {
      * @param permission Проверяемое разрешение.
      * @returns true, если разрешение есть, иначе false.
      */
-    public hasOrganizationPermission(orgId: OrganizationId, permission: EmployeeOrganizationPermission): boolean {
+    public hasOrganizationPermission(orgId: OrganizationId, permission: DefaultOrganizationPermission): boolean {
         // Сначала проверяем глобальное разрешение в Map
         if (this._organizations.has(GLOBAL_ORGANIZATION_KEY) && this._organizations.get(GLOBAL_ORGANIZATION_KEY)?.includes(permission)) {
             return true;
@@ -129,7 +121,7 @@ export class EmployeePermissions {
      * @param permission Проверяемое разрешение.
      * @returns true, если разрешение есть, иначе false.
      */
-    public hasReviewPermission(orgId: OrganizationId, permission: EmployeeReviewPermission): boolean {
+    public hasReviewPermission(orgId: OrganizationId, permission: DefaultReviewPermission): boolean {
         // Сначала проверяем глобальное разрешение в Map
         if (this._reviews.has(GLOBAL_ORGANIZATION_KEY) && this._reviews.get(GLOBAL_ORGANIZATION_KEY)?.includes(permission)) {
             return true;
@@ -142,17 +134,18 @@ export class EmployeePermissions {
     // --- Методы для предоставления/отзыва разрешений (возвращают новый экземпляр) ---
     // Эти методы также должны работать с Map и создавать новые экземпляры, сохраняя иммутабельность.
 
-    public grantCompanyPermission(permission: EmployeeCompanyPermission): EmployeePermissions {
+    public grantCompanyPermission(permission: DefaultCompanyPermission): DefaultPermissions {
         const newCompanies = new Set(this._companies);
         newCompanies.add(permission);
-        return new EmployeePermissions(
+        return new DefaultPermissions(
             Array.from(newCompanies),
+            this._employees,
             this._reviews, // Map передается по ссылке, но его содержимое не изменяется
             this._organizations // Map передается по ссылке, но его содержимое не изменяется
         );
     }
 
-    public grantOrganizationPermission(orgId: OrganizationId, permission: EmployeeOrganizationPermission): EmployeePermissions {
+    public grantOrganizationPermission(orgId: OrganizationId, permission: DefaultOrganizationPermission): DefaultPermissions {
         // Если уже есть глобальное разрешение на этот тип, нет смысла добавлять конкретное
         if (this._organizations.has(GLOBAL_ORGANIZATION_KEY) && this._organizations.get(GLOBAL_ORGANIZATION_KEY)?.includes(permission)) {
             return this;
@@ -165,14 +158,15 @@ export class EmployeePermissions {
         currentOrgPermissions.add(permission);
         newOrganizations.set(orgIdString, Array.from(currentOrgPermissions));
 
-        return new EmployeePermissions(
+        return new DefaultPermissions(
             this._companies,
+            this._employees,
             this._reviews,
             newOrganizations
         );
     }
 
-    public grantReviewPermission(orgId: OrganizationId, permission: EmployeeReviewPermission): EmployeePermissions {
+    public grantReviewPermission(orgId: OrganizationId, permission: DefaultReviewPermission): DefaultPermissions {
         // Если уже есть глобальное разрешение на этот тип, нет смысла добавлять конкретное
         if (this._reviews.has(GLOBAL_ORGANIZATION_KEY) && this._reviews.get(GLOBAL_ORGANIZATION_KEY)?.includes(permission)) {
             return this;
@@ -185,24 +179,26 @@ export class EmployeePermissions {
         currentReviewPermissions.add(permission);
         newReviews.set(orgIdString, Array.from(currentReviewPermissions));
 
-        return new EmployeePermissions(
+        return new DefaultPermissions(
             this._companies,
+            this._employees,
             newReviews,
             this._organizations
         );
     }
 
-    public revokeCompanyPermission(permission: EmployeeCompanyPermission): EmployeePermissions {
+    public revokeCompanyPermission(permission: DefaultCompanyPermission): DefaultPermissions {
         const newCompanies = new Set(this._companies);
         newCompanies.delete(permission);
-        return new EmployeePermissions(
+        return new DefaultPermissions(
             Array.from(newCompanies),
+            this._employees,
             this._reviews,
             this._organizations
         );
     }
 
-    public revokeOrganizationPermission(orgId: OrganizationId, permission: EmployeeOrganizationPermission): EmployeePermissions {
+    public revokeOrganizationPermission(orgId: OrganizationId, permission: DefaultOrganizationPermission): DefaultPermissions {
         // Нельзя отозвать, если есть глобальное разрешение
         if (this._organizations.has(GLOBAL_ORGANIZATION_KEY) && this._organizations.get(GLOBAL_ORGANIZATION_KEY)?.includes(permission)) {
             console.warn(`Attempted to revoke global organization permission for ${permission}. This operation is ignored.`);
@@ -217,14 +213,15 @@ export class EmployeePermissions {
             newOrganizations.set(orgIdString, Array.from(currentOrgPermissions));
         }
 
-        return new EmployeePermissions(
+        return new DefaultPermissions(
             this._companies,
+            this._employees,
             this._reviews,
             newOrganizations
         );
     }
 
-    public revokeReviewPermission(orgId: OrganizationId, permission: EmployeeReviewPermission): EmployeePermissions {
+    public revokeReviewPermission(orgId: OrganizationId, permission: DefaultReviewPermission): DefaultPermissions {
         if (this._reviews.has(GLOBAL_ORGANIZATION_KEY) && this._reviews.get(GLOBAL_ORGANIZATION_KEY)?.includes(permission)) {
             console.warn(`Attempted to revoke global review permission for ${permission}. This operation is ignored.`);
             return this;
@@ -238,8 +235,9 @@ export class EmployeePermissions {
             newReviews.set(orgIdString, Array.from(currentReviewPermissions));
         }
 
-        return new EmployeePermissions(
+        return new DefaultPermissions(
             this._companies,
+            this._employees,
             newReviews,
             this._organizations
         );

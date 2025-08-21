@@ -1,17 +1,17 @@
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
-import {
-    CreateEmployeeRoleUseCase
-} from "@application/use-cases/default/role/commands/create-employee-role/create-employee-role.usecase";
-import {IRoleRepository} from "@domain/policy/repositories/role-repository.interface";
-import {RoleOrmRepository} from "@infrastructure/repositories/role/role.repository";
 import {RoleProxy} from "@application/use-case-proxies/role/role.proxy";
+import {EmployeeQueryService} from "@infrastructure/query-services/employee-query.service";
+import {IEmployeeQs} from "@application/interfaces/query-services/employee-qs/employee-qs.interface";
+import {
+    GetEmployeeRolesUseCase
+} from "@application/use-cases/default/employee/queries/get-roles/get-employee-roles.usecase";
 
 export const roleProxyProviders = [
     {
-        inject: [RoleOrmRepository],
-        provide: RoleProxy.CREATE_EMPLOYEE_ROLE,
-        useFactory: (roleRepo: IRoleRepository) => {
-            return new UseCaseProxy(new CreateEmployeeRoleUseCase(roleRepo))
+        inject: [EmployeeQueryService],
+        provide: RoleProxy.GET_EMPLOYEE_ROLES,
+        useFactory: (employeeQueryService: IEmployeeQs) => {
+            return new UseCaseProxy(new GetEmployeeRolesUseCase(employeeQueryService))
         }
     },
 ]

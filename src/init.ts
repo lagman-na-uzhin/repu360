@@ -4,7 +4,9 @@ export enum TYPE_ENV {
     AUTO_REPLY = 'AUTO_REPLY',
 
 
-    REVIEW_SYNC = 'REVIEW_SYNC'
+    REVIEW_SYNC = 'REVIEW_SYNC',
+
+    MAILER = 'MAILER'
 }
 
 const productionNodeEnvs = ['prod', 'PROD', 'production'];

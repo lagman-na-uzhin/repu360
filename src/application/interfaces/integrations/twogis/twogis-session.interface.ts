@@ -33,5 +33,7 @@ export interface ITwogisSession {
         payload: GetOrganizationReviewsInDto,
     ): Promise<Review[] | null>;
     searchRubrics(accessToken: string, query: string): Promise<ISearchedRubricsResult>
+    addRubrics(rubricIds: string[]): Promise<void>
+    deleteRubrics(rubricIds: string[]): Promise<void>
 
 }

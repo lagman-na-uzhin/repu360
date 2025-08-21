@@ -2,18 +2,18 @@ import {IRoleRepository} from "@domain/policy/repositories/role-repository.inter
 import {Role, RoleId} from "@domain/policy/model/role";
 import {EntityManager} from "typeorm";
 import {UserRoleEntity} from "@infrastructure/entities/user/access/user-role.entity";
-import {EMPLOYEE_PERMISSIONS_MODULE, EmployeePermissions} from "@domain/policy/model/employee-permissions";
-import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
+import {DEFAULT_PERMISSIONS_MODULE, DefaultPermissions} from "@domain/policy/model/default-permissions";
+import {ControlPermissions} from "@domain/policy/model/control-permissions";
 import {RoleType} from "@domain/policy/types/role-type.enum";
-import {OrganizationId} from "@domain/organization/organization";
 import {UserPermissionEntity} from "@infrastructure/entities/user/access/user-permission.entity";
 import {InjectEntityManager} from "@nestjs/typeorm";
-import {EmployeeCompanyPermission} from "@domain/policy/model/employee/employee-company-permission.enum";
-import {ManagerCompanyPermission} from "@domain/policy/model/manager/manager-company.permission.enum";
-import {ManagerOrganizationPermission} from "@domain/policy/model/manager/manager-organization-permission.enum";
-import {ManagerLeadPermission} from "@domain/policy/model/manager/manager-lead-permission.enum";
-import {EmployeeReviewPermission} from "@domain/policy/model/employee/employee-review-permission.enum";
-import {EmployeeOrganizationPermission} from "@domain/policy/model/employee/employee-organization-permission.enum";
+import {DefaultCompanyPermission} from "@domain/policy/model/default/default-company-permission.enum";
+import {ManagerCompanyPermission} from "@domain/policy/model/control/manager-company.permission.enum";
+import {ManagerOrganizationPermission} from "@domain/policy/model/control/manager-organization-permission.enum";
+import {ManagerLeadPermission} from "@domain/policy/model/control/manager-lead-permission.enum";
+import {DefaultReviewPermission} from "@domain/policy/model/default/default-review-permission.enum";
+import {DefaultOrganizationPermission} from "@domain/policy/model/default/default-organization-permission.enum";
+import {DefaultEmployeePermission} from "@domain/policy/model/default/default-employee-permission.enum";
 
 const GLOBAL_ORGANIZATION_KEY = "*";
 
@@ -23,6 +23,7 @@ export class RoleOrmRepository implements IRoleRepository {
     ) {}
 
     async save(role: Role): Promise<void> {
+        console.log(this.fromDomain(role), "this.fromDomain(role entirt")
         await this.manager.getRepository(UserRoleEntity).save(this.fromDomain(role));
     }
 
@@ -45,39 +46,35 @@ export class RoleOrmRepository implements IRoleRepository {
         );
     }
 
-    private toPermissionsDomain(entity: UserRoleEntity): EmployeePermissions | ManagerPermissions {
+    private toPermissionsDomain(entity: UserRoleEntity): DefaultPermissions | ControlPermissions {
         // --- Employee Permissions ---
-        const employeeCompaniesPermissions = this.getPermissionsForModule<EmployeeCompanyPermission>(entity.permissions, EMPLOYEE_PERMISSIONS_MODULE.EMPLOYEE);
-        const employeeReviewsPermissionsMap = this.getPermissionsForOrganization<EmployeeReviewPermission>(entity.permissions, EMPLOYEE_PERMISSIONS_MODULE.REVIEW);
-        const employeeOrganizationsPermissionsMap = this.getPermissionsForOrganization<EmployeeOrganizationPermission>(entity.permissions, EMPLOYEE_PERMISSIONS_MODULE.ORGANIZATION);
+        const companiesPermissions = this.getPermissionsForModule<DefaultCompanyPermission>(entity.permissions, DEFAULT_PERMISSIONS_MODULE.COMPANIES);
+        const employeesPermissions = this.getPermissionsForModule<DefaultEmployeePermission>(entity.permissions, DEFAULT_PERMISSIONS_MODULE.EMPLOYEE);
+        const reviewsPermissionsMap = this.getPermissionsForOrganization<DefaultReviewPermission>(entity.permissions, DEFAULT_PERMISSIONS_MODULE.REVIEW);
+        const organizationsPermissionsMap = this.getPermissionsForOrganization<DefaultOrganizationPermission>(entity.permissions, DEFAULT_PERMISSIONS_MODULE.ORGANIZATION);
 
         // --- Manager Permissions ---
-        const managerOrganizationsPermissionsMap = this.getPermissionsForOrganization<ManagerOrganizationPermission>(entity.permissions, "MANAGER_ORGANIZATIONS");
-        const managerLeadsPermissions = this.getPermissionsForModule<ManagerLeadPermission>(entity.permissions, "LEADS");
-        const managerCompaniesPermissions = this.getPermissionsForModule<ManagerCompanyPermission>(entity.permissions, "MANAGER_COMPANIES");
+        const controlOrganizationsPermissionsMap = this.getPermissionsForOrganization<ManagerOrganizationPermission>(entity.permissions, "MANAGER_ORGANIZATIONS");
+        const controlLeadsPermissions = this.getPermissionsForModule<ManagerLeadPermission>(entity.permissions, "LEADS");
+        const controlCompaniesPermissions = this.getPermissionsForModule<ManagerCompanyPermission>(entity.permissions, "MANAGER_COMPANIES");
 
 
         if (entity.type === RoleType.ADMIN || entity.type === RoleType.MANAGER) {
-            return ManagerPermissions.fromPersistence(
-                managerCompaniesPermissions,
-                managerOrganizationsPermissionsMap,
-                managerLeadsPermissions,
+            return ControlPermissions.fromPersistence(
+                controlCompaniesPermissions,
+                controlOrganizationsPermissionsMap,
+                controlLeadsPermissions,
             );
         } else {
-            return EmployeePermissions.fromPersistence(
-                employeeCompaniesPermissions,
-                employeeReviewsPermissionsMap,
-                employeeOrganizationsPermissionsMap
+            return DefaultPermissions.fromPersistence(
+                companiesPermissions,
+                employeesPermissions,
+                reviewsPermissionsMap,
+                organizationsPermissionsMap
             );
         }
     }
 
-    /**
-     * Generic method to get permissions grouped by organization ID (or global key).
-     * @param permissions All UserPermissionEntity records.
-     * @param module The specific module to filter by (e.g., "REVIEWS", "ORGANIZATIONS").
-     * @returns A Map where keys are organization IDs (or "*") and values are arrays of specific enum permissions.
-     */
     private getPermissionsForOrganization<T extends string>(permissions: UserPermissionEntity[], module: string): Map<string, T[]> {
         const permissionsMap = new Map<string, T[]>();
 
@@ -88,7 +85,6 @@ export class RoleOrmRepository implements IRoleRepository {
 
                 currentPermissions.push(permissionEntity.permission as T);
 
-                // Set the updated array back into the Map
                 permissionsMap.set(orgKey, currentPermissions);
             }
         });
@@ -96,12 +92,6 @@ export class RoleOrmRepository implements IRoleRepository {
         return permissionsMap;
     }
 
-    /**
-     * Generic method to get permissions for a specific module that are NOT tied to an organization.
-     * @param permissions All UserPermissionEntity records.
-     * @param module The specific module to filter by.
-     * @returns An array of specific enum permissions.
-     */
     private getPermissionsForModule<T extends string>(permissions: UserPermissionEntity[], module: string): T[] {
         const result: T[] = [];
         permissions.forEach(permissionEntity => {
@@ -118,6 +108,93 @@ export class RoleOrmRepository implements IRoleRepository {
         entity.id = role.id.toString();
         entity.name = role.name;
         entity.type = role.type.toString();
+
+        const userPermissions: UserPermissionEntity[] = [];
+
+        if (role.isEmployee() || role.isOwner()) {
+            const defaultPermissions = role.defaultPermissions as DefaultPermissions;
+
+            defaultPermissions.companies.forEach(p => {
+                const permissionEntity = new UserPermissionEntity();
+                permissionEntity.id = crypto.randomUUID();
+                permissionEntity.roleId = entity.id;
+                permissionEntity.module = 'COMPANY';
+                permissionEntity.permission = p;
+                permissionEntity.organizationId = null;
+                userPermissions.push(permissionEntity);
+            });
+
+            defaultPermissions.employees.forEach(p => {
+                const permissionEntity = new UserPermissionEntity();
+                permissionEntity.id = crypto.randomUUID();
+                permissionEntity.roleId = entity.id;
+                permissionEntity.module = 'EMPLOYEE';
+                permissionEntity.permission = p;
+                permissionEntity.organizationId = null;
+                userPermissions.push(permissionEntity);
+            });
+
+            for (const [orgId, perms] of defaultPermissions.organizations.entries()) {
+                perms.forEach(p => {
+                    const permissionEntity = new UserPermissionEntity();
+                    permissionEntity.id = crypto.randomUUID();
+                    permissionEntity.roleId = entity.id;
+                    permissionEntity.module = 'ORGANIZATION';
+                    permissionEntity.permission = p;
+                    permissionEntity.organizationId = orgId === GLOBAL_ORGANIZATION_KEY ? null : orgId;
+                    userPermissions.push(permissionEntity);
+                });
+            }
+
+            for (const [orgId, perms] of defaultPermissions.reviews.entries()) {
+                perms.forEach(p => {
+                    const permissionEntity = new UserPermissionEntity();
+                    permissionEntity.id = crypto.randomUUID();
+                    permissionEntity.roleId = entity.id;
+                    permissionEntity.module = 'REVIEW';
+                    permissionEntity.permission = p;
+                    permissionEntity.organizationId = orgId === GLOBAL_ORGANIZATION_KEY ? null : orgId;
+                    userPermissions.push(permissionEntity);
+                });
+            }
+        }
+        else if (role.isManager() || role.isAdmin()) {
+            const controlPermissions = role.controlPermissions as ControlPermissions;
+
+            controlPermissions.companies.forEach(p => {
+                const permissionEntity = new UserPermissionEntity();
+                permissionEntity.id = crypto.randomUUID();
+                permissionEntity.roleId = entity.id;
+                permissionEntity.module = 'COMPANIES';
+                permissionEntity.permission = p;
+                permissionEntity.organizationId = null;
+                userPermissions.push(permissionEntity);
+            });
+
+            for (const [orgId, perms] of controlPermissions.organizations.entries()) {
+                perms.forEach(p => {
+                    const permissionEntity = new UserPermissionEntity();
+                    permissionEntity.id = crypto.randomUUID();
+                    permissionEntity.roleId = entity.id;
+                    permissionEntity.module = 'ORGANIZATIONS';
+                    permissionEntity.permission = p;
+                    permissionEntity.organizationId = orgId === GLOBAL_ORGANIZATION_KEY ? GLOBAL_ORGANIZATION_KEY : orgId;
+                    userPermissions.push(permissionEntity);
+                });
+            }
+
+            controlPermissions.leads.forEach(p => {
+                const permissionEntity = new UserPermissionEntity();
+                permissionEntity.id = crypto.randomUUID();
+                permissionEntity.roleId = entity.id;
+                permissionEntity.module = 'LEADS';
+                permissionEntity.permission = p;
+                permissionEntity.organizationId = null;
+                userPermissions.push(permissionEntity);
+            });
+        }
+
+        entity.permissions = userPermissions;
 
         return entity;
     }

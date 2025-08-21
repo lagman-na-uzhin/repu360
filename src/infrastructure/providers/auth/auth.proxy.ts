@@ -15,6 +15,10 @@ import {ICacheRepository} from "@application/interfaces/services/cache/cache-rep
 import {EmployeeLoginUseCase} from "@application/use-cases/default/auth/commands/login/login.usecase";
 import {ManagerLoginUseCase} from "@application/use-cases/default/auth/commands/login-admin/login.usecase";
 import {UseCaseProxy} from "@application/use-case-proxies/use-case-proxy";
+import {IEmployeeQs} from "@application/interfaces/query-services/employee-qs/employee-qs.interface";
+import {IManagerQs} from "@application/interfaces/query-services/manager-qs/manager-qs.interface";
+import {EmployeeQueryService} from "@infrastructure/query-services/employee-query.service";
+import {ManagerQueryService} from "@infrastructure/query-services/manager-query.service";
 
 export const AuthProxy = {
     "ME_USE_CASE": `${ProxyPrefix.COMPANY_PROXY}UserMeUseCaseProxy`,
@@ -25,10 +29,10 @@ export const AuthProxy = {
 
 export const authProxyProviders = [
     {
-        inject: [EmployeeOrmRepository, ManagerOrmRepository],
+        inject: [EmployeeQueryService, ManagerQueryService],
         provide: AuthProxy.ME_USE_CASE,
-        useFactory: (employeeRepo: IEmployeeRepository, managerRepo: IManagerRepository) => {
-            return new UseCaseProxy(new MeUseCase(employeeRepo, managerRepo))
+        useFactory: (employeeQS: IEmployeeQs, managerQs: IManagerQs) => {
+            return new UseCaseProxy(new MeUseCase(employeeQS, managerQs))
         }
     },
 

@@ -12,7 +12,7 @@ export class GetListReviewQuery extends BaseQuery {
         public readonly filter: {
             readonly companyId: CompanyId;
             readonly groupIds: GroupId[];
-            readonly organizationIds: OrganizationId[];
+            readonly organizationIds?: OrganizationId[];
             readonly cities: string[];
             readonly tone?: 'positive' | 'negative';
             readonly platform?: PLATFORMS
@@ -26,7 +26,7 @@ export class GetListReviewQuery extends BaseQuery {
     static of(dto: {
                   filter: {
                       readonly groupIds: GroupId[];
-                      readonly organizationIds: OrganizationId[];
+                      readonly organizationIds?: OrganizationId[];
                       readonly cities: string[];
                       readonly tone?: 'positive' | 'negative';
                       readonly platform?: PLATFORMS

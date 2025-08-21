@@ -30,18 +30,14 @@ export class ConfirmLeadUseCase {
     ) {}
 
     async execute(command: ConfirmLeadCommand): Promise<void> {
-        console.log("ConfirmLeadUseCase ConfirmLeadUseCase ConfirmLeadUseCase")
         const leadToConfirm = await this.leadRepository.getById(command.leadId);
         if (!leadToConfirm) {
             throw new Error(EXCEPTION.LEAD.NOT_FOUND);
         }
-        console.log(leadToConfirm, "leadToConfirmleadToConfirmleadToConfirmleadToConfirm")
         const newCompany = this.createCompany(
             command?.companyName || leadToConfirm.contact.companyName,
             command.actor.id
         );
-        console.log(newCompany, "companyu")
-
         const ownerRole = Role.createCompanyOwnerRole();
 
         const { originalPassword, hashedPassword } = await this.generateOwnerPassword();
@@ -61,7 +57,7 @@ export class ConfirmLeadUseCase {
 
         await this.saveAllEntities(leadToConfirm, newCompany, ownerRole, newCompanyOwner, tariff);
 
-        // await this.sendPasswordToEmail(originalPassword, leadToConfirm.contact.email);
+        // await this.sendPasswordToEmail(originalPassword, leadToConfirm.contact.mail);
     }
 
     private createCompany(companyName: LeadContactCompanyName, managerId: ManagerId) {
@@ -129,7 +125,7 @@ export class ConfirmLeadUseCase {
 
     private async sendPasswordToEmail(password: EmployeePassword, email: LeadContactEmail): Promise<void> {
         await this.taskService.addTask({
-            queue: QUEUES.SEND_TO_EMAIL,
+            queue: QUEUES.SEND_MAIL_QUEUE,
             jobId: `send_password_to_${email.toString()}`,
             attempts: 5,
             delay: 0,

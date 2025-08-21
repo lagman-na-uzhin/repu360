@@ -10,17 +10,16 @@ import {EmployeeAuthDataType} from "@application/interfaces/services/cache/types
 import {Actor} from "@domain/policy/actor";
 import {Role} from "@domain/policy/model/role";
 import {ManagerAuthDataType} from "@application/interfaces/services/cache/types/manager-auth-data.type";
-import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
-import {EmployeePermissions} from "@domain/policy/model/employee-permissions";
+import {ControlPermissions} from "@domain/policy/model/control-permissions";
+import {DefaultPermissions} from "@domain/policy/model/default-permissions";
 import {RoleType} from "@domain/policy/types/role-type.enum";
-import {ManagerOrganizationPermission} from "@domain/policy/model/manager/manager-organization-permission.enum";
-import {ManagerLeadPermission} from "@domain/policy/model/manager/manager-lead-permission.enum";
-import {ManagerCompanyPermission} from "@domain/policy/model/manager/manager-company.permission.enum";
-import {EmployeeCompanyPermission} from "@domain/policy/model/employee/employee-company-permission.enum";
-import {EmployeeReviewPermission} from "@domain/policy/model/employee/employee-review-permission.enum";
-import {EmployeeOrganizationPermission} from "@domain/policy/model/employee/employee-organization-permission.enum";
-
-const GLOBAL_ORGANIZATION_KEY = "*"
+import {ManagerOrganizationPermission} from "@domain/policy/model/control/manager-organization-permission.enum";
+import {ManagerLeadPermission} from "@domain/policy/model/control/manager-lead-permission.enum";
+import {ManagerCompanyPermission} from "@domain/policy/model/control/manager-company.permission.enum";
+import {DefaultCompanyPermission} from "@domain/policy/model/default/default-company-permission.enum";
+import {DefaultReviewPermission} from "@domain/policy/model/default/default-review-permission.enum";
+import {DefaultOrganizationPermission} from "@domain/policy/model/default/default-organization-permission.enum";
+import {DefaultEmployeePermission} from "@domain/policy/model/default/default-employee-permission.enum";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -54,7 +53,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   private getActor(raw: string): Actor {
     const persistence: ManagerAuthDataType | EmployeeAuthDataType = JSON.parse(raw);
-    let permissions: EmployeePermissions | ManagerPermissions;
+    let permissions: DefaultPermissions | ControlPermissions;
 
     if (persistence.role.type === RoleType.ADMIN || persistence.role.type === RoleType.MANAGER) {
       const managerData = persistence as ManagerAuthDataType;
@@ -65,7 +64,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
       const managerLeads = managerData.role.permissions.leads as ManagerLeadPermission[];
 
-      permissions = ManagerPermissions.fromPersistence(
+      permissions = ControlPermissions.fromPersistence(
           managerCompanies,
           managerOrganizationsMap,
           managerLeads
@@ -82,22 +81,24 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     } else {
       const employeeData = persistence as EmployeeAuthDataType;
 
-      const employeeCompanies = employeeData.role.permissions.companies as EmployeeCompanyPermission[];
+      const defaultCompanies = employeeData.role.permissions.companies as DefaultCompanyPermission[];
+      const defaultEmployees = employeeData.role.permissions.employees as DefaultEmployeePermission[];
 
-      const employeeReviewsMap = new Map<string, EmployeeReviewPermission[]>();
+      const defaultReviewsMap = new Map<string, DefaultReviewPermission[]>();
       employeeData.role.permissions.reviews.forEach(item => {
-        employeeReviewsMap.set(item.organizationId, item.permissions as EmployeeReviewPermission[]);
+        defaultReviewsMap.set(item.organizationId, item.permissions as DefaultReviewPermission[]);
       });
 
-      const employeeOrganizationsMap = new Map<string, EmployeeOrganizationPermission[]>();
+      const defaultOrganizationsMap = new Map<string, DefaultOrganizationPermission[]>();
       employeeData.role.permissions.organizations.forEach(item => {
-        employeeOrganizationsMap.set(item.organizationId, item.permissions as EmployeeOrganizationPermission[]);
+        defaultOrganizationsMap.set(item.organizationId, item.permissions as DefaultOrganizationPermission[]);
       });
 
-      permissions = EmployeePermissions.fromPersistence(
-          employeeCompanies,
-          employeeReviewsMap,
-          employeeOrganizationsMap,
+      permissions = DefaultPermissions.fromPersistence(
+          defaultCompanies,
+          defaultEmployees,
+          defaultReviewsMap,
+          defaultOrganizationsMap,
       );
 
       const role = Role.fromPersistence(

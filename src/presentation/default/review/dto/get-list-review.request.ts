@@ -8,34 +8,30 @@ import {GroupId} from "@domain/organization/group";
 
 
 class GetReviewListFilterDto  {
-    @IsOptional()
-    @IsArray({ message: 'groupIds must be an array' })
     @Transform(({ value }) => {
         if (value === '') {
             return null;
         }
         if (Array.isArray(value)) {
             const validIds = value.filter(i => i && typeof i === 'string' && i.trim() !== '');
-            return validIds.length ? validIds.map(i => new GroupId(i)) : null;
+            return validIds.length ? validIds.map(i => GroupId.of(i)) : null;
         }
         return null;
     })
     readonly groupIds: GroupId[];
 
-    @IsOptional()
-    @IsArray({ message: 'organizationIds must be an array' })
     @Transform(({ value }) => {
         if (value === '') {
             return null;
         }
         if (Array.isArray(value)) {
             const validIds = value.filter(i => i && typeof i === 'string' && i.trim() !== '');
-            return validIds.length ? validIds.map(i => new OrganizationId(i)) : null;
+            return validIds.length ? validIds.map(i => OrganizationId.of(i)) : null;
         }
 
         return null;
     })
-    readonly organizationIds: OrganizationId[];
+    readonly organizationIds?: OrganizationId[];
 
     @IsOptional()
     @IsArray({ message: 'cities must be an array' })

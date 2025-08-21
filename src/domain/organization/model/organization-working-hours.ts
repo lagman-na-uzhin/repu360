@@ -13,7 +13,10 @@ export class WorkingSchedule {
 
     ) {
         this._daily_hours = new Map();
-        dailyHours.forEach(dh => this.addDailyHours(dh));
+        dailyHours.forEach(dh => {
+            this.validateDailyHours(dh)
+            this.addDailyHours(dh)
+        });
     }
 
     /**
@@ -74,4 +77,13 @@ export class WorkingSchedule {
 
     get isTemporarilyClosed() {return this._is_temporarily_closed}
     get id() {return this._id}
+
+
+    private validateDailyHours(dh: DailyWorkingHours) {
+        // Throws an error if only one of the break start or end times is provided.
+        // This ensures both values are either present or absent together.
+        if ((dh.breakTime?.start && !dh.breakTime.end) || (!dh.breakTime?.start && dh.breakTime?.end)) {
+            throw new Error('Break start and end times must be provided together or not at all.');
+        }
+    }
 }

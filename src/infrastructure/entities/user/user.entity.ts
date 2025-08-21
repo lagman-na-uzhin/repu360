@@ -38,10 +38,7 @@ export class UserEntity {
   @Column({ nullable: true, type: "uuid"})
   public companyId: string | null;
 
-  @Column({
-    unique: true,
-    type: "uuid"
-  })
+  @Column({type: "uuid"})
   public roleId: string;
 
 

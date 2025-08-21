@@ -26,7 +26,11 @@ export class UserRoleEntity {
     @OneToMany(() => UserEntity, user => user.role)
     users: UserEntity[];
 
-    @OneToMany(() => UserPermissionEntity, (permission) => permission.role, { eager: true })
+    @OneToMany(
+        () => UserPermissionEntity,
+        (permission) => permission.role,
+        { eager: true, cascade: ['remove', 'soft-remove', 'recover', 'insert', 'update'] }
+    )
     permissions: UserPermissionEntity[];
 
 

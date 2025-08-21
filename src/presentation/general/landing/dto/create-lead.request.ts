@@ -17,7 +17,7 @@ export class CreateLeadRequestDto {
     readonly name: LeadContactName;
 
     @IsNotEmpty({ message: 'Email is required' })
-    @IsEmail({}, { message: 'Email must be a valid email address' })
+    @IsEmail({}, { message: 'Email must be a valid mail address' })
     @Transform(({ value }) => new LeadContactEmail(value))
     readonly email: LeadContactEmail;
 

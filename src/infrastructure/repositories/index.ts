@@ -14,6 +14,7 @@ import {SubscriptionOrmRepository} from "@infrastructure/repositories/subscripti
 import {TariffOrmRepository} from "@infrastructure/repositories/subscription/tariff.repository";
 import {LeadOrmRepository} from "@infrastructure/repositories/lead/lead.repository";
 import {GoogleRepository} from "@infrastructure/integrations/google/google.repository";
+import {MailerOrmRepository} from "@infrastructure/repositories/mailer/mailer.repository";
 
 export const REPOSITORIES = [
   CacheRepository,
@@ -31,5 +32,6 @@ export const REPOSITORIES = [
   SubscriptionOrmRepository,
   TariffOrmRepository,
   LeadOrmRepository,
-  GoogleRepository
+  GoogleRepository,
+  MailerOrmRepository
 ]

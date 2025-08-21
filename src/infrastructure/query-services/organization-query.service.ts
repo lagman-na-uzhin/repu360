@@ -33,6 +33,7 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
         let queryBuilder = this.manager.getRepository(OrganizationEntity)
             .createQueryBuilder('org')
             .leftJoinAndSelect('org.workingSchedule', 'schedule')
+            .leftJoinAndSelect('schedule.entries', 'scheduleEntries')
             .leftJoinAndSelect('org.rubrics', 'rubrics')
             .leftJoinAndSelect('org.placements', 'placements')
             .leftJoinAndSelect('org.address', 'address')
@@ -71,6 +72,7 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
         const totalPages = Math.ceil(total / pagination.limit);
 
 
+        console.log(organizations, "working")
         const list: QSOrganizationDto[] = organizations.map(org => ({
             id: org.id,
             name: org.name,

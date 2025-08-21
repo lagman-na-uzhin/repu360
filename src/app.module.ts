@@ -20,6 +20,8 @@ import {TemplateServiceModule} from "@infrastructure/services/template/template.
 import {UnitOfWorkModule} from "@infrastructure/services/unit-of-work/unit-of-work.module";
 import {TwogisModule} from "@infrastructure/integrations/twogis/twogis.module";
 import {TestController} from "@presentation/test.controller";
+import {MailerModule} from "@infrastructure/services/mail/mailer.module";
+import {BullServiceModule} from "@infrastructure/services/bull/bull.module";
 
 @Module({
   imports: [
@@ -74,7 +76,9 @@ import {TestController} from "@presentation/test.controller";
     LanguageDetectorServiceModule,
     TemplateServiceModule,
     UnitOfWorkModule,
-    TwogisModule
+    TwogisModule,
+    MailerModule,
+    BullServiceModule
   ],
   controllers: [TestController], //TODO TEST
   providers: [

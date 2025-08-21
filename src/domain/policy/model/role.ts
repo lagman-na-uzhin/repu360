@@ -1,6 +1,6 @@
 import {UniqueID} from "@domain/common/unique-id";
-import {EmployeePermissions} from "@domain/policy/model/employee-permissions";
-import {ManagerPermissions} from "@domain/policy/model/manager-permissions";
+import {DefaultPermissions} from "@domain/policy/model/default-permissions";
+import {ControlPermissions} from "@domain/policy/model/control-permissions";
 import {RoleType} from "@domain/policy/types/role-type.enum";
 
 
@@ -11,40 +11,40 @@ export class Role {
        private readonly _id: RoleId,
        private _name: string,
        private _type: RoleType,
-       private _permissions: EmployeePermissions | ManagerPermissions
+       private _permissions: DefaultPermissions | ControlPermissions
     ) {}
 
-    static create(type: RoleType, permissions: EmployeePermissions, name: string) {
+    static create(type: RoleType, permissions: DefaultPermissions, name: string) {
         return new Role(new RoleId(), name, type, permissions);
     }
 
-    static fromPersistence(id: string, name: string, type: string, permissions: EmployeePermissions | ManagerPermissions) {
+    static fromPersistence(id: string, name: string, type: string, permissions: DefaultPermissions | ControlPermissions) {
         return new Role(new RoleId(id), name, type as RoleType, permissions);
     }
 
     static createCompanyOwnerRole() {
-        const ownerPermissions = EmployeePermissions.owner();
+        const ownerPermissions = DefaultPermissions.owner();
         return new Role(new RoleId(), 'Owner', RoleType.OWNER, ownerPermissions)
     }
 
-    get employeePermissions(): EmployeePermissions {
+    get defaultPermissions(): DefaultPermissions {
         if (this.isAdmin() && this.isManager()) {
             throw new Error("Error: The role must be either Owner or Employee to retrieve permissions.");
         }
 
-        if (this._permissions instanceof EmployeePermissions) {
+        if (this._permissions instanceof DefaultPermissions) {
             return this._permissions;
         }
 
         throw new Error("Error: Permissions are not of type EmployeePermissions.");
     }
 
-    get managerPermissions(): ManagerPermissions {
+    get controlPermissions(): ControlPermissions {
         if (this.isEmployee() && this.isOwner()) {
-            throw new Error("Error: Cannot retrieve manager permissions when both Employee and Owner roles are present.");
+            throw new Error("Error: Cannot retrieve control permissions when both Employee and Owner roles are present.");
         }
 
-        if (this._permissions instanceof ManagerPermissions) {
+        if (this._permissions instanceof ControlPermissions) {
             return this._permissions;
         }
 

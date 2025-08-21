@@ -36,7 +36,7 @@ export class ContactPoint {
                 isValid = /^(@[\w.]+|https?:\/\/(?:www\.)?instagram\.com\/[\w.]+\/?)$/i.test(this.value);
                 break;
             case ContactPointType.EMAIL:
-                // Basic email regex
+                // Basic mail regex
                 isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
                 break;
             case ContactPointType.WEBSITE:

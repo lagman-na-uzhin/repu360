@@ -5,31 +5,33 @@ import {IManagerRepository} from "@domain/manager/repositories/manager-repositor
 import {Employee} from "@domain/employee/employee";
 import {Manager} from "@domain/manager/manager";
 import {Role} from "@domain/policy/model/role";
+import {IEmployeeQs} from "@application/interfaces/query-services/employee-qs/employee-qs.interface";
+import {IManagerQs} from "@application/interfaces/query-services/manager-qs/manager-qs.interface";
+import {
+    QSManagerWithRoleDto
+} from "@application/interfaces/query-services/manager-qs/dtos/response/manager-with-role.dto";
+import {
+    QSEmployeeWithRoleDto
+} from "@application/interfaces/query-services/employee-qs/dtos/response/employees-with-role.dto";
 
 export class MeUseCase {
     constructor(
-        private readonly employeeRepo: IEmployeeRepository,
-        private readonly managerRepo: IManagerRepository,
+        private readonly employeeQs: IEmployeeQs,
+        private readonly managerQS: IManagerQs,
     ) {
     }
-    async execute(query: UserMeQuery): Promise<{
-        user: Employee | Manager,
-        role: Role
-    }> {
+    async execute(query: UserMeQuery): Promise<QSManagerWithRoleDto | QSEmployeeWithRoleDto> {
         let user;
         if (query.actor.role.isManager() || query.actor.role.isAdmin()) {
-            user = await this.managerRepo.getById(query.actor.id);
+            user = await this.managerQS.getManagerWithRole(query.actor.id);
 
         } else {
-            user = await this.employeeRepo.getById(query.actor.id);
+            user = await this.employeeQs.getEmployeeWithRole(query.actor.id);
         }
 
         if (!user) {
             throw new Error(EXCEPTION.COMMON.UNAUTHORIZED);
         }
-        return {
-            user,
-            role: query.actor.role
-        }
+        return user;
     }
 }

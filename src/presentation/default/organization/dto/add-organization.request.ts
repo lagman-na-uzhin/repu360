@@ -5,17 +5,14 @@ import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {GroupId} from "@domain/organization/group";
 
 export class AddOrganizationRequestDto {
-    @IsNotEmpty({ message: 'Company Id is required' })
-    @IsString({ message: 'Company Id must be a string' })
-    @Transform(({ value }) => new CompanyId(value))
+    @Transform(({ value }) => CompanyId.of(value))
     readonly companyId: CompanyId;
 
     @IsNotEmpty({ message: 'City is required' })
     @IsString({ message: 'City must be a string' })
     readonly city: string;
 
-    @IsString({ message: 'Group Id must be a string' })
-    @Transform(({ value }) =>{value ? new GroupId(value) : null})
+    @Transform(({ value }) =>{value ? GroupId.of(value) : null})
     readonly groupId: GroupId | null;
 
     @IsNotEmpty({ message: 'External ID is required' })

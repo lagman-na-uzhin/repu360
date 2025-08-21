@@ -1,4 +1,4 @@
-export enum EmployeeCompanyPermission {
+export enum DefaultCompanyPermission {
     CAN_EDIT_COMPANY_DATA = 'CAN_EDIT_COMPANY_DATA',
     CAN_ADD_ORGANIZATION_TO_COMPANY = 'CAN_ADD_ORGANIZATION_TO_COMPANY'
 }

@@ -9,7 +9,7 @@ export class AssignManagerRequestDto {
     @Transform(({ value }) => new LeadId(value))
     readonly leadId: LeadId;
 
-    @IsString({ message: 'manager ID must be a string' })
+    @IsString({ message: 'control ID must be a string' })
     @Transform(({ value }) => value ? new ManagerId(value) : undefined)
     readonly managerId?: ManagerId;
 }

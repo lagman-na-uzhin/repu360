@@ -15,7 +15,7 @@ import {Rubric} from "@domain/rubric/rubric";
 import {ExternalRubric} from "@domain/rubric/value-object/external-rubric.vo";
 import {PLATFORMS} from "@domain/common/platfoms.enum";
 
-export class SyncOrganizationProcessUseCase {
+export class SyncOrganizationProcessUseCase { //TODO make as schedule :mayb)
     constructor(
         private readonly placementRepo: IPlacementRepository,
         private readonly twogisSession: ITwogisSession,
@@ -30,23 +30,19 @@ export class SyncOrganizationProcessUseCase {
         const organization = await this.organizationRepo.getById(organizationId);
         if (!organization) throw new Error(EXCEPTION.ORGANIZATION.NOT_FOUND);
 
-        const placement = await this.placementRepo.getTwogisByOrgId(organizationId);
-        if (!placement) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_NOT_FOUND);
-
-        const twogisExternalInfo = (await this.twogisSession.getByIdOrganization(placement.externalId)).result.items[0];
-
-        this.sync(twogisExternalInfo, organization, placement);
+        this.sync(organization);
 
         await this.uow.run(async (ctx) => {
             await ctx.organizationRepo.save(organization);
-            await ctx.placementRepo.save(placement);
+            // await ctx.placementRepo.save(placement);
         })
     }
 
-    private sync(externalInfo: OrgItem, organization: Organization, placement: Placement) {
+    private sync(organization: Organization, placement: Placement) {
+        this.syncRubrics(organization);
+
         this.syncWorkingSchedule(externalInfo.schedule, organization)
-        this.syncRubrics(externalInfo.rubrics, organization)
-        this.syncPlacement(externalInfo.reviews.general_rating, placement)
+        // this.syncPlacement(externalInfo.reviews.general_rating, placement)
     }
     private syncWorkingSchedule(rawSchedule: OrgSchedule, organization: Organization) {
         const dayMap: Record<string, DayOfWeek> = {
@@ -94,22 +90,52 @@ export class SyncOrganizationProcessUseCase {
         organization.workingSchedule = new WorkingSchedule(dailyHoursArray);
     }
 
-    private syncRubrics(rubricsRaw: {
-        alias: string,
-        "id": string,
-        "kind": "primary" | "additional",
-        "name": string,
-        "parent_id": string,
-        "short_id": number
-    }[],
-          organization: Organization
-    ): void {
-        // organization.rubrics = rubricsRaw.map(raw => {
-        //     const external = new ExternalRubric(PLATFORMS.TWOGIS, raw.id);
-        //     return Rubric.create(raw.name, [external]);
-        // });
+    private async syncRubrics(
+        organization: Organization,
+        rubrics: Rubric[],
+        externalRubrics: { id: string; name: string }[]
+    ): Promise<void> {
+        const rubricIdsFromOrg = new Set(
+            rubrics.flatMap(r =>
+                r.external
+                    .filter(i => i.platform === 'TWOGIS')
+                    .map(i => i.externalId)
+            )
+        );
 
-        organization.rubrics = [] //TODO mock
+        const externalRubricIds = new Set(externalRubrics.map(er => er.id));
+
+        const idsToAdd: string[] = [];
+        const idsToDelete: string[] = [];
+
+        for (const id of externalRubricIds) {
+            if (!rubricIdsFromOrg.has(id)) {
+                idsToDelete.push(id);
+            }
+        }
+
+        for (const id of rubricIdsFromOrg) {
+            if (!externalRubricIds.has(id)) {
+                idsToAdd.push(id);
+            }
+        }
+
+        if (idsToAdd.length > 0) {
+            await this.twogisSession.addRubrics(idsToAdd);
+        }
+        if (idsToDelete.length > 0) {
+            await this.twogisSession.deleteRubrics(idsToDelete);
+        }
+
+        const finalRubricIds = new Set(externalRubricIds);
+        for (const id of idsToAdd) {
+            finalRubricIds.add(id);
+        }
+        for (const id of idsToDelete) {
+            finalRubricIds.delete(id);
+        }
+
+        organization.rubrics = finalRubricIds
     }
 
     private syncPlacement(

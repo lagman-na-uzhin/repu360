@@ -20,4 +20,5 @@ export class Rubric {
 
     get id() {return this._Id}
     get name() {return this._name}
+    get external() {return this._external}
 }

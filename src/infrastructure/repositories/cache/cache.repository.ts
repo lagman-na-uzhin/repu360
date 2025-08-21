@@ -32,20 +32,21 @@ export class CacheRepository implements ICacheRepository {
       await this.client.del(key);
     }
 
-    const data: EmployeeAuthDataType = <EmployeeAuthDataType>{
+    const data: EmployeeAuthDataType = {
       id: employee.id.toString(),
       companyId: employee.companyId.toString(),
       role: {
         id: role.id.toString(),
-        name: role.name?.toString() || null,
+        name: role.name.toString(),
         type: role.type.toString(),
         permissions: {
-          reviews: Array.from(role.employeePermissions.reviews.entries()).map(([orgId, permissions]) => ({
+          reviews: Array.from(role.defaultPermissions.reviews.entries()).map(([orgId, permissions]) => ({
             organizationId: orgId.toString(),
             permissions: Array.from(permissions),
           })),
-          companies: Array.from(role.employeePermissions.companies),
-          organizations: Array.from(role.employeePermissions.organizations.entries()).map(([orgId, permissions]) => ({
+          employees: Array.from(role.defaultPermissions.employees),
+          companies: Array.from(role.defaultPermissions.companies),
+          organizations: Array.from(role.defaultPermissions.organizations.entries()).map(([orgId, permissions]) => ({
             organizationId: orgId.toString(),
             permissions: Array.from(permissions),
           }))
@@ -73,7 +74,7 @@ export class CacheRepository implements ICacheRepository {
         name: role.name?.toString() || null,
         type: role.type.toString(),
         permissions: {
-          companies: Array.from(role.managerPermissions.companies)
+          companies: Array.from(role.controlPermissions.companies)
         },
       }
     };

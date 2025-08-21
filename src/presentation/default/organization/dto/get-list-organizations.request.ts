@@ -1,15 +1,12 @@
-import {IsNotEmpty, IsOptional, IsString, ValidateNested} from "class-validator";
+import { IsOptional, IsString, ValidateNested} from "class-validator";
 import {Transform, Type} from "class-transformer";
 import {PaginationParamsDto, SortParamsDto} from "@presentation/dtos/get-list.request";
 import {GetListParams} from "@application/interfaces/query-services/common/get-list.interface";
 import {CompanyId} from "@domain/company/company";
 
 class GetOrganizationListFilterDto {
-    @IsNotEmpty({ message: 'Company Id is required' })
-    @IsString({ message: 'Company Id must be a string' })
-    @Transform(({ value }) => new CompanyId(value))
+    @Transform(({ value }) => CompanyId.of(value))
     readonly companyId: CompanyId;
-
 
     @IsOptional()
     readonly isActive?: boolean;

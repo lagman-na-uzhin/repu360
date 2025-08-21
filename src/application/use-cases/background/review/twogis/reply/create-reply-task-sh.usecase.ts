@@ -55,22 +55,22 @@ export class TwogisCreateSendReplyTaskScheduleUseCase {
         placement: Placement,
         review: Review,
     ) {
-        const jobId = `${placement.id}_${review.id}`;
-        const isJobExists = await this.taskService.isJobExists(
-            jobId,
-            QUEUES.SEND_REPLY_QUEUE,
-        );
-
-        if (!isJobExists) {
-            const command = TwogisSendReplyCommand.of(placement.id.toString(), review.id.toString(), 'new CompanyId()'); //TODO mock
-
-            await this.taskService.addTask({
-                queue: QUEUES.SEND_REPLY_QUEUE,
-                jobId,
-                attempts: 1,
-                delay: 0,
-                payload: command,
-            });
-        }
+        // const jobId = `${placement.id}_${review.id}`;
+        // const isJobExists = await this.taskService.isJobExists(
+        //     jobId,
+        //     QUEUES.SEND_REPLY_QUEUE,
+        // );
+        //
+        // if (!isJobExists) {
+        //     const command = TwogisSendReplyCommand.of(placement.id.toString(), review.id.toString(), 'new CompanyId()'); //TODO mock
+        //
+        //     await this.taskService.addTask({
+        //         queue: QUEUES.SEND_REPLY_QUEUE,
+        //         jobId,
+        //         attempts: 1,
+        //         delay: 0,
+        //         payload: command,
+        //     });
+        // }
     }
 }

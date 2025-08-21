@@ -35,6 +35,9 @@ import {employeeProxyExports} from '@application/use-case-proxies/employee/emplo
 import {QueryServicesModule} from "@infrastructure/query-services/query-services.module";
 import {roleProxyProviders} from "@infrastructure/providers/role/role.providers";
 import {roleProxyExports} from "@application/use-case-proxies/role/role.proxy";
+import {mailProxyExports} from "@application/use-case-proxies/mail/mail.proxy";
+import {mailProxyProviders} from "@infrastructure/providers/mail/mail.provider";
+import {MailerModule} from "@infrastructure/services/mail/mailer.module";
 
 @Module({
   imports: [
@@ -48,9 +51,10 @@ import {roleProxyExports} from "@application/use-case-proxies/role/role.proxy";
     LanguageDetectorServiceModule,
     TemplateServiceModule,
     UnitOfWorkModule,
-      TwogisModule,
+    TwogisModule,
     GoogleModule,
-    QueryServicesModule
+    QueryServicesModule,
+    MailerModule
   ],
 })
 export class UsecaseProxyModule {
@@ -68,7 +72,8 @@ export class UsecaseProxyModule {
         ...subscriptionProxyProviders,
         ...leadProxyProviders,
         ...externalProxyProviders,
-        ...roleProxyProviders
+        ...roleProxyProviders,
+        ...mailProxyProviders
 
       ],
       exports: [
@@ -82,7 +87,8 @@ export class UsecaseProxyModule {
         ...leadProxyExports,
         ...externalProxyExports,
         ...employeeProxyExports,
-        ...roleProxyExports
+        ...roleProxyExports,
+        ...mailProxyExports
       ],
     };
   }

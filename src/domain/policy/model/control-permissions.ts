@@ -1,11 +1,11 @@
-import {ManagerOrganizationPermission} from "@domain/policy/model/manager/manager-organization-permission.enum";
-import {ManagerLeadPermission} from "@domain/policy/model/manager/manager-lead-permission.enum";
+import {ManagerOrganizationPermission} from "@domain/policy/model/control/manager-organization-permission.enum";
+import {ManagerLeadPermission} from "@domain/policy/model/control/manager-lead-permission.enum";
 import {OrganizationId} from "@domain/organization/organization";
-import {ManagerCompanyPermission} from "@domain/policy/model/manager/manager-company.permission.enum";
+import {ManagerCompanyPermission} from "@domain/policy/model/control/manager-company.permission.enum";
 
 const GLOBAL_ORGANIZATION_KEY = '*';
 
-export class ManagerPermissions {
+export class ControlPermissions {
     constructor(
         private readonly _companies: ManagerCompanyPermission[],
         private readonly _organizations: Map<string, ManagerOrganizationPermission[]>,
@@ -16,18 +16,18 @@ export class ManagerPermissions {
         companies: ManagerCompanyPermission[],
         organizations: Map<string, ManagerOrganizationPermission[]>,
         leads: ManagerLeadPermission[],
-    ): ManagerPermissions {
-        return new ManagerPermissions(companies, organizations, leads);
+    ): ControlPermissions {
+        return new ControlPermissions(companies, organizations, leads);
     }
 
-    static admin(): ManagerPermissions {
+    static admin(): ControlPermissions {
         const allCompanyPermissions: ManagerCompanyPermission[] = Object.values(ManagerCompanyPermission) as ManagerCompanyPermission[];
         const allOrganizationPermissions: ManagerOrganizationPermission[] = Object.values(ManagerOrganizationPermission) as ManagerOrganizationPermission[];
         const allLeadPermissions: ManagerLeadPermission[] = Object.values(ManagerLeadPermission) as ManagerLeadPermission[];
 
         const organizationsMap = new Map<string, ManagerOrganizationPermission[]>([[GLOBAL_ORGANIZATION_KEY, allOrganizationPermissions]]);
 
-        return new ManagerPermissions(
+        return new ControlPermissions(
             allCompanyPermissions,
             organizationsMap,
             allLeadPermissions

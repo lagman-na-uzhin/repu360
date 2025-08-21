@@ -24,7 +24,7 @@ export class UserPermissionEntity {
     @Column()
     permission: string;
 
-    @Column({ nullable: true, type: "uuid" })
+    @Column({ nullable: true, type: "varchar" })
     organizationId: string | null;
 
     @ManyToOne(() => UserRoleEntity, (role) => role.permissions, { onDelete: 'SET NULL' })

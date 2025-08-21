@@ -29,5 +29,5 @@ export class WorkingScheduleEntryEntity {
 
     @ManyToOne(() => WorkingScheduleEntity, schedule => schedule.entries)
     @JoinColumn({ name: 'schedule_id' })
-    schedule: OrganizationEntity;
+    schedule: WorkingScheduleEntity;
 }

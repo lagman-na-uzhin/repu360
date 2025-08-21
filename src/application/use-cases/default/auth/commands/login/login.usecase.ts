@@ -27,6 +27,8 @@ export class EmployeeLoginUseCase {
         const passwordIsValid = await this.hashService.compare(cmd.password.toString(), employee.password.toString());
         if (!passwordIsValid) throw new Error(EXCEPTION.EMPLOYEE.INCORRECT_EMAIL_OR_PASSWORD);
 
+        console.log(employee, "employee")
+        console.log(role, "roleee")
         await this.cacheRepo.setEmployeeAuth(employee, role);
 
         return {

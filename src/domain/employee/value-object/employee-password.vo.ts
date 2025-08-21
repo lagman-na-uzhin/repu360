@@ -10,6 +10,10 @@ export class EmployeePassword {
     this._value = password;
   }
 
+  static of(password: string) {
+    return new EmployeePassword(password);
+  }
+
   private isValid(password: string): boolean {
     return true
     // return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password);

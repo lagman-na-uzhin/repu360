@@ -10,6 +10,10 @@ export class ManagerEmail {
     this.value = email;
   }
 
+  static of(email: string) {
+    return new ManagerEmail(email);
+  }
+
   private isValid(email: string): boolean {
     const emailRegex = /^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);

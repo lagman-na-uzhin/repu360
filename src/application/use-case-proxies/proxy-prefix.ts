@@ -9,4 +9,5 @@ export enum ProxyPrefix {
   EMPLOYEE_PROXY = 'EmployeeProxy',
   ORGANIZATION_PROXY = 'OrganizationProxy',
   ROLE_PROXY = 'RoleProxy',
+  MAIL_PROXY = 'MailProxy'
 }
