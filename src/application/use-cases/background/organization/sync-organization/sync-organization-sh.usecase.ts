@@ -4,7 +4,7 @@ import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-w
 import {Organization, OrganizationId} from "@domain/organization/organization";
 import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
 import {IOrganizationRepository} from "@domain/organization/repositories/organization-repository.interface";
-import {OrgItem, OrgSchedule} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
+import {OrgSchedule} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 import {Placement} from "@domain/placement/placement";
 import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
 import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
@@ -12,10 +12,9 @@ import {Time} from "@domain/organization/value-objects/working-hours/time.vo";
 import {DailyWorkingHours} from "@domain/organization/value-objects/working-hours/daily-working-hours.vo";
 import {TimeRange} from "@domain/organization/value-objects/working-hours/time-range.vo";
 import {Rubric} from "@domain/rubric/rubric";
-import {ExternalRubric} from "@domain/rubric/value-object/external-rubric.vo";
-import {PLATFORMS} from "@domain/common/platfoms.enum";
+import {TwogisCabinetCredentials} from "@domain/placement/value-object/twogis/twogis-cabinet-credentials.vo";
 
-export class SyncOrganizationProcessUseCase { //TODO make as schedule :mayb)
+export class SyncOrganizationScheduleUseCase {
     constructor(
         private readonly placementRepo: IPlacementRepository,
         private readonly twogisSession: ITwogisSession,
@@ -25,21 +24,18 @@ export class SyncOrganizationProcessUseCase { //TODO make as schedule :mayb)
     }
 
     async execute(organizationId: OrganizationId) {
-        await this.twogisSession.init();
-
         const organization = await this.organizationRepo.getById(organizationId);
         if (!organization) throw new Error(EXCEPTION.ORGANIZATION.NOT_FOUND);
 
-        this.sync(organization);
+        const cabinetCredentials = await this.getTwogisCabinetCredentialByOrgId(organization.id);
 
-        await this.uow.run(async (ctx) => {
-            await ctx.organizationRepo.save(organization);
-            // await ctx.placementRepo.save(placement);
-        })
+        await this.twogisSession.init(organization.companyId, cabinetCredentials);
+
+        await this.sync(organization);
     }
 
-    private sync(organization: Organization, placement: Placement) {
-        this.syncRubrics(organization);
+    private async sync(organization: Organization, placement: Placement) {
+        this.syncRubricsTwogis(organization);
 
         this.syncWorkingSchedule(externalInfo.schedule, organization)
         // this.syncPlacement(externalInfo.reviews.general_rating, placement)
@@ -90,52 +86,42 @@ export class SyncOrganizationProcessUseCase { //TODO make as schedule :mayb)
         organization.workingSchedule = new WorkingSchedule(dailyHoursArray);
     }
 
-    private async syncRubrics(
+    private async syncRubricsTwogis(
         organization: Organization,
-        rubrics: Rubric[],
-        externalRubrics: { id: string; name: string }[]
+        ourRubrics: Rubric[], // Данные из нашей системы (источник истины)
+        twogisRubricsRaw: { id: string; name: string }[], // Данные из сервиса Twogis
     ): Promise<void> {
-        const rubricIdsFromOrg = new Set(
-            rubrics.flatMap(r =>
+        const ourRubricIds = new Set(
+            ourRubrics.flatMap(r =>
                 r.external
                     .filter(i => i.platform === 'TWOGIS')
-                    .map(i => i.externalId)
-            )
+                    .map(i => i.externalId),
+            ),
         );
 
-        const externalRubricIds = new Set(externalRubrics.map(er => er.id));
+        const twogisRubricIds = new Set(twogisRubricsRaw.map(r => r.id));
 
         const idsToAdd: string[] = [];
         const idsToDelete: string[] = [];
 
-        for (const id of externalRubricIds) {
-            if (!rubricIdsFromOrg.has(id)) {
-                idsToDelete.push(id);
-            }
-        }
-
-        for (const id of rubricIdsFromOrg) {
-            if (!externalRubricIds.has(id)) {
+        for (const id of ourRubricIds) {
+            if (!twogisRubricIds.has(id)) {
                 idsToAdd.push(id);
             }
         }
 
+        for (const id of twogisRubricIds) {
+            if (!ourRubricIds.has(id)) {
+                idsToDelete.push(id);
+            }
+        }
+
         if (idsToAdd.length > 0) {
-            await this.twogisSession.addRubrics(idsToAdd);
+            await this.twogisSession.addRubrics(idsToAdd, organization.id);
         }
         if (idsToDelete.length > 0) {
-            await this.twogisSession.deleteRubrics(idsToDelete);
+            await this.twogisSession.deleteRubrics(idsToDelete, organization.id);
         }
-
-        const finalRubricIds = new Set(externalRubricIds);
-        for (const id of idsToAdd) {
-            finalRubricIds.add(id);
-        }
-        for (const id of idsToDelete) {
-            finalRubricIds.delete(id);
-        }
-
-        organization.rubrics = finalRubricIds
     }
 
     private syncPlacement(
@@ -145,6 +131,16 @@ export class SyncOrganizationProcessUseCase { //TODO make as schedule :mayb)
         if (placement.rating !== rating) {
             placement.rating = rating;
         }
+    }
+
+    private async getTwogisCabinetCredentialByOrgId(organizationId: OrganizationId): Promise<TwogisCabinetCredentials> {
+        const twogisPlacement  = await this.placementRepo.getTwogisByOrgId(organizationId);
+        if (!twogisPlacement) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_NOT_FOUND);
+
+        const cabinetCredentials = twogisPlacement.getTwogisPlacementDetail()?.cabinetCredentials;
+        if (!cabinetCredentials) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_INVALID_CABINET_CREDENTIALS)
+
+        return cabinetCredentials;
     }
 }
 

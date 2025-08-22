@@ -24,6 +24,7 @@ import {extractBaseId} from "@infrastructure/integrations/twogis/twogis.utils";
 import {
     ISearchedRubricsResult
 } from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
+import {OrganizationId} from "@domain/organization/organization";
 
 // export class TwogisSession implements ITwogisSession{
 //     private proxy: IProxy;
@@ -78,6 +79,7 @@ import {
 export class TwogisSession implements ITwogisSession {
     private proxy: IProxy;
     private repo: TwogisRepository;
+    private cabinetAccessToken: string | null = null;
 
     constructor(
         private readonly proxyService: ProxyService,
@@ -85,11 +87,14 @@ export class TwogisSession implements ITwogisSession {
         private readonly cacheRepo: CacheRepository
     ) {}
 
-    async init(companyId?: CompanyId): Promise<void> {
-        console.log("init")
+    async init(companyId?: CompanyId, cabinetCredentials?: TwogisCabinetCredentials): Promise<void> {
         this.proxy = await this.getProxy(companyId);
-        console.log('proxy')
         this.repo = new TwogisRepository(this.proxyService, this.requestService);
+
+        if (cabinetCredentials) {
+            const loginResponse = await this.getCabinetAccessToken(cabinetCredentials);
+            this.cabinetAccessToken = loginResponse.result.access_token;
+        }
     }
 
     async getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials): Promise<ILoginTwogisCabinetResponse> {
@@ -123,6 +128,20 @@ export class TwogisSession implements ITwogisSession {
     async getByIdOrganization(externalId: string): Promise<OrgByIdOutDto> {
         console.log(externalId, "sessionj")
         return this.repo.getByIdOrganization(externalId, this.proxy)
+    }
+
+    async addRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void> {
+        const data = {
+            rubrics: rubricIds.map(id =>{ return  {action: "add", id: id} })
+        }
+        return this.repo.updateRubrics(data, organizationId.toString(), accessToken, this.proxy);
+    }
+
+    async deleteRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void> {
+        const data = {
+            rubrics: rubricIds.map(id =>{ return  {action: "delete", id: id} })
+        }
+        return this.repo.updateRubrics(data, organizationId.toString(), accessToken, this.proxy);
     }
 
 

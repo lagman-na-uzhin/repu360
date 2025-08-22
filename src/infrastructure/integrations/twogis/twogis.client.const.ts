@@ -733,6 +733,24 @@ export const GET_RATINGS_CONFIG = (oranizationExternalId: string) => {
     }
 }
 
+
+export const UPDATE_RUBRICS_CONFIG = (data: {rubrics: {action: string, id: string}[]}, accessToke: string, organizationId: string) => {
+    return {
+        requestConfig: {
+            url: `https://api.account.2gis.com/api/1.0/branches/${organizationId}`,
+            method: REQUEST_METHOD.PUT,
+            data,
+            headers: {
+                Accept: 'application/json, text/plain, */*',
+                AcceptLanguage: 'en-US,en;q=0.5',
+                Origin: 'https://account.2gis.com',
+                Referer: 'https://account.2gis.com/',
+        },
+        localConfig: {
+            responseType: RESPONSE_TYPE.DATA,
+        }
+    }
+}
 function getFileName() {
     return `${Math.round(new Date().getTime() / 1000)}${extname('image')}`;
 }

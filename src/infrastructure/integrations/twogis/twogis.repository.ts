@@ -27,7 +27,7 @@ import {
   GET_ORGANIZATION_REVIEWS_CONFIG,
   GET_ORGANIZATION_REVIEWS_NEXT_CONFIG,
   GET_REVIEW_CONFIG, SEARCH_RUBRICS_CONFIG,
-  SEND_REVIEW_REPLY_CONFIG
+  SEND_REVIEW_REPLY_CONFIG, UPDATE_RUBRICS_CONFIG
 } from "@infrastructure/integrations/twogis/twogis.client.const";
 import {
   IReviewFromCabinet
@@ -118,6 +118,14 @@ export class TwogisRepository implements ITwogisRepository {
   async searchRubrics(accessToken: string, query: string, proxy: IProxy): Promise<ISearchedRubricsResult> {
     return this.requestService.request(
         SEARCH_RUBRICS_CONFIG(accessToken, query),
+        proxy,
+        1,
+    );
+  }
+
+  async updateRubrics(data: { rubrics: { action: string; id: string }[] }, organizationId: string, accessToken: string, proxy: IProxy): Promise<void> {
+    return this.requestService.request(
+        UPDATE_RUBRICS_CONFIG(data, accessToken, organizationId),
         proxy,
         1,
     );

@@ -10,18 +10,17 @@ import {
     GetOrganizationReviewsInDto
 } from "@application/interfaces/integrations/twogis/client/dto/in/get-organization-reviews.in.dto";
 import {Review} from "@domain/review/review";
-import {Profile} from "@domain/review/profile";
 import {
     ILoginTwogisCabinetResponse
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
-import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 import {
     ISearchedRubricsResult
 } from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
+import {OrganizationId} from "@domain/organization/organization";
 
 export interface ITwogisSession {
-    init(companyId?: CompanyId): Promise<void>;
+    init(companyId?: CompanyId, cabinetCredentials?: TwogisCabinetCredentials): Promise<void>;
     getByIdOrganization(externalId: string): Promise<OrgByIdOutDto>
     getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials): Promise<ILoginTwogisCabinetResponse>;
     generateReply(accessToken: string, authorName: string): Promise<IGenerateReply>;
@@ -33,7 +32,7 @@ export interface ITwogisSession {
         payload: GetOrganizationReviewsInDto,
     ): Promise<Review[] | null>;
     searchRubrics(accessToken: string, query: string): Promise<ISearchedRubricsResult>
-    addRubrics(rubricIds: string[]): Promise<void>
-    deleteRubrics(rubricIds: string[]): Promise<void>
+    addRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void>;
+    deleteRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void>;
 
 }

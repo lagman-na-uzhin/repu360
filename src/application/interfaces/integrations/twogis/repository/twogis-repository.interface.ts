@@ -31,6 +31,12 @@ export interface ITwogisRepository {
     generateReply(accessToken: string, authorName: string, proxy: IProxy): Promise<IGenerateReply>;
     getReviewFromCabinet(accessToken: string, reviewExternalId: string, proxy: IProxy): Promise<IReviewFromCabinet>;
     sendOfficialReply(accessToken: string, text: string, reviewExternalId: string, proxy: IProxy): Promise<ISendReply>;
-    searchRubrics(accessToken: string, query: string, proxy: IProxy): Promise<ISearchedRubricsResult>
-
+    searchRubrics(accessToken: string, query: string, proxy: IProxy): Promise<ISearchedRubricsResult>;
+    updateRubrics(data: {
+        rubrics: {action: 'add', id: string}[]
+    },
+                  organizationId: string,
+                  accessToken: string,
+                  proxy: IProxy
+    ): Promise<void>
 }
