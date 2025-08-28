@@ -153,4 +153,10 @@ export class EnvConfigService
   getGoogleApiKey(): string {
     return this.configService.get<string>('GOOGLE_API_KEY') || '';
   }
+
+
+  //GeoCoding Geoapify
+  getgGoapifyApiKey(): string {
+        return this.configService.get<string>('GEOPIFY_API_KEY') || '';
+    }
  }

@@ -1,6 +1,6 @@
-import {UniqueID} from '@domain/common/unique-id';
-import {ManagerId} from "@domain/manager/manager";
+import {UniqueID} from "@domain/common/unique-id";
 import {CompanyName} from "@domain/company/value-object/company-name.vo";
+import {ManagerId} from "@domain/manager/manager";
 
 export class CompanyId extends UniqueID {}
 

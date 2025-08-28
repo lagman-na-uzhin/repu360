@@ -2,7 +2,7 @@ import { OrganizationPlacementEntity } from '../placement/organization-placement
 import {
     Column,
     CreateDateColumn, DeleteDateColumn,
-    Entity, JoinColumn,
+    Entity, JoinColumn, ManyToMany,
     ManyToOne,
     OneToMany, OneToOne,
     PrimaryColumn,
@@ -12,8 +12,8 @@ import { CompanyEntity } from '@infrastructure/entities/company/company.entity';
 import {WorkingScheduleEntity} from "@infrastructure/entities/organization/working-schedule.entity";
 import {ContactPointEntity} from "@infrastructure/entities/organization/contact-point.entity";
 import {OrganizationGroupEntity} from "@infrastructure/entities/organization/group.entity";
-import {OrganizationRubricsEntity} from "@infrastructure/entities/organization/rubrics.entity";
 import {OrganizationAddressEntity} from "@infrastructure/entities/organization/organization-address.entity";
+import {RubricEntity} from "@infrastructure/entities/rubric/rubric.entity";
 
 @Entity('organization')
 export class OrganizationEntity {
@@ -41,19 +41,22 @@ export class OrganizationEntity {
         workingSchedule => workingSchedule.organization,
         {cascade: ["soft-remove", "recover", "insert", "update"], eager: true}
     )
-    workingSchedule: WorkingScheduleEntity;
+    workingSchedule: WorkingScheduleEntity | null;
+
+    @ManyToMany(
+        () => RubricEntity,
+        rubrics => rubrics.organization
+    )
+    rubrics: RubricEntity[];
 
     @OneToMany(
-        () => OrganizationRubricsEntity,
-        rubrics => rubrics.organization,
+        () => ContactPointEntity,
+            contactPoint => contactPoint.organization,
         {cascade: ["soft-remove", "recover", "insert", "update"], eager: true}
     )
-    rubrics: OrganizationRubricsEntity[];
-
-    @OneToMany(() => ContactPointEntity, contactPoint => contactPoint.organization)
     contactPoints: ContactPointEntity[];
 
-    @ManyToOne(() => OrganizationGroupEntity, group => group.organization)
+    @ManyToOne(() => OrganizationGroupEntity, group => group.organization, {eager: true})
     group: OrganizationGroupEntity;
 
     @OneToOne(

@@ -1,4 +1,3 @@
-
 export enum ContactPointType {
     WHATSAPP = 'WHATSAPP',
         VIBER = 'VIBER',
@@ -8,18 +7,43 @@ export enum ContactPointType {
         TELEGRAM = 'TELEGRAM', // Example of adding a new type
         WEBSITE = 'WEBSITE',
 }
+
 export class ContactPoint {
-    constructor(public readonly type: ContactPointType, public readonly value: string) {
-        if (!value || value.trim() === '') {
+    constructor(public readonly type: ContactPointType, private _value: string) {
+        if (!_value || _value.trim() === '') {
             throw new Error(`Contact point value for type ${type} cannot be empty.`);
         }
-        this.value = value.trim();
-        this.validateFormat(); // Validate based on type
+
+        // Sanitize the value first to remove common noise
+        this._value = this.sanitizeValue(_value);
+
+        // Then validate the cleaned value
+        this.validateFormat();
     }
 
     /**
-     * @description Validates the format of the contact value based on its type.
-     * This method centralizes validation logic for all contact types.
+     * @description Prepares the contact value by removing unnecessary characters.
+     * This method ensures the value is in a consistent format for validation.
+     */
+    private sanitizeValue(value: string): string {
+        switch (this.type) {
+            case ContactPointType.WHATSAPP:
+            case ContactPointType.VIBER:
+            case ContactPointType.PHONE:
+            case ContactPointType.TELEGRAM:
+                // Removes all non-digit characters and plus signs, then adds a single leading '+' if it was there
+                const sanitized = value.replace(/[^\d+]/g, '').trim();
+                return sanitized.startsWith('+') ? sanitized : `+${sanitized}`;
+            case ContactPointType.INSTAGRAM:
+                // Removes a leading '@' and trims whitespace
+                return value.replace(/^@/, '').trim();
+            default:
+                return value.trim();
+        }
+    }
+
+    /**
+     * @description Validates the format of the sanitized contact value based on its type.
      */
     private validateFormat(): void {
         let isValid = false;
@@ -28,30 +52,33 @@ export class ContactPoint {
             case ContactPointType.VIBER:
             case ContactPointType.PHONE:
             case ContactPointType.TELEGRAM:
-                // Basic phone number format: starts with '+' and contains 10-15 digits
-                isValid = /^\+\d{10,15}$/.test(this.value);
+                // Checks for a leading '+' followed by 10 to 15 digits
+                isValid = /^\+\d{10,15}$/.test(this._value);
                 break;
             case ContactPointType.INSTAGRAM:
-                // Instagram username (@username) or URL
-                isValid = /^(@[\w.]+|https?:\/\/(?:www\.)?instagram\.com\/[\w.]+\/?)$/i.test(this.value);
+                // Checks for a username with allowed characters
+                isValid = /^(?!.*\.\.)(?!.*__)(?!^\.|^__)[a-z0-9_.]{1,30}$/i.test(this._value);
                 break;
             case ContactPointType.EMAIL:
-                // Basic mail regex
-                isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value);
+                // More robust email regex
+                isValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this._value);
                 break;
             case ContactPointType.WEBSITE:
-                // Basic URL validation
-                isValid = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/.test(this.value);
+                // More comprehensive URL validation
+                isValid = /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/[a-zA-Z0-9]+\.[^\s]{2,}|[a-zA-Z0-9]+\.[^\s]{2,})$/i.test(this._value);
                 break;
             default:
-                // If a new type is added without specific validation, default to true or throw
                 isValid = true;
                 break;
         }
 
         if (!isValid) {
-            throw new Error(`Invalid format for ${this.type} contact: "${this.value}"`);
+            throw new Error(`Invalid format for ${this.type} contact: "${this._value}"`);
         }
+    }
+
+    public get value(): string {
+        return this._value;
     }
 
     /**

@@ -23,7 +23,7 @@ export interface QSOrganizationDto {
     createdAt: Date;
     updatedAt: Date;
 
-    workingSchedule: QSWorkingScheduleDto;
+    workingSchedule: QSWorkingScheduleDto | null;
     rubrics: QSOrganizationRubricsDto[];
     placements: QSOrganizationPlacementDto[];
 }

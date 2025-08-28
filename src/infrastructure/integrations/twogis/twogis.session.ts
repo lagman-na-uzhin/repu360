@@ -25,6 +25,9 @@ import {
     ISearchedRubricsResult
 } from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
 import {OrganizationId} from "@domain/organization/organization";
+import {
+    OrgByIdBusinessOutDto
+} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id-business.out.dto";
 
 // export class TwogisSession implements ITwogisSession{
 //     private proxy: IProxy;
@@ -36,18 +39,18 @@ import {OrganizationId} from "@domain/organization/organization";
 //         private readonly companyId?: CompanyId,
 //     ) {}
 //
-//     private repository: ITwogisRepository;
+//     private repositories: ITwogisRepository;
 //
 //     async init(): Promise<void> {
 //         this.proxy = await this.getProxy(this.companyId)
 //     }
 //
 //     async loginCabinet(credentials: TwogisCabinetCredentials) {
-//         return this.repository.loginCabinet(credentials, this.proxy);
+//         return this.repositories.loginCabinet(credentials, this.proxy);
 //     }
 //
 //     async generateReply(accessToken: string, authorName: string) {
-//         return this.repository.generateReply(accessToken, authorName, this.proxy);
+//         return this.repositories.generateReply(accessToken, authorName, this.proxy);
 //     }
 //
 //     async getOrganizationReviews(
@@ -55,7 +58,7 @@ import {OrganizationId} from "@domain/organization/organization";
 //         externalId: string,
 //         payload: GetOrganizationReviewsInDto,
 //     ) {
-//         return this.repository.getOrganizationReviews(placementId, externalId, payload);
+//         return this.repositories.getOrganizationReviews(placementId, externalId, payload);
 //     }
 //
 //     private async getProxy(companyId?: CompanyId) {
@@ -92,8 +95,9 @@ export class TwogisSession implements ITwogisSession {
         this.repo = new TwogisRepository(this.proxyService, this.requestService);
 
         if (cabinetCredentials) {
-            const loginResponse = await this.getCabinetAccessToken(cabinetCredentials);
+            const loginResponse = await this.getCabinetAccessToken(cabinetCredentials); //TODO caching
             this.cabinetAccessToken = loginResponse.result.access_token;
+            console.log(this.cabinetAccessToken, "this.cabinetAccessToken")
         }
     }
 
@@ -112,8 +116,10 @@ export class TwogisSession implements ITwogisSession {
         return this.repo.sendOfficialReply(accessToken, text, reviewExternalId, this.proxy);
     }
 
-    async searchRubrics(accessToken: string, query: string): Promise<ISearchedRubricsResult> {
-        return this.repo.searchRubrics(accessToken, query, this.proxy);
+    async searchRubrics(query: string): Promise<ISearchedRubricsResult> {
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+        const res = await this.repo.searchRubrics(query, this.cabinetAccessToken, this.proxy)
+        return res.meta.code == 200 ? res.result : {total: 0, items: []};
     }
 
     async getOrganizationReviews(
@@ -130,26 +136,47 @@ export class TwogisSession implements ITwogisSession {
         return this.repo.getByIdOrganization(externalId, this.proxy)
     }
 
-    async addRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void> {
+    async getByIdOrganizationFromBusiness(externalId: string): Promise<OrgByIdBusinessOutDto> {
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+        return this.repo.getByIdOrganizationFromBusiness(externalId, this.cabinetAccessToken, this.proxy)
+    }
+
+    async addRubrics(rubricIds: string[], externalId: string): Promise<void> {
         const data = {
             rubrics: rubricIds.map(id =>{ return  {action: "add", id: id} })
         }
-        return this.repo.updateRubrics(data, organizationId.toString(), accessToken, this.proxy);
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+
+        await this.repo.updateRubrics(data, externalId, this.cabinetAccessToken, this.proxy);
     }
 
-    async deleteRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void> {
+    async deleteRubrics(rubricIds: string[], externalId: string): Promise<void> {
         const data = {
             rubrics: rubricIds.map(id =>{ return  {action: "delete", id: id} })
         }
-        return this.repo.updateRubrics(data, organizationId.toString(), accessToken, this.proxy);
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+
+        await this.repo.updateRubrics(data, externalId, this.cabinetAccessToken, this.proxy);
+    }
+
+    async updateWorkingHours(externalId: string, days: {
+        [p: string]: { from: string; to: string; breaks?: { from: string; to: string }[] }
+    }) {
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+
+        await this.repo.updateWorkingHours(externalId, this.cabinetAccessToken, this.proxy, days);
+    }
+
+    async getOrganizationGeometryHover(orgExternalId: string): Promise<{ lat: number; lon: number }> {
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+
+        return this.repo.getOrganizationGeometryHover(orgExternalId, this.cabinetAccessToken, this.proxy);
     }
 
 
     private async getProxy(companyId?: CompanyId) {
         let proxy: IProxy | null;
-        console.log(companyId, "        console.log()\n")
         if (companyId) {
-            console.log(this.proxyService, "proxy srvice")
             proxy = await this.proxyService.getCompanyIndividualProxy(companyId);
         } else {
             proxy = await this.proxyService.getSharedProxy();

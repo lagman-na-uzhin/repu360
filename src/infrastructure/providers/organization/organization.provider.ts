@@ -22,6 +22,16 @@ import {
     GetCompactOrganizationsUseCase
 } from "@application/use-cases/default/organization/queries/get-organization-compact/get-compact-organizations.usecase";
 import {GetSummaryUseCase} from "@application/use-cases/default/organization/queries/get-summary/get-summary.usecase";
+import {
+    SyncOrganizationScheduleUseCase
+} from "@application/use-cases/background/organization/sync-organization/sync-organization-sh.usecase";
+import {IRubricRepository} from "@domain/rubric/repositories/rubric-repository.interface";
+import {RubricOrmRepository} from "@infrastructure/repositories/rubric/rubric-repository";
+import {
+    UpdateOrganizationUseCase
+} from "@application/use-cases/default/organization/commands/update/update-organization.usecase";
+import {IGeocoderService} from "@application/interfaces/services/geocoder/geocoder-service.interface";
+import {GeocoderService} from "@infrastructure/services/geocoder/geocoder.service";
 
 
 export const organizationProxyProviders = [
@@ -34,21 +44,21 @@ export const organizationProxyProviders = [
     },
 
     {
-        inject: [CompanyOrmRepository, OrganizationOrmRepository, PlacementOrmRepository, UnitOfWork,   ProxySessionProxy.TWOGIS_SESSION],
+        inject: [CompanyOrmRepository, PlacementOrmRepository, UnitOfWork, ProxySessionProxy.TWOGIS_SESSION, GeocoderService],
         provide: OrganizationProxy.ADD,
         useFactory: (
             companyRepo: ICompanyRepository,
-            organizationRepo: IOrganizationRepository,
             placementRepo: IPlacementRepository,
             uof: IUnitOfWork,
-            twogisSession: ITwogisSession
+            twogisSession: ITwogisSession,
+            geocoderService: IGeocoderService
         ) => {
             return new UseCaseProxy(new AddOrganizationUseCase(
                 companyRepo,
-                organizationRepo,
                 placementRepo,
                 uof,
-                twogisSession
+                twogisSession,
+                geocoderService
             ))
         }
     },
@@ -66,6 +76,35 @@ export const organizationProxyProviders = [
         provide: OrganizationProxy.GET_SUMMARY,
         useFactory: (organizationQs: IOrganizationQs) => {
             return new UseCaseProxy(new GetSummaryUseCase(organizationQs))
+        }
+    },
+
+    {
+        inject: [OrganizationOrmRepository, RubricOrmRepository, UnitOfWork],
+        provide: OrganizationProxy.UPDATE,
+        useFactory: (organizationRepo: IOrganizationRepository, rubricRepo: IRubricRepository, uof: IUnitOfWork) => {
+            return new UseCaseProxy(new UpdateOrganizationUseCase(organizationRepo, rubricRepo, uof))
+        }
+    },
+
+
+    //BACKGROUND
+
+    {
+        inject: [PlacementOrmRepository, ProxySessionProxy.TWOGIS_SESSION, OrganizationOrmRepository, RubricOrmRepository],
+        provide: OrganizationProxy.SYNC_SCHEDULE,
+        useFactory: (
+            placementRepo: IPlacementRepository,
+            twogisSession: ITwogisSession,
+            organizationRepo: IOrganizationRepository,
+            rubricRepo: IRubricRepository
+        ) => {
+            return new UseCaseProxy(new SyncOrganizationScheduleUseCase(
+                placementRepo,
+                twogisSession,
+                organizationRepo,
+                rubricRepo
+            ))
         }
     },
 ]

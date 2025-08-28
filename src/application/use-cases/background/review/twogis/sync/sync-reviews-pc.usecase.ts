@@ -43,7 +43,7 @@ export class SyncTwogisReviewsProcessUseCase {
 
   private async getUnSyncedReviewObj(placement: Placement): Promise<Review[] | null> {
     const twogisDetail = placement.getTwogisPlacementDetail();
-    return this.twogisSession.getOrganizationReviews(placement.id, placement.externalId, {type: twogisDetail.type})
+    return this.twogisSession.getOrganizationReviews(placement.id, placement.externalId, {type: 'branch'}) //TODO branch mock
   }
 
   private async handleUnSyncedReviews(unSyncedReviews: Review[]) {

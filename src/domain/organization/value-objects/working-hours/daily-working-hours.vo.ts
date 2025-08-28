@@ -1,38 +1,22 @@
-import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
-import {TimeRange} from "@domain/organization/value-objects/working-hours/time-range.vo";
+import { DayOfWeek } from "@domain/common/consts/day-of-week.enums";
+import { TimeRange } from "@domain/organization/value-objects/working-hours/time-range.vo";
 
 export class DailyWorkingHours {
-    constructor(
+    private constructor(
         public readonly dayOfWeek: DayOfWeek,
-        public readonly workingHours: TimeRange,
-        public readonly breakTime?: TimeRange
+        public readonly workingHours: TimeRange | null,
+        public readonly breakTime: TimeRange | null
     ) {
-        if (breakTime) {
-            // Ensure break time is within working hours
-            if (!workingHours.contains(breakTime.start) || !workingHours.contains(breakTime.end)) {
-                throw new Error('Break time must be within working hours.');
-            }
+        if (!workingHours && breakTime) {
+            throw new Error('Cannot have a break time without working hours.');
         }
     }
 
-    /**
-     * @description Compares two DailyWorkingHours objects for equality.
-     */
-    public equals(other: DailyWorkingHours): boolean {
-        const breakEquals = (this.breakTime && other.breakTime) ? this.breakTime.equals(other.breakTime) : !this.breakTime && !other.breakTime;
-        return this.dayOfWeek === other.dayOfWeek &&
-            this.workingHours.equals(other.workingHours) &&
-            breakEquals;
+    static create(dayOfWeek: DayOfWeek, workingHours: TimeRange | null, breakTime: TimeRange | null) {
+        return new DailyWorkingHours(dayOfWeek, workingHours, breakTime);
     }
 
-    /**
-     * @description Returns a description of the daily working hours.
-     */
-    public toString(): string {
-        let description = `${DayOfWeek[this.dayOfWeek]}: ${this.workingHours.toString()}`;
-        if (this.breakTime) {
-            description += ` (Break: ${this.breakTime.toString()})`;
-        }
-        return description;
+    static fromPersistence(dayOfWeek: DayOfWeek, workingHours: TimeRange | null, breakTime: TimeRange | null) {
+        return new DailyWorkingHours(dayOfWeek, workingHours, breakTime);
     }
 }

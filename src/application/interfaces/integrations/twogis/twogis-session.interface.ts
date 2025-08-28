@@ -17,7 +17,10 @@ import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/
 import {
     ISearchedRubricsResult
 } from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
-import {OrganizationId} from "@domain/organization/organization";
+import {
+    OrgByIdBusinessOutDto
+} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id-business.out.dto";
+import {IProxy} from "@application/interfaces/services/proxy/proxy-repository.interface";
 
 export interface ITwogisSession {
     init(companyId?: CompanyId, cabinetCredentials?: TwogisCabinetCredentials): Promise<void>;
@@ -31,8 +34,16 @@ export interface ITwogisSession {
         externalId: string,
         payload: GetOrganizationReviewsInDto,
     ): Promise<Review[] | null>;
-    searchRubrics(accessToken: string, query: string): Promise<ISearchedRubricsResult>
-    addRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void>;
-    deleteRubrics(rubricIds: string[], organizationId: OrganizationId, accessToken: string): Promise<void>;
+    searchRubrics(query: string): Promise<ISearchedRubricsResult>
+    addRubrics(rubricIds: string[], externalId: string): Promise<void>;
+    deleteRubrics(rubricIds: string[], externalId: string): Promise<void>;
 
+    updateWorkingHours(
+        externalId: string,
+        days: {
+            [p: string]: { from?: string; to?: string; breaks?: { from: string; to: string }[] }
+        })
+
+    getByIdOrganizationFromBusiness(externalId: string): Promise<OrgByIdBusinessOutDto>
+    getOrganizationGeometryHover(orgExternalId: string): Promise<{ lat: number; lon: number }>
 }

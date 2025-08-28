@@ -35,6 +35,7 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
             .leftJoinAndSelect('org.workingSchedule', 'schedule')
             .leftJoinAndSelect('schedule.entries', 'scheduleEntries')
             .leftJoinAndSelect('org.rubrics', 'rubrics')
+            .leftJoinAndSelect('rubrics.external', 'external')
             .leftJoinAndSelect('org.placements', 'placements')
             .leftJoinAndSelect('org.address', 'address')
             .leftJoinAndSelect('org.group', 'group');
@@ -79,7 +80,7 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
             group: org.group?.id ? {id: org.group.id, name: org.group.name} : null,
             address: {
                 city: org.address.city,
-                address: org.address.address,
+                addressName: `${org.address.street}, ${org.address.housenumber}`,
                 latitude: org.address.latitude,
                 longitude: org.address.longitude
             },
@@ -87,21 +88,29 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
             createdAt: org.createdAt,
             updatedAt: org.updatedAt,
 
-            workingSchedule: {
-                id: org.workingSchedule?.id,
-                isTemporaryClosed: org.workingSchedule?.isTemporaryClosed,
-                entries: org.workingSchedule?.entries.map(schedule => ({
-                    dayOfWeek: schedule.dayOfWeek,
-                    startTime: schedule.startTime,
-                    endTime: schedule.endTime,
-                    breakStartTime: schedule.breakStartTime,
-                    breakEndTime: schedule.breakEndTime,
-                })) ?? [],
-            },
+            workingSchedule:
+                org.workingSchedule
+                    ? {
+                        isTemporaryClosed: org.workingSchedule.isTemporaryClosed,
+                        entries: org.workingSchedule.entries?.map(schedule => ({
+                                dayOfWeek: schedule.dayOfWeek,
+                                startTime: schedule.startTime,
+                                endTime: schedule.endTime,
+                                breakStartTime: schedule.breakStartTime,
+                                breakEndTime: schedule.breakEndTime
+                                })) || []
+                        }
+                        : null,
             rubrics: org.rubrics?.map(rubric => ({
-                alias: rubric.alias,
+                id: rubric.id,
                 name: rubric.name,
-                type: rubric.type,
+                external: rubric?.external.map(e => {
+                    return {
+                        name: e.name,
+                        externalId: e.externalId,
+                        platform: e.platform
+                    }
+                }) ?? []
             })) ?? [],
             placements: org.placements?.map(placement => ({
                 id: placement.id,
@@ -148,9 +157,9 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
             companyId: org.companyId,
             address: {
                 city: org.address.city,
-                address: org.address.address,
-                latitude: org.address.latitude,
+                addressName: `${org.address.street}, ${org.address.housenumber}`,
                 longitude: org.address.longitude,
+                latitude: org.address.latitude
             },
         }));
     }

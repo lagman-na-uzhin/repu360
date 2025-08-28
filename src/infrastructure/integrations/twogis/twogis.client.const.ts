@@ -64,121 +64,6 @@ export const GET_ORGANIZATION_REVIEWS_NEXT_CONFIG = (url: string) => {
 };
 
 
-export const GET_ORGANIZATION_BRANCH = (
-    accessToken: string,
-    branchId: string,
-) => {
-    return {
-        requestConfig: {
-            url: `https://api.account.2gis.com/api/1.0/branches/${branchId}`,
-            method: REQUEST_METHOD.GET,
-            headers: {
-                Accept: '*/*',
-                Origin: 'https://2gis.kz',
-                Referer: 'https://2gis.kz/',
-                Authorization: `Bearer ${accessToken}`,
-            },
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.DATA,
-        },
-    };
-};
-
-export const AUTH_BASIC_CONFIG = (email: string, password: string) => {
-    const grant_type = 'password';
-    const locale = 'ru-KZ';
-    return {
-        requestConfig: {
-            url: 'https://id.2gis.com/api/v1/sign_in',
-            method: REQUEST_METHOD.POST,
-            data: {
-                grant_type,
-                locale,
-                username: email,
-                password,
-            },
-            headers: {
-                Accept: '*/*',
-                Origin: 'https://2gis.kz',
-                Referer: 'https://2gis.kz/',
-            },
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.COOKIE,
-        },
-    };
-};
-
-export const AUTH_BASIC_WITH_NAME_CONFIG = (
-    email: string,
-    password: string,
-) => {
-    const grant_type = 'password';
-    const locale = 'ru-KZ';
-    return {
-        requestConfig: {
-            url: 'https://id.2gis.com/api/v1/sign_in',
-            method: REQUEST_METHOD.POST,
-            data: {
-                grant_type,
-                locale,
-                username: email,
-                password,
-            },
-            headers: {
-                Accept: '*/*',
-                Origin: 'https://2gis.kz',
-                Referer: 'https://2gis.kz/',
-            },
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.LOGIN_GET_NAME,
-        },
-    };
-};
-
-export const SEND_REVIEW_CONFIG = (
-    token: string,
-    objectId: string,
-    objectType: string,
-    rating: string,
-    imagesId: string[],
-    text?: string,
-) => {
-    const formData = new FormData2();
-
-    formData.append('object_id', objectId);
-    formData.append('object_type', objectType === 'branch' ? 'branch' : 'geo');
-    formData.append('rating', rating);
-    if (text) {
-        formData.append('text', text);
-    }
-    formData.append('fields', 'reviews.hiding_reason');
-    if (imagesId.length) {
-        formData.append('photo_ids', imagesId.join(','));
-    }
-
-    return {
-        requestConfig: {
-            url: 'https://public-api.reviews.2gis.com/2.0/reviews?key=b0209295-ae15-48b2-acb2-58309b333c37&locale=ru_KZ',
-            method: REQUEST_METHOD.POST,
-            data: formData,
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: '*/*',
-                Origin: 'https://2gis.kz',
-                Referer: 'https://2gis.kz/',
-                ...formData.getHeaders(),
-            },
-            timeout: 120000,
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.RES,
-        },
-    };
-};
-
 export const SEARCH_RUBRICS_CONFIG = (
     token: string,
     query: string,
@@ -196,90 +81,6 @@ export const SEARCH_RUBRICS_CONFIG = (
         },
         localConfig: {
             responseType: RESPONSE_TYPE.RES,
-        },
-    };
-};
-
-
-export const SET_AVATAR_FIRST_CONFIG = (token: string, externalId: string) => {
-    const formData3 = new FormData2();
-
-    formData3.append('key', 'Cugh6ahW');
-    formData3.append('object_id', `${externalId}`);
-    formData3.append('object_type', 'profile');
-    formData3.append('album_code', 'avatar');
-    formData3.append('locale', 'ru_KZ');
-    formData3.append('region_id', '67');
-    formData3.append('items[0][uid]', '36787300-b23a-4ee2-88c2-aec9125bd48e');
-    formData3.append('replace', 'true');
-
-    return {
-        requestConfig: {
-            method: REQUEST_METHOD.POST,
-            url: `https://api.photo.2gis.com/2.0/photo/add`,
-            headers: {
-                'Auth-Token': token,
-                ...formData3.getHeaders(),
-            },
-            data: formData3,
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.DATA,
-        },
-    };
-};
-
-export const SET_AVATAR_SECOND_CONFIG = (
-    uniq: string,
-    hash: string,
-    image: Buffer,
-    token: string,
-) => {
-    const formData4 = new FormData2();
-
-    formData4.append('key', 'Cugh6ahW');
-    formData4.append('items[0][id]', `${uniq}`);
-    formData4.append('items[0][hash]', `${hash}`);
-    formData4.append('items[0][file]', image, { filename: getFileName() });
-    formData4.append(
-        'preview_size',
-        '656x340,328x170,232x232,176x176,116x116,88x88',
-    );
-
-    return {
-        requestConfig: {
-            method: REQUEST_METHOD.POST,
-            url: `https://api.photo.2gis.com/2.0/photo/upload`,
-            headers: {
-                'Auth-Token': token,
-                'Content-Type':
-                    'multipart/form-data; boundary=----WebKitFormBoundaryyVIAOUFhV274cYPr',
-                ...formData4.getHeaders(),
-            },
-            data: formData4,
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.DATA,
-        },
-    };
-};
-
-export const SET_AVATAR_THIRD_CONFIG = (token: string, url: string) => {
-    const formData3 = new FormData2();
-
-    formData3.append('avatar', url);
-
-    return {
-        requestConfig: {
-            method: REQUEST_METHOD.PATCH,
-            url: `https://api.auth.2gis.com/2.1/users/me?locale=ru_KZ&client_id=VDEDqs4X9Rn2cz3FbBqFnFmhVdn76fN8&access_token=${token}`,
-            headers: {
-                ...formData3.getHeaders(),
-            },
-            data: formData3,
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.DATA,
         },
     };
 };
@@ -430,6 +231,26 @@ export const GET_BY_ID_ORG = (externalId: string) => {
             url: `https://catalog.api.2gis.com/3.0/items/byid?id=${externalId}&locale=ru_RU&fields=${fields}&key=${key}`,
             headers: {
                 Accept: 'application/json, text/plain, */*',
+            },
+        },
+        localConfig: {
+            responseType: RESPONSE_TYPE.DATA,
+        },
+    }
+}
+
+export const GET_BY_ID_ORG_FROM_BUSINESS = (externalId: string, accessToken: string) => {
+    const fields = 'contactGroupsWithSplittedPhone,schedule,country,rubrics'
+
+    return {
+        requestConfig: {
+            url: `https://api.account.2gis.com/api/1.0/branches/${externalId}?fields=${fields}`,
+            headers: {
+                Accept: 'application/json, text/plain, */*',
+                Authorization: `Bearer ${accessToken}`,
+                Origin: 'https://account.2gis.com',
+                Referer: 'https://account.2gis.com',
+                'Content-Type': 'application/json'
             },
         },
         localConfig: {
@@ -633,29 +454,6 @@ export const DELETE_OFFICIAL_ANSWER_CONFIG = (
     };
 };
 
-export const RESTORE_PROFILE_PASSWORD = (email: string) => {
-    const params = new URLSearchParams();
-    params.append('grant_type', 'email');
-    params.append('email', email);
-
-    return {
-        requestConfig: {
-            url: `https://api.auth.2gis.com/2.1/users/recovery?client_id=v4-iphone&locale=ru_KZ`,
-            method: REQUEST_METHOD.POST,
-            data: params,
-            headers: {
-                Accept: '*/*',
-                Origin: 'https://2gis.kz',
-                Referer: 'https://2gis.kz/',
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.RES,
-        },
-    };
-};
-
 export const SEND_COMPLAINT = (
     accessToken: string,
     reviewExternalId: string,
@@ -708,49 +506,74 @@ export const GET_COMPLAINTS = (
     };
 };
 
-export const GET_RATINGS_CONFIG = (oranizationExternalId: string) => {
+export const UPDATE_RUBRICS_CONFIG = (data: {rubrics: {action: string, id: string}[]}, accessToken: string, externalId: string) => {
     return {
         requestConfig: {
-            url: `https://public-api.reviews.2gis.com/2.0/objects/${oranizationExternalId}/ratings?key=6e7e1929-4ea9-4a5d-8c05-d601860389bd`,
-            method: REQUEST_METHOD.GET,
-            headers: {
-                Accept: 'application/json, text/plain, */*',
-                AcceptLanguage: 'en-GB,en-US;q=0.9,en;q=0.8',
-                Origin: 'https://2gis.kz',
-                Priority: 'u=1, i',
-                Referer: 'https://2gis.kz/',
-                secChUa: '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
-                SecChUaMobile: '?0',
-                SecChUaPlatform: '"macOS"',
-                SecFetchDest: 'empty',
-                SecFetchMode: 'cors',
-                SecFetchSite: 'cross-site',
-            },
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.DATA,
-        }
-    }
-}
-
-
-export const UPDATE_RUBRICS_CONFIG = (data: {rubrics: {action: string, id: string}[]}, accessToke: string, organizationId: string) => {
-    return {
-        requestConfig: {
-            url: `https://api.account.2gis.com/api/1.0/branches/${organizationId}`,
+            url: `https://api.account.2gis.com/api/1.0/branches/${externalId}`,
             method: REQUEST_METHOD.PUT,
             data,
             headers: {
+                Authorization: `Bearer ${accessToken}`,
                 Accept: 'application/json, text/plain, */*',
                 AcceptLanguage: 'en-US,en;q=0.5',
                 Origin: 'https://account.2gis.com',
                 Referer: 'https://account.2gis.com/',
-        },
-        localConfig: {
-            responseType: RESPONSE_TYPE.DATA,
+            },
+            localConfig: {
+                responseType: RESPONSE_TYPE.DATA,
+            }
         }
     }
 }
-function getFileName() {
-    return `${Math.round(new Date().getTime() / 1000)}${extname('image')}`;
+
+export const UPDATE_WORKING_HOURS = (
+    data: {
+        schedule: {
+            comment: null,
+            days: { [p: string]: { from?: string; to?: string; breaks?: { from: string; to: string }[] }}
+        }
+    },
+    accessToken: string,
+    externalId: string
+) => {
+    return {
+        requestConfig: {
+            url: `https://api.account.2gis.com/api/1.0/branches/${externalId}`,
+            method: REQUEST_METHOD.PUT,
+            data,
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                Accept: 'application/json, text/plain, */*',
+                AcceptLanguage: 'en-US,en;q=0.5',
+                Origin: 'https://account.2gis.com',
+                Referer: 'https://account.2gis.com/',
+            },
+            localConfig: {
+                responseType: RESPONSE_TYPE.DATA,
+            }
+        }
+    }
 }
+
+export const GET_ORGANIZATION_GEOMETRY_HOVER = (
+    externalIdOrg: string,
+    accessToken: string,
+) => {
+    return {
+        requestConfig: {
+            url: `https://catalog.api.2gis.ru/3.0/items/byid?id=${externalIdOrg}&fields=items.links.database_entrances,items.geometry.hover&key=rupycp2722`,
+            method: REQUEST_METHOD.GET,
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                Accept: 'application/json, text/plain, */*',
+                AcceptLanguage: 'en-US,en;q=0.5',
+                Origin: 'https://account.2gis.com',
+                Referer: 'https://account.2gis.com/',
+            },
+            localConfig: {
+                responseType: RESPONSE_TYPE.DATA,
+            }
+        }
+    }
+}
+

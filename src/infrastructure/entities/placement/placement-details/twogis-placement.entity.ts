@@ -15,9 +15,6 @@ export class TwogisPlacementDetailEntity {
     @PrimaryColumn({type: "uuid", unique: true})
     placementId: string;
 
-    @Column()
-    type: string;
-
     @Column({ nullable: true })
     cabinetLogin: string;
 

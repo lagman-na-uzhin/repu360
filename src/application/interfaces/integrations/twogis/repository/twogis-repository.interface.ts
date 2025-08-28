@@ -15,11 +15,18 @@ import {
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 import {
-    ISearchedRubricsResult
+    ISearchedRubricsResult, SearchedRubricsOutDto
 } from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
+import {
+    OrgByIdBusinessOutDto
+} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id-business.out.dto";
+import {
+    OrgGeometryHoverOutDto
+} from "@application/interfaces/integrations/twogis/client/dto/out/org-geometry-hover.out.dto";
 
 export interface ITwogisRepository {
     getByIdOrganization(externalId: string, proxy: IProxy): Promise<OrgByIdOutDto>
+    getByIdOrganizationFromBusiness(externalId: string, accessToken: string, proxy: IProxy): Promise<OrgByIdBusinessOutDto>
     getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials, proxy: IProxy): Promise<ILoginTwogisCabinetResponse>
     generateReply(accessToken: string, authorName: string, proxy: IProxy): Promise<IGenerateReply>
     getOrganizationReviews(
@@ -31,7 +38,7 @@ export interface ITwogisRepository {
     generateReply(accessToken: string, authorName: string, proxy: IProxy): Promise<IGenerateReply>;
     getReviewFromCabinet(accessToken: string, reviewExternalId: string, proxy: IProxy): Promise<IReviewFromCabinet>;
     sendOfficialReply(accessToken: string, text: string, reviewExternalId: string, proxy: IProxy): Promise<ISendReply>;
-    searchRubrics(accessToken: string, query: string, proxy: IProxy): Promise<ISearchedRubricsResult>;
+    searchRubrics(query: string, accessToken: string,  proxy: IProxy): Promise<SearchedRubricsOutDto>;
     updateRubrics(data: {
         rubrics: {action: 'add', id: string}[]
     },
@@ -39,4 +46,5 @@ export interface ITwogisRepository {
                   accessToken: string,
                   proxy: IProxy
     ): Promise<void>
+    getOrganizationGeometryHover(orgExternalId: string, accessToken: string, proxy: IProxy): Promise<{ lat: number; lon: number }>
 }

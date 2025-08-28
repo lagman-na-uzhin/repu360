@@ -1,6 +1,6 @@
 export interface QSOrganizationAddressDto {
     city: string;
-    address: string;
+    addressName: string;
     latitude: number;
     longitude: number;
 }

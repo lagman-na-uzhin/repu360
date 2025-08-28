@@ -10,6 +10,7 @@ import {CompanyOrmRepository} from "@infrastructure/repositories/company/company
 import {TariffOrmRepository} from "@infrastructure/repositories/subscription/tariff.repository";
 import {PlacementOrmRepository} from "@infrastructure/repositories/placement/placement.repository";
 import {OrganizationOrmRepository} from "@infrastructure/repositories/organization/organization.repository";
+import {RubricOrmRepository} from "@infrastructure/repositories/rubric/rubric-repository";
 
 
 
@@ -30,7 +31,8 @@ export class UnitOfWork implements IUnitOfWork {
                 companyRepo: new CompanyOrmRepository(manager),
                 tariffRepo: new TariffOrmRepository(manager),
                 placementRepo: new PlacementOrmRepository(manager),
-                organizationRepo: new OrganizationOrmRepository(manager)
+                organizationRepo: new OrganizationOrmRepository(manager),
+                rubricRepo: new RubricOrmRepository(manager)
 
             };
 

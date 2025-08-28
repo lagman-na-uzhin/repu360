@@ -14,9 +14,11 @@ import {ManagerLeadPermission} from "@domain/policy/model/control/manager-lead-p
 import {DefaultReviewPermission} from "@domain/policy/model/default/default-review-permission.enum";
 import {DefaultOrganizationPermission} from "@domain/policy/model/default/default-organization-permission.enum";
 import {DefaultEmployeePermission} from "@domain/policy/model/default/default-employee-permission.enum";
+import {Injectable} from "@nestjs/common";
 
 const GLOBAL_ORGANIZATION_KEY = "*";
 
+@Injectable()
 export class RoleOrmRepository implements IRoleRepository {
     constructor(
         @InjectEntityManager() private readonly manager: EntityManager,

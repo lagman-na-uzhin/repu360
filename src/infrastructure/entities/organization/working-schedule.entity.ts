@@ -15,21 +15,21 @@ import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/
 
 @Entity('organization_working_schedules')
 export class WorkingScheduleEntity {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn('uuid')
     id: string;
 
     @Column({ name: 'organization_id' })
     organizationId: string;
 
-    @Column()
+    @Column({default: false})
     isTemporaryClosed: boolean;
 
     @OneToMany(
         () => WorkingScheduleEntryEntity,
             entries => entries.schedule,
-        { cascade: ['update', 'insert', 'recover', 'remove', 'soft-remove'] }
+        { cascade: ['update', 'insert', 'recover', 'remove', 'soft-remove'], eager: true}
     )
-    entries: WorkingScheduleEntryEntity[];
+    entries: WorkingScheduleEntryEntity[] | null;
 
     @OneToOne(() => OrganizationEntity)
     @JoinColumn({name: 'organization_id'})

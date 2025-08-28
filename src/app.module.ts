@@ -22,6 +22,7 @@ import {TwogisModule} from "@infrastructure/integrations/twogis/twogis.module";
 import {TestController} from "@presentation/test.controller";
 import {MailerModule} from "@infrastructure/services/mail/mailer.module";
 import {BullServiceModule} from "@infrastructure/services/bull/bull.module";
+import {GeocoderServiceModule} from "@infrastructure/services/geocoder/geocoder.module";
 
 @Module({
   imports: [
@@ -78,7 +79,8 @@ import {BullServiceModule} from "@infrastructure/services/bull/bull.module";
     UnitOfWorkModule,
     TwogisModule,
     MailerModule,
-    BullServiceModule
+    BullServiceModule,
+      GeocoderServiceModule
   ],
   controllers: [TestController], //TODO TEST
   providers: [

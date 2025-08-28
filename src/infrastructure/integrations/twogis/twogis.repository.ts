@@ -22,12 +22,12 @@ import {Reply} from "@domain/review/model/review/reply/reply";
 import {ReplyType} from "@domain/review/value-object/reply/reply-type.vo";
 import {ProxyService} from "@infrastructure/services/request/proxy.service";
 import {
-  ACCOUNT_2GIS_AUTH,
-  GENERATE_REVIEW_REPLY_CONFIG, GET_BY_ID_ORG,
-  GET_ORGANIZATION_REVIEWS_CONFIG,
-  GET_ORGANIZATION_REVIEWS_NEXT_CONFIG,
-  GET_REVIEW_CONFIG, SEARCH_RUBRICS_CONFIG,
-  SEND_REVIEW_REPLY_CONFIG, UPDATE_RUBRICS_CONFIG
+    ACCOUNT_2GIS_AUTH,
+    GENERATE_REVIEW_REPLY_CONFIG, GET_BY_ID_ORG, GET_BY_ID_ORG_FROM_BUSINESS, GET_ORGANIZATION_GEOMETRY_HOVER,
+    GET_ORGANIZATION_REVIEWS_CONFIG,
+    GET_ORGANIZATION_REVIEWS_NEXT_CONFIG,
+    GET_REVIEW_CONFIG, SEARCH_RUBRICS_CONFIG,
+    SEND_REVIEW_REPLY_CONFIG, UPDATE_RUBRICS_CONFIG, UPDATE_WORKING_HOURS
 } from "@infrastructure/integrations/twogis/twogis.client.const";
 import {
   IReviewFromCabinet
@@ -38,8 +38,14 @@ import {
 } from "@application/interfaces/integrations/twogis/client/dto/out/login-cabinet.out.dto";
 import {OrgByIdOutDto} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id.out.dto";
 import {
-  ISearchedRubricsResult
+    ISearchedRubricsResult, SearchedRubricsOutDto
 } from "@application/interfaces/integrations/twogis/client/dto/out/searched-rubrics.out.dto";
+import {
+    OrgByIdBusinessOutDto
+} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id-business.out.dto";
+import {
+    OrgGeometryHoverOutDto
+} from "@application/interfaces/integrations/twogis/client/dto/out/org-geometry-hover.out.dto";
 
 export class TwogisRepository implements ITwogisRepository {
   constructor(
@@ -51,6 +57,14 @@ export class TwogisRepository implements ITwogisRepository {
     console.log("get by id repo",  externalId)
     return this.requestService.request(
         GET_BY_ID_ORG(externalId),
+        proxy,
+        1,
+    );
+  }
+
+  async getByIdOrganizationFromBusiness(externalId: string, accessToken: string, proxy: IProxy): Promise<OrgByIdBusinessOutDto> {
+    return this.requestService.request(
+        GET_BY_ID_ORG_FROM_BUSINESS(externalId, accessToken),
         proxy,
         1,
     );
@@ -115,23 +129,68 @@ export class TwogisRepository implements ITwogisRepository {
     return allReviews;
   }
 
-  async searchRubrics(accessToken: string, query: string, proxy: IProxy): Promise<ISearchedRubricsResult> {
-    return this.requestService.request(
+  async searchRubrics( query: string, accessToken: string, proxy: IProxy): Promise<SearchedRubricsOutDto> {
+    const res = (await this.requestService.request(
         SEARCH_RUBRICS_CONFIG(accessToken, query),
         proxy,
         1,
-    );
+    )).data;
+      return res
   }
 
-  async updateRubrics(data: { rubrics: { action: string; id: string }[] }, organizationId: string, accessToken: string, proxy: IProxy): Promise<void> {
+  async updateRubrics(data: { rubrics: { action: string; id: string }[] }, externalId: string, accessToken: string, proxy: IProxy): Promise<void> {
     return this.requestService.request(
-        UPDATE_RUBRICS_CONFIG(data, accessToken, organizationId),
+        UPDATE_RUBRICS_CONFIG(data, accessToken, externalId),
         proxy,
         1,
     );
   }
 
-  private async fetchReviews(
+  async updateWorkingHours(
+      externalId: string,
+      accessToken: string,
+      proxy: IProxy,
+      days: {
+        [p: string]: { from?: string; to?: string; breaks?: { from: string; to: string }[] }
+      }
+  ) {
+    const payload = {
+      schedule: {
+        comment: null,
+        days
+      }
+    }
+    return this.requestService.request(
+        UPDATE_WORKING_HOURS(payload, accessToken, externalId),
+        proxy,
+        1,
+    );
+  }
+
+
+  async getOrganizationGeometryHover(orgExternalId: string, accessToken: string, proxy: IProxy): Promise<{ lat: number; lon: number }> {
+      const res: OrgGeometryHoverOutDto = await this.requestService.request(
+          GET_ORGANIZATION_GEOMETRY_HOVER(orgExternalId, accessToken),
+          proxy,
+          1,
+      );
+      let lon: number | null = 0;
+      let lat: number | null = 0;
+
+      const geometry = res.result.items[0].links.database_entrances[0].geometry.points[0]
+
+      const regex = /POINT\(([-\d.]+) ([-\d.]+)\)/;
+      const matches = geometry.match(regex);
+
+      if (matches && matches.length === 3) {
+          lon = parseFloat(matches[1]);
+          lat = parseFloat(matches[2]);
+      }
+
+      return { lat, lon}
+  }
+
+    private async fetchReviews(
       source: string,
       payload: GetOrganizationReviewsInDto,
       proxy: IProxy,

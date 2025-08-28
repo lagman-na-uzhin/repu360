@@ -7,16 +7,12 @@ export const DEFAULT_ROUTES = {
   },
 
   ORGANIZATION: {
-    BASE: 'organizations',
-
-    ADD: '',
-
-    GET_LIST: '',
-
-    COMPACT_ORGANIZATIONS: 'c',
-
-    SUMMARY: 'summary'
-
+      BASE: 'organizations',
+      ADD: '',
+      GET_LIST: '',
+      COMPACT_ORGANIZATIONS: 'c',
+      SUMMARY: 'summary',
+      UPDATE: ':organizationId'
   },
 
   EMPLOYEE: {
@@ -56,9 +52,9 @@ export const DEFAULT_ROUTES = {
   },
 
   EXTERNAL: {
-    BASE: 'external',
-
-    GOOGLE_PLACES_SEARCH: 'google/places-search'
+      BASE: 'external',
+      GOOGLE_PLACES_SEARCH: 'google/places-search',
+      TWOGIS_SEARCH_RUBRICS: 'twogis/rubrics-search'
   }
 
 } as const;

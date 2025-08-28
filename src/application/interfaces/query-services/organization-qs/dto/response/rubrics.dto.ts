@@ -1,5 +1,11 @@
+import {PLATFORMS} from "@domain/common/platfoms.enum";
+
 export interface QSOrganizationRubricsDto {
-    alias: string;
+    id: string;
     name: string;
-    type: "primary" | "additional";
+    external: {
+        name: string;
+        externalId: string;
+        platform: PLATFORMS
+    }[]
 }

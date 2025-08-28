@@ -38,6 +38,7 @@ import {roleProxyExports} from "@application/use-case-proxies/role/role.proxy";
 import {mailProxyExports} from "@application/use-case-proxies/mail/mail.proxy";
 import {mailProxyProviders} from "@infrastructure/providers/mail/mail.provider";
 import {MailerModule} from "@infrastructure/services/mail/mailer.module";
+import {GeocoderServiceModule} from "@infrastructure/services/geocoder/geocoder.module";
 
 @Module({
   imports: [
@@ -54,7 +55,8 @@ import {MailerModule} from "@infrastructure/services/mail/mailer.module";
     TwogisModule,
     GoogleModule,
     QueryServicesModule,
-    MailerModule
+    MailerModule,
+      GeocoderServiceModule
   ],
 })
 export class UsecaseProxyModule {

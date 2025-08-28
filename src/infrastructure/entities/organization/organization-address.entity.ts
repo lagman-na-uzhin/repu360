@@ -1,4 +1,3 @@
-import { OrganizationPlacementEntity } from '../placement/organization-placement.entity';
 import {
     Column,
     CreateDateColumn, DeleteDateColumn,
@@ -17,10 +16,19 @@ export class OrganizationAddressEntity {
     public organizationId: string;
 
     @Column()
-    public city: string;
+    country: string;
 
     @Column()
-    public address: string;
+    city: string;
+
+    @Column()
+    district: string;
+
+    @Column()
+    street: string;
+
+    @Column()
+    housenumber: string;
 
     @Column('decimal', { precision: 10, scale: 7 })
     latitude: number;

@@ -96,7 +96,6 @@ export class PlacementOrmRepository implements IPlacementRepository {
             const twogisDetailEntity = new TwogisPlacementDetailEntity();
             const detail = placement.getTwogisPlacementDetail();
             twogisDetailEntity.placementId = placement.id.toString()
-            twogisDetailEntity.type = detail.type;
             entity.twogisDetail = twogisDetailEntity;
         } else if (placement.placementDetail instanceof YandexPlacementDetail) {
             const yandexDetailEntity = new YandexPlacementDetailEntity();
@@ -113,7 +112,6 @@ export class PlacementOrmRepository implements IPlacementRepository {
         let placementDetail;
         if (entity.twogisDetail) {
             placementDetail = TwogisPlacementDetail.fromPersistence(
-                entity.twogisDetail.type,
                 entity.twogisDetail.cabinetLogin,
                 entity.twogisDetail.cabinetPassword
             );
@@ -162,6 +160,7 @@ export class PlacementOrmRepository implements IPlacementRepository {
                 organizationId: organizationId.toString()
             }
         })
+        console.log(entity, "entity")
         return entity ? this.toDomain(entity) : null;
     }
 }

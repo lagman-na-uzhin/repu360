@@ -14,11 +14,12 @@ export class Organization {
     private readonly _id: OrganizationId,
     private readonly _companyId: CompanyId,
     private _groupId: GroupId | null,
+    private _is_active: boolean,
     private _name: string,
     private _address: OrganizationAddress,
-    private _working_schedule: WorkingSchedule,
+    private _working_schedule: WorkingSchedule | null,
     private _contact_points: ContactPoint[],
-    private _rubrics: RubricId[],
+    private _rubricIds: RubricId[],
   ) {}
 
   static create(
@@ -26,14 +27,16 @@ export class Organization {
       groupId: GroupId | null,
       name: string,
       address: OrganizationAddress,
-      workingSchedule: WorkingSchedule,
+      workingSchedule: WorkingSchedule | null,
       contactPoints: ContactPoint[],
       rubrics: RubricId[],
+      isActive: boolean = true,
   ): Organization | any {
     return new Organization(
         new OrganizationId(),
         companyId,
         groupId,
+        isActive,
         name,
         address,
         workingSchedule,
@@ -48,19 +51,21 @@ export class Organization {
       name: string,
       address: OrganizationAddress,
       groupId: string | null,
-      workingHours: WorkingSchedule,
+      workingHours: WorkingSchedule | null,
       contactPoints: ContactPoint[],
-      rubrics: RubricId[],
+      rubricIds: RubricId[],
+      isActive: boolean = true,
       ) {
     return new Organization(
         new OrganizationId(id),
         new CompanyId(companyId),
         groupId ? new GroupId(groupId) : null,
+        isActive,
         name,
         address,
         workingHours,
         contactPoints,
-        rubrics,
+        rubricIds,
     );
   }
 
@@ -76,6 +81,10 @@ export class Organization {
     return this._id;
   }
 
+  get isActive() {
+      return this._is_active;
+  }
+
   get companyId(): CompanyId {
     return this._companyId;
   }
@@ -88,20 +97,21 @@ export class Organization {
     return this._address;
   }
 
+  get contactPoints() {return this._contact_points}
 
-  get workingSchedule() {
+  get workingSchedule(): WorkingSchedule | null {
     return this._working_schedule;
   }
   set workingSchedule(schedule: WorkingSchedule) {
     this._working_schedule = schedule
   }
 
-  get rubrics() {
-    return this._rubrics;
+  get rubricIds() {
+    return this._rubricIds;
   }
 
-  set rubrics(rubrics: RubricId[]) {
-    this._rubrics = rubrics;
+  set rubricIds(rubrics: RubricId[]) {
+    this._rubricIds = rubrics;
   }
 
   toPlainObject() {

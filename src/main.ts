@@ -37,9 +37,10 @@ async function bootstrap() {
   await app.register(fastifyCookie);
 
   await app.register(fastifyCors, {
-    credentials: true,
-    origin: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true,
+      origin: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   app.useGlobalFilters(new AllExceptionFilter(new WinstonService()));

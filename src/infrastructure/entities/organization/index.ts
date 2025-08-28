@@ -4,10 +4,10 @@ import {ContactPointEntity} from "@infrastructure/entities/organization/contact-
 import {WorkingScheduleEntryEntity} from "@infrastructure/entities/organization/working-schedule-entries.entity";
 import {WorkingScheduleEntity} from "@infrastructure/entities/organization/working-schedule.entity";
 export const ORGANIZATION_ENTITIES = [
-  OrganizationEntity,
+    OrganizationEntity,
     OrganizationGroupEntity,
     WorkingScheduleEntity,
     WorkingScheduleEntryEntity,
-    ContactPointEntity
+    ContactPointEntity,
 
 ]

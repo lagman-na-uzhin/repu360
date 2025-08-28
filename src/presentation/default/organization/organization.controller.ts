@@ -1,4 +1,4 @@
-import {Controller, Get, Inject, Post, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Inject, Param, Post, Put, UseGuards} from '@nestjs/common';
 import {DEFAULT_ROUTES} from "@presentation/routes";
 import JwtAuthGuard from "@infrastructure/common/guards/jwt-auth.guard";
 import {RequestActor} from "@infrastructure/common/decorators/request-actor.decorator";
@@ -30,6 +30,16 @@ import {
 import {GetSummaryRequest} from "@presentation/default/organization/dto/get-summary.request";
 import {GetSummaryQuery} from "@application/use-cases/default/organization/queries/get-summary/get-summary.query";
 import {GetSummaryUseCase} from "@application/use-cases/default/organization/queries/get-summary/get-summary.usecase";
+import {
+    UpdateOrganizationUseCase
+} from "@application/use-cases/default/organization/commands/update/update-organization.usecase";
+import {
+    UpdateOrganizationCommand
+} from "@application/use-cases/default/organization/commands/update/update-organization.command";
+import {
+    UpdateOrganizationBodyRequestDto,
+    UpdateOrganizationParamRequestDto
+} from "@presentation/default/organization/dto/update-organization.request";
 
 @UseGuards(JwtAuthGuard)
 @Controller(DEFAULT_ROUTES.ORGANIZATION.BASE)
@@ -37,6 +47,8 @@ export class OrganizationController {
     constructor(
         @Inject(OrganizationProxy.ADD)
         private readonly addOrganizationProxy: UseCaseProxy<AddOrganizationUseCase>,
+        @Inject(OrganizationProxy.UPDATE)
+        private readonly updateProxy: UseCaseProxy<UpdateOrganizationUseCase>,
         @Inject(OrganizationProxy.GET_LIST)
         private readonly getListProxy: UseCaseProxy<GetOrganizationListUseCase>,
         @Inject(OrganizationProxy.COMPACT_ORGANIZATIONS)
@@ -54,6 +66,17 @@ export class OrganizationController {
         return this.addOrganizationProxy.getInstance().execute(command);
     }
 
+    @Put(DEFAULT_ROUTES.ORGANIZATION.UPDATE)
+    async update(
+        @Param() params: UpdateOrganizationParamRequestDto,
+        @Body() dto: UpdateOrganizationBodyRequestDto,
+        @RequestActor() actor
+    ) {
+        const command = UpdateOrganizationCommand.of({organizationId: params.organizationId, ...dto}, actor);
+
+        return this.updateProxy.getInstance().execute(command);
+
+    }
 
     @Get(DEFAULT_ROUTES.ORGANIZATION.GET_LIST)
     async getListByCompany(

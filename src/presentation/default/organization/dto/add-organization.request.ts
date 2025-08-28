@@ -22,4 +22,7 @@ export class AddOrganizationRequestDto {
     @IsEnum(PLATFORMS)
     public readonly platform: PLATFORMS;
 
+    public readonly login: string;
+    public readonly password: string;
+
 }

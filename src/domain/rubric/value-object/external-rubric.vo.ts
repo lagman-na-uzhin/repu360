@@ -10,6 +10,9 @@ export class ExternalRubric {
     static create(platform: PLATFORMS, name: string, externalId: string) {
         return new ExternalRubric(platform, name, externalId);
     }
+    static fromPersistence(platform: PLATFORMS, name: string, externalId: string) {
+        return new ExternalRubric(platform, name, externalId);
+    }
     get platform() {return this._platform}
     get name() {return this._name}
     get externalId() {return this._external_id}

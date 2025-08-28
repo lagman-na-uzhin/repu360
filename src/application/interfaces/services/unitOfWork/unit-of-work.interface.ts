@@ -7,6 +7,7 @@ import {ICompanyRepository} from "@domain/company/repositories/company-repositor
 import {ITariffRepository} from "@domain/subscription/repositories/tariff-repository.interface";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
 import {IOrganizationRepository} from "@domain/organization/repositories/organization-repository.interface";
+import {IRubricRepository} from "@domain/rubric/repositories/rubric-repository.interface";
 
 export interface IUnitOfWork {
     run<T>(work: (ctx: IUnitOfWorkContext) => Promise<T>): Promise<T>;
@@ -23,4 +24,5 @@ export interface IUnitOfWorkContext {
     tariffRepo: ITariffRepository;
     placementRepo: IPlacementRepository;
     organizationRepo: IOrganizationRepository;
+    rubricRepo: IRubricRepository;
 }
