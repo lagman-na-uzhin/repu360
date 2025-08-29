@@ -1,13 +1,13 @@
 export const DEFAULT_ROUTES = {
   COMPANY: {
-    BASE: 'company',
+    BASE: 'api/company',
 
     BY_ID: ':companyId', //GET
     UPDATE: ':companyId', //PATCH
   },
 
   ORGANIZATION: {
-      BASE: 'organizations',
+      BASE: 'api/organizations',
       ADD: '',
       GET_LIST: '',
       COMPACT_ORGANIZATIONS: 'c',
@@ -16,7 +16,7 @@ export const DEFAULT_ROUTES = {
   },
 
   EMPLOYEE: {
-    BASE: 'employees',
+    BASE: 'api/employees',
 
     CREATE: '', //POST
     LIST: '', //GET
@@ -26,7 +26,7 @@ export const DEFAULT_ROUTES = {
   },
 
   REVIEW: {
-    BASE: 'reviews',
+    BASE: 'api/reviews',
 
     LIST: '', //GET
     BY_ID: ':reviewId', //GET
@@ -39,20 +39,20 @@ export const DEFAULT_ROUTES = {
   },
 
   MANAGER: {
-    BASE: 'managers',
+    BASE: 'api/managers',
 
     BY_ID: ':managerId', //GET
   },
 
   ROLE: {
-    BASE: 'roles',
+    BASE: 'api/roles',
 
     ROLES: '',
     CREATE_EMPLOYEE_ROLE: 'employee', //POST
   },
 
   EXTERNAL: {
-      BASE: 'external',
+      BASE: 'api/external',
       GOOGLE_PLACES_SEARCH: 'google/places-search',
       TWOGIS_SEARCH_RUBRICS: 'twogis/rubrics-search'
   }
