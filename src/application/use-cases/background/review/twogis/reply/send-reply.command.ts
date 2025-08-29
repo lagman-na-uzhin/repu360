@@ -1,11 +1,15 @@
+import {PlacementId} from "@domain/placement/placement";
+import {ReviewId} from "@domain/review/review";
+import {CompanyId} from "@domain/company/company";
+
 export class TwogisSendReplyCommand {
     private constructor(
-        public readonly placementId: string,
-        public readonly reviewId: string,
-        public readonly companyId: string,
+        public readonly placementId: PlacementId,
+        public readonly reviewId: ReviewId,
+        public readonly companyId: CompanyId,
     ) {}
 
-    public static of(placementId: string, reviewId: string, companyId: string) {
+    public static of(placementId: PlacementId, reviewId: ReviewId, companyId: CompanyId) {
         return new TwogisSendReplyCommand(placementId, reviewId, companyId);
     }
 }

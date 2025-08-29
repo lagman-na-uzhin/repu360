@@ -105,20 +105,24 @@ export class TwogisSession implements ITwogisSession {
         return this.repo.getCabinetAccessToken(cabinetCredentials, this.proxy);
     }
 
-    async generateReply(accessToken: string, authorName: string): Promise<IGenerateReply> {
-        return this.repo.generateReply(accessToken, authorName, this.proxy);
+    async generateReply(authorName: string): Promise<IGenerateReply> {
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+        return this.repo.generateReply(this.cabinetAccessToken, authorName, this.proxy);
     }
-    async getReviewFromCabinet(reviewExternalId: string, accessToken: string): Promise<IReviewFromCabinet> {
-        return this.repo.getReviewFromCabinet(reviewExternalId, accessToken, this.proxy);
+    async getReviewFromCabinet(reviewExternalId: string): Promise<IReviewFromCabinet> {
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+        return this.repo.getReviewFromCabinet(reviewExternalId, this.cabinetAccessToken, this.proxy);
     }
 
-    async sendOfficialReply(accessToken: string, text: string, reviewExternalId: string) {
-        return this.repo.sendOfficialReply(accessToken, text, reviewExternalId, this.proxy);
+    async sendOfficialReply(text: string, reviewExternalId: string) {
+        if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
+        return this.repo.sendOfficialReply(this.cabinetAccessToken, text, reviewExternalId, this.proxy);
     }
 
     async searchRubrics(query: string): Promise<ISearchedRubricsResult> {
         if (!this.cabinetAccessToken) throw new Error('Business Access Token Not Provided')
         const res = await this.repo.searchRubrics(query, this.cabinetAccessToken, this.proxy)
+        console.log(res, "ress session")
         return res.meta.code == 200 ? res.result : {total: 0, items: []};
     }
 

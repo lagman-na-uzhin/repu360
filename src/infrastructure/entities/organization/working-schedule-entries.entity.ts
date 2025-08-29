@@ -6,8 +6,8 @@ import {WorkingScheduleEntity} from "@infrastructure/entities/organization/worki
 @Entity('working_schedule_entries')
 @Unique(['scheduleId', 'dayOfWeek'])
 export class WorkingScheduleEntryEntity {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryColumn()
+    uniqueRelation: string;
 
     @Column({ name: 'schedule_id' })
     scheduleId: string;

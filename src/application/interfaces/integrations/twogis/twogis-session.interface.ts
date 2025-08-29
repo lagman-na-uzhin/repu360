@@ -26,9 +26,9 @@ export interface ITwogisSession {
     init(companyId?: CompanyId, cabinetCredentials?: TwogisCabinetCredentials): Promise<void>;
     getByIdOrganization(externalId: string): Promise<OrgByIdOutDto>
     getCabinetAccessToken(cabinetCredentials: TwogisCabinetCredentials): Promise<ILoginTwogisCabinetResponse>;
-    generateReply(accessToken: string, authorName: string): Promise<IGenerateReply>;
-    getReviewFromCabinet(reviewExternalId: string, accessToken: string): Promise<IReviewFromCabinet>;
-    sendOfficialReply(accessToken: string, text: string, reviewExternalId: string): Promise<ISendReply>;
+    generateReply(authorName: string): Promise<IGenerateReply>;
+    getReviewFromCabinet(reviewExternalId: string): Promise<IReviewFromCabinet>;
+    sendOfficialReply(text: string, reviewExternalId: string): Promise<ISendReply>;
     getOrganizationReviews(
         placementId: PlacementId,
         externalId: string,

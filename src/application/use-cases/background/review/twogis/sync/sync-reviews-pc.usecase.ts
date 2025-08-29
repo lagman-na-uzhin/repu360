@@ -18,7 +18,6 @@ export class SyncTwogisReviewsProcessUseCase {
   ) {}
 
   async execute(placementId: PlacementId) {
-    console.log("PRoxeccer execute")
     await this.twogisSession.init()
 
     const placement = await this.getPlacementOrFail(placementId);

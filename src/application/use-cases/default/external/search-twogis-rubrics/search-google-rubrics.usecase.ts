@@ -12,7 +12,9 @@ export class SearchGoogleRubricsUseCase {
         const placement = await this.placementRepo.getTwogisByOrgId(query.organizationId);
         if (!placement) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_NOT_FOUND);
 
+        console.log(placement, "place")
         const cabinetCredentials = placement.getTwogisPlacementDetail().cabinetCredentials;
+        console.log(cabinetCredentials, "cab")
         if (!cabinetCredentials) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_INVALID_CABINET_CREDENTIALS);
 
         await this.twogisSession.init(query.companyId, cabinetCredentials);

@@ -1,140 +1,42 @@
+import {ITaskService, QUEUES} from "@application/interfaces/services/task/task-service.interface";
 import {IPlacementRepository} from "@domain/placement/repositories/placement-repository.interface";
-import {ITwogisSession} from "@application/interfaces/integrations/twogis/twogis-session.interface";
-import {Organization, OrganizationId} from "@domain/organization/organization";
-import {EXCEPTION} from "@domain/common/exceptions/exceptions.const";
+import {PlacementId} from "@domain/placement/placement";
 import {IOrganizationRepository} from "@domain/organization/repositories/organization-repository.interface";
-import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
-import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
-import {Rubric} from "@domain/rubric/rubric";
-import {IRubricRepository} from "@domain/rubric/repositories/rubric-repository.interface";
-import {
-    OrgByIdBusinessItem
-} from "@application/interfaces/integrations/twogis/client/dto/out/org-by-id-business.out.dto";
+import {OrganizationId} from "@domain/organization/organization";
 
-export class SyncOrganizationScheduleUseCase {
+
+export class SyncTwogisOrganizationScheduleUseCase {
     constructor(
-        private readonly placementRepo: IPlacementRepository,
-        private readonly twogisSession: ITwogisSession,
         private readonly organizationRepo: IOrganizationRepository,
-        private readonly rubricRepo: IRubricRepository,
-    ) {
-    }
+        private readonly placementRepo: IPlacementRepository,
+        private readonly taskService: ITaskService,
+    ) {}
 
-    async execute(organizationId: OrganizationId) {
-        const organization = await this.organizationRepo.getById(organizationId);
-        console.log(organization, "organization")
-        if (!organization) throw new Error(EXCEPTION.ORGANIZATION.NOT_FOUND);
+    private readonly timeMap = new Map<PlacementId, number>();
 
-        const twogisPlacement  = await this.placementRepo.getTwogisByOrgId(organizationId);
-        console.log(twogisPlacement, "twogisPlacement")
-        if (!twogisPlacement) throw new Error(EXCEPTION.PLACEMENT.TWOGIS_NOT_FOUND)
+    async execute() {
+        const activeOrganizations = await this.organizationRepo.getActiveList();
 
-        await this.twogisSession.init(organization.companyId, twogisPlacement.getTwogisPlacementDetail().cabinetCredentials || undefined);
+        const now = Date.now();
+        for (let i = 0; i < activeOrganizations.length; i++) {
+            const organizationId = activeOrganizations[i].id;
+            const lastRequestTime = this.timeMap.get(organizationId) || 0;
 
-        const twogisExternalInfo = (await this.twogisSession.getByIdOrganizationFromBusiness(twogisPlacement.externalId)).result.items[0];
-        console.log(twogisExternalInfo, "twogisExternalInfo")
+            if (now - lastRequestTime >= 30 * 18000) {
+                this.timeMap.set(organizationId, now);
 
-        const rubrics = await this.rubricRepo.getByIds(organization.rubricIds);
-        console.log(rubrics, "rubrics")
-
-        await this.sync(organization, rubrics, twogisExternalInfo, twogisPlacement.externalId);
-    }
-
-    private async sync(organization: Organization, rubrics: Rubric[], twogisExternalInfo: OrgByIdBusinessItem, externalId: string) {
-        // await this.syncRubricsTwogis(externalId, rubrics, twogisExternalInfo.rubrics);
-
-        await this.syncWorkingScheduleTwogis(externalId, organization.workingSchedule)
-    }
-    private async syncWorkingScheduleTwogis(externalId: string, workingSchedule: WorkingSchedule | null) {
-        if(workingSchedule === null) {return} //TODO
-
-        const days: {
-            [key: string]: {
-                from?: string;
-                to?: string;
-                breaks?: { from: string; to: string }[];
-            };
-        } = {};
-
-        const dayAbbreviationMap = {
-            [DayOfWeek.MONDAY]: "Mon",
-            [DayOfWeek.TUESDAY]: "Tue",
-            [DayOfWeek.WEDNESDAY]: "Wed",
-            [DayOfWeek.THURSDAY]: "Thu",
-            [DayOfWeek.FRIDAY]: "Fri",
-            [DayOfWeek.SATURDAY]: "Sat",
-            [DayOfWeek.SUNDAY]: "Sun",
-        };
-
-        // Перебираем все дни недели, а не только те, что есть в расписании
-        for (const dayOfWeek of Object.values(DayOfWeek)) {
-            const abbreviatedDay = dayAbbreviationMap[dayOfWeek];
-            const dailyHours = workingSchedule.dailyHours.get(dayOfWeek);
-
-            // Если для дня есть расписание
-            if (dailyHours && dailyHours.workingHours?.start && dailyHours.workingHours?.end) {
-                const dayData: {
-                    from?: string;
-                    to?: string;
-                    breaks?: { from: string; to: string }[];
-                } = {
-                    from: dailyHours.workingHours?.start.toString(),
-                    to: dailyHours.workingHours?.end.toString(),
-                };
-
-                if (dailyHours.breakTime) {
-                    dayData.breaks = [
-                        {
-                            from: dailyHours.breakTime.start.toString(),
-                            to: dailyHours.breakTime.end.toString(),
-                        },
-                    ];
-                }
-                days[abbreviatedDay] = dayData;
-            } else {
-                days[abbreviatedDay] = {};
+                await this.initTask(organizationId)
             }
         }
-
-        console.log(days, "days");
-        await this.twogisSession.updateWorkingHours(externalId, days);
     }
-    private async syncRubricsTwogis(
-        placementExternalId: string,
-        ourRubrics: Rubric[], // Данные из нашей системы (источник истины)
-        twogisRubricsRaw: { id: string; name: string }[], // Данные из сервиса Twogis
-    ): Promise<void> {
-        const ourRubricIds = new Set(
-            ourRubrics.flatMap(r =>
-                r.external
-                    .filter(i => i.platform === 'TWOGIS')
-                    .map(i => i.externalId),
-            ),
-        );
 
-        const twogisRubricIds = new Set(twogisRubricsRaw.map(r => r.id));
-
-        const idsToAdd: string[] = [];
-        const idsToDelete: string[] = [];
-
-        for (const id of ourRubricIds) {
-            if (!twogisRubricIds.has(id)) {
-                idsToAdd.push(id);
-            }
-        }
-
-        for (const id of twogisRubricIds) {
-            if (!ourRubricIds.has(id)) {
-                idsToDelete.push(id);
-            }
-        }
-
-        if (idsToAdd.length > 0) {
-            await this.twogisSession.addRubrics(idsToAdd, placementExternalId);
-        }
-        if (idsToDelete.length > 0) {
-            await this.twogisSession.deleteRubrics(idsToDelete, placementExternalId);
-        }
+    private async initTask(organizationId: OrganizationId):Promise<void>  {
+        await this.taskService.addTask({
+            queue: QUEUES.SYNC_TWOGIS_ORGANIZATION,
+            jobId: `sync_organization_${organizationId.toString()}`,
+            attempts: 1,
+            delay: 0,
+            payload: {organizationId: organizationId.toString()},
+        });
     }
 }
-

@@ -19,9 +19,12 @@ const IMPORT_PROVIDERS_BY_TYPE_ENV = () => {
     // }
 
     if (isInitTypeEnv(TYPE_ENV.REVIEW_SYNC)) {
-        // schedules.push(SyncReviewsSchedule);
+        schedules.push(SyncReviewsSchedule);
+        processes.push(SyncTwogisReviewsProcess);
+    }
+    if (isInitTypeEnv(TYPE_ENV.ORGANIZATION_DATA_SYNC)) {
         schedules.push(SyncOrganizationSchedule);
-        // processes.push(SyncTwogisReviewsProcess);
+        processes.push(SyncTwogisReviewsProcess);
     }
     if (isInitTypeEnv(TYPE_ENV.MAILER)) {
         processes.push(SendMailProcess);

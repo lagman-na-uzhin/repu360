@@ -144,7 +144,8 @@ export class OrganizationQueryService extends BaseQueryService implements IOrgan
                 'group.id',
                 'group.name',
                 'address.city',
-                'address.address',
+                'address.street',
+                'address.housenumber',
                 'address.latitude',
                 'address.longitude',
             ])

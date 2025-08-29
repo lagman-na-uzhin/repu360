@@ -15,8 +15,7 @@ import { ITwogisSession } from "@application/interfaces/integrations/twogis/twog
 import { EXCEPTION } from "@domain/common/exceptions/exceptions.const";
 import { Profile } from "@domain/review/profile";
 import { CompanyId } from "@domain/company/company";
-import {IFirstAnswer} from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
-
+import { IFirstAnswer } from "@application/interfaces/integrations/twogis/client/dto/out/review-from-cabinet.out.dto";
 
 interface ReviewEligibility {
     canBeReplied: boolean;
@@ -36,21 +35,24 @@ export class TwogisSendReplyProcessUseCase {
     ) {}
 
     async execute(command: TwogisSendReplyCommand): Promise<void> {
-        const { reviewId, placementId, companyId } = this.initializeCommandObjects(command);
-
-        await this.twogisSession.init(companyId);
-
-        const review = await this.retrieveReviewAndPreCheck(reviewId);
-
-        const placement = await this.retrievePlacement(placementId);
-        const accessToken = await this.getTwogisCabinetAccessToken(placement);
-
-        if (!accessToken) return;
-
         try {
-            const eligibility = await this.evaluateReviewEligibilityAndSync(review, accessToken);
+            const placement = await this.retrievePlacement(command.placementId);
+            const cabinetCredentials = placement.getTwogisPlacementDetail().cabinetCredentials;
+            if (!cabinetCredentials) {
+                throw new Error(EXCEPTION.PLACEMENT.TWOGIS_INVALID_CABINET_CREDENTIALS);
+            }
 
-            if (eligibility.hasExistingOfficialReply) {
+            await this.twogisSession.init(command.companyId, cabinetCredentials);
+            const review = await this.getReviewAndPreCheck(command.reviewId);
+
+            const twogisReviewExternalId = review.getTwogisReviewPlacementDetail().externalId;
+            const twogisReviewData = await this.twogisSession.getReviewFromCabinet(twogisReviewExternalId);
+
+            const { eligibility, officialReply } = await this.evaluateReviewEligibilityAndSync(review, twogisReviewData);
+
+            if (officialReply) {
+                review.setOfficialReply(officialReply.id, officialReply.text, ReplyType.EXTERNAL);
+                await this.reviewRepo.save(review);
                 return;
             }
 
@@ -59,32 +61,24 @@ export class TwogisSendReplyProcessUseCase {
                 return;
             }
 
-            await this.composeAndSubmitReply(review, accessToken, placement);
+            await this.composeAndSubmitReply(review, placement);
 
             await this.reviewRepo.save(review);
-
         } catch (error) {
             if (error instanceof Error && error.message === ERR_REQUEST.INVALID_GRANT) {
-                await this.cacheRepo.deleteTwogisCabinetAuth(placementId);
+                await this.cacheRepo.deleteTwogisCabinetAuth(command.placementId);
             }
             throw error;
         }
     }
 
-    private initializeCommandObjects(command: TwogisSendReplyCommand) {
-        return {
-            reviewId: new ReviewId(command.reviewId),
-            placementId: new PlacementId(command.placementId),
-            companyId: new CompanyId(command.companyId)
-        };
-    }
-
-    private async retrieveReviewAndPreCheck(reviewId: ReviewId): Promise<Review> {
+    private async getReviewAndPreCheck(reviewId: ReviewId): Promise<Review> {
         const review = await this.reviewRepo.getById(reviewId);
         if (!review) {
             throw new Error(EXCEPTION.REVIEW.NOT_FOUND);
         }
         if (review.hasOfficialReply()) {
+            // This case might be redundant now, but it's a good initial check.
             throw new Error(EXCEPTION.REVIEW.OFFICIAL_ANSWER_ALREADY_EXIST);
         }
         return review;
@@ -98,29 +92,10 @@ export class TwogisSendReplyProcessUseCase {
         return placement;
     }
 
-    private async getTwogisCabinetAccessToken(placement: Placement): Promise<string | null> {
-        const credentials = placement.getTwogisPlacementDetail().cabinetCredentials;
-        if (!credentials) {
-            throw new Error(EXCEPTION.PLACEMENT.TWOGIS_INVALID_CABINET_CREDENTIALS);
-        }
-
-        const accessTokenResponse = await this.twogisSession.getCabinetAccessToken(credentials);
-        if (!accessTokenResponse || !accessTokenResponse.result || !accessTokenResponse.result.access_token) {
-            throw new Error("2GIS access token not found or invalid response structure.");
-        }
-        return accessTokenResponse.result.access_token;
-    }
-
     private async evaluateReviewEligibilityAndSync(
         review: Review,
-        accessToken: string,
-    ): Promise<ReviewEligibility> {
-        const twogisReviewExternalId = review.getTwogisReviewPlacementDetail().externalId;
-        const twogisReviewData = await this.twogisSession.getReviewFromCabinet(
-            twogisReviewExternalId,
-            accessToken,
-        );
-
+        twogisReviewData: any, // Use a proper DTO type here if available
+    ): Promise<{ eligibility: ReviewEligibility, officialReply?: IFirstAnswer }> {
         const responseCode = twogisReviewData?.meta?.code || twogisReviewData;
 
         if (responseCode === 404) {
@@ -134,26 +109,25 @@ export class TwogisSendReplyProcessUseCase {
         const { result } = twogisReviewData;
         const currentRating = Number(result.rating);
         const hasCompanyCommentInTwogis = result.hasCompanyComment || result.firstAnswer;
+        const firstAnswer = result.firstAnswer;
 
         if (currentRating !== review.rating) {
             review.rating = currentRating;
         }
 
-        if (hasCompanyCommentInTwogis) {
-            review.setOfficialReply(result.firstAnswer.id, result.firstAnswer.text, ReplyType.EXTERNAL);
-        }
-
         const canBeReplied = currentRating >= 4 && !hasCompanyCommentInTwogis;
 
         return {
-            canBeReplied: canBeReplied,
-            hasExistingOfficialReply: hasCompanyCommentInTwogis,
+            eligibility: {
+                canBeReplied,
+                hasExistingOfficialReply: hasCompanyCommentInTwogis,
+            },
+            officialReply: firstAnswer,
         };
     }
 
     private async composeAndSubmitReply(
         review: Review,
-        accessToken: string,
         placement: Placement,
     ): Promise<void> {
         const reviewAuthorProfile = await this.profileRepo.getById(review.profile.id) as Profile;
@@ -162,7 +136,6 @@ export class TwogisSendReplyProcessUseCase {
         const replyContent = await this.generateReplyContent(
             reviewAuthorProfile,
             reviewLanguage,
-            accessToken,
             placement.id
         );
 
@@ -172,7 +145,6 @@ export class TwogisSendReplyProcessUseCase {
 
         const twogisReviewExternalId = review.getTwogisReviewPlacementDetail().externalId;
         const sendResult = await this.twogisSession.sendOfficialReply(
-            accessToken,
             replyContent,
             twogisReviewExternalId
         );
@@ -189,7 +161,6 @@ export class TwogisSendReplyProcessUseCase {
     private async generateReplyContent(
         profile: Profile,
         language: LANGUAGE,
-        accessToken: string,
         placementId: PlacementId
     ): Promise<string | undefined> {
         let content: string | undefined;
@@ -202,7 +173,6 @@ export class TwogisSendReplyProcessUseCase {
                 });
             } else {
                 const generatedReply = await this.twogisSession.generateReply(
-                    accessToken,
                     profile?.firstname || '',
                 );
                 content = generatedReply?.result?.comment;

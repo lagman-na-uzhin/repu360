@@ -1,4 +1,5 @@
 import {
+    IsString,
     ValidateNested,
 } from 'class-validator';
 import {Transform } from 'class-transformer';
@@ -15,6 +16,7 @@ export class UpdateOrganizationBodyRequestDto {
     @ValidateNested()
     workingSchedule?: {
         dailyHours:{
+            uniqueRelation: string
             dayOfWeek: DayOfWeek
             startTime: string
             endTime: string

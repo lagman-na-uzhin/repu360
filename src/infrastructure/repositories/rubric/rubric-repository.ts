@@ -31,7 +31,7 @@ export class RubricOrmRepository implements IRubricRepository {
         return Rubric.fromPersistence(
             entity.id,
             entity.name,
-            entity.external.map(external => ExternalRubric.fromPersistence(external.platform, external.name, external.id))
+            entity.external.map(external => ExternalRubric.fromPersistence(external.id, external.platform, external.name, external.externalId))
             )
     }
 
@@ -42,7 +42,6 @@ export class RubricOrmRepository implements IRubricRepository {
         entity.name = domain.name;
         entity.external = domain.external.map(e => {
             return {
-                id: undefined,
                 externalId: e.externalId,
                 rubricId: domain.id.toString(),
                 name: e.name,

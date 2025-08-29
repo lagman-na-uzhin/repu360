@@ -11,7 +11,7 @@ import {PLATFORMS} from "@domain/common/platfoms.enum";
 import {PlacementDetail} from "@domain/placement/types/placement-detail.types";
 import {ICompanyRepository} from "@domain/company/repositories/company-repository.interface";
 import {IUnitOfWork} from "@application/interfaces/services/unitOfWork/unit-of-work.interface";
-import {WorkingSchedule} from "@domain/organization/model/organization-working-hours";
+import {WorkingSchedule, WorkingScheduleId} from "@domain/organization/model/organization-working-hours";
 import {DayOfWeek} from "@domain/common/consts/day-of-week.enums";
 import {DailyWorkingHours} from "@domain/organization/value-objects/working-hours/daily-working-hours.vo";
 import {Time} from "@domain/organization/value-objects/working-hours/time.vo";
@@ -132,17 +132,19 @@ export class AddOrganizationUseCase {
             return new Time(hour, minute);
         }
 
+        const workingScheduleId = new WorkingScheduleId();
+
         for (const day of Object.keys(rawSchedule.days)) {
             const dayData = rawSchedule.days[day as keyof typeof rawSchedule.days];
             const dayOfWeek = dayMap[day];
             const workingHours = dayData?.from && dayData?.from ? new TimeRange(parseTime(dayData.from), parseTime(dayData.from)) : null;
             const breakTime = dayData.breaks?.length ? new TimeRange(parseTime(dayData.breaks[0].from), parseTime(dayData.breaks[0].to)) : null;
 
-            const dailyHours = DailyWorkingHours.create(dayOfWeek, workingHours, breakTime);
+            const dailyHours = DailyWorkingHours.create(workingScheduleId, dayOfWeek, workingHours, breakTime);
             dailyHoursArray.push(dailyHours)
         }
 
-        return WorkingSchedule.create(dailyHoursArray, rawSchedule.isTemporarilyClosed);
+        return WorkingSchedule.create(dailyHoursArray, rawSchedule.isTemporarilyClosed, workingScheduleId);
     }
 
     private createRubrics(rubricsRaw: OrgByIdBusinessRubric[]) {

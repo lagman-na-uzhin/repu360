@@ -7,5 +7,5 @@ export class TwogisSearchRubricsRequest {
      text: string;
 
     @Transform(({ value }) => OrganizationId.of(value))
-     organizationId: OrganizationId;
+    organizationId: OrganizationId;
 }

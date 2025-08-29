@@ -23,6 +23,7 @@ export class UpdateOrganizationCommand extends BaseCommand{
             organizationId: OrganizationId;
             workingSchedule?: {
                 dailyHours: {
+                    uniqueRelation: string;
                     dayOfWeek: DayOfWeek;
                     startTime: string;
                     endTime: string;
@@ -44,6 +45,7 @@ export class UpdateOrganizationCommand extends BaseCommand{
 
         if (dto.workingSchedule) {
             const workingScheduleEntries = dto.workingSchedule.dailyHours.map(dayData => ({
+                uniqueRelation: dayData.uniqueRelation,
                 dayOfWeek: dayData.dayOfWeek,
                 startTime: dayData.startTime,
                 endTime: dayData.endTime,

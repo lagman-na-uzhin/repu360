@@ -75,7 +75,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
                 id: entity.workingSchedule.id,
                 isTemporaryClosed: entity.workingSchedule.isTemporaryClosed,
                 entries: entity.workingSchedule.entries?.map(entry => ({
-                    id: entry.id,
+                    uniqueRelation: entry.uniqueRelation,
                     dayOfWeek: entry.dayOfWeek,
                     startTime: entry?.startTime || null,
                     endTime: entry?.endTime || null,
@@ -147,6 +147,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
                 .filter((daily): daily is DailyWorkingHours => daily !== null)
                 .map(daily => {
                     const entry = new WorkingScheduleEntryEntity();
+                    entry.uniqueRelation = daily.uniqueRelation;
                     entry.dayOfWeek = daily.dayOfWeek;
 
                     if (daily.workingHours) {

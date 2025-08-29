@@ -23,8 +23,8 @@ import {
 } from "@application/use-cases/default/organization/queries/get-organization-compact/get-compact-organizations.usecase";
 import {GetSummaryUseCase} from "@application/use-cases/default/organization/queries/get-summary/get-summary.usecase";
 import {
-    SyncOrganizationScheduleUseCase
-} from "@application/use-cases/background/organization/sync-organization/sync-organization-sh.usecase";
+    SyncOrganizationProcessUseCase
+} from "@application/use-cases/background/organization/sync-organization/sync-organization-pc.usecase";
 import {IRubricRepository} from "@domain/rubric/repositories/rubric-repository.interface";
 import {RubricOrmRepository} from "@infrastructure/repositories/rubric/rubric-repository";
 import {
@@ -32,6 +32,11 @@ import {
 } from "@application/use-cases/default/organization/commands/update/update-organization.usecase";
 import {IGeocoderService} from "@application/interfaces/services/geocoder/geocoder-service.interface";
 import {GeocoderService} from "@infrastructure/services/geocoder/geocoder.service";
+import {
+    SyncTwogisOrganizationScheduleUseCase
+} from "@application/use-cases/background/organization/sync-organization/sync-organization-sh.usecase";
+import {ITaskService} from "@application/interfaces/services/task/task-service.interface";
+import {BullService} from "@infrastructure/services/bull/bull.service";
 
 
 export const organizationProxyProviders = [
@@ -88,23 +93,25 @@ export const organizationProxyProviders = [
     },
 
 
-    //BACKGROUND
+
 
     {
         inject: [PlacementOrmRepository, ProxySessionProxy.TWOGIS_SESSION, OrganizationOrmRepository, RubricOrmRepository],
-        provide: OrganizationProxy.SYNC_SCHEDULE,
+        provide: OrganizationProxy.SYNC_TWOGIS_PROCESS,
         useFactory: (
             placementRepo: IPlacementRepository,
             twogisSession: ITwogisSession,
             organizationRepo: IOrganizationRepository,
             rubricRepo: IRubricRepository
         ) => {
-            return new UseCaseProxy(new SyncOrganizationScheduleUseCase(
-                placementRepo,
-                twogisSession,
-                organizationRepo,
-                rubricRepo
-            ))
+            return new UseCaseProxy(new SyncOrganizationProcessUseCase(placementRepo, twogisSession, organizationRepo, rubricRepo))
+        }
+    },
+    {
+        inject: [OrganizationOrmRepository, PlacementOrmRepository, BullService],
+        provide: OrganizationProxy.SYNC_TWOGIS_SCHEDULE,
+        useFactory: (organizationRepo: IOrganizationRepository, placementRepo: IPlacementRepository, taskService: ITaskService) => {
+            return new UseCaseProxy(new SyncTwogisOrganizationScheduleUseCase(organizationRepo, placementRepo, taskService))
         }
     },
 ]

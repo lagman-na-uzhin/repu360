@@ -20,7 +20,6 @@ export class RequestService {
     proxy: IProxy | null,
     retries = DEFAULT_RETRIES_AMOUNT,
   ) {
-    console.log('request method')
     return await this.retry(request, proxy, retries);
   }
 
@@ -41,7 +40,6 @@ export class RequestService {
           },
         });
       }
-      console.log("before send")
       return await this.send(axiosConfig, request.localConfig?.responseType);
     } catch ({ message }) {
       if (count <= 0 || !RequestService.isRetry(message))
@@ -55,7 +53,6 @@ export class RequestService {
     axiosConfig: AxiosRequestConfig,
     responseType = RESPONSE_TYPE.DATA,
   ) {
-    console.log("send")
     return await axios({ ...axiosConfig })
       .then((res) => {
         if (responseType === RESPONSE_TYPE.COOKIE) {

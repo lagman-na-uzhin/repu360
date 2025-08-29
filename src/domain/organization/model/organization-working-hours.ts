@@ -31,14 +31,15 @@ export class WorkingSchedule {
         });
     }
 
-    static create(dailyWorkingHours: DailyWorkingHours[], isTemporaryClosed: boolean) {
-        return new WorkingSchedule(new WorkingScheduleId(), dailyWorkingHours, isTemporaryClosed);
+    static create(dailyWorkingHours: DailyWorkingHours[], isTemporaryClosed: boolean, id?: WorkingScheduleId) {
+        return new WorkingSchedule(id || new WorkingScheduleId(), dailyWorkingHours, isTemporaryClosed);
     }
 
     static fromPersistence(data: {
         id: string,
         isTemporaryClosed: boolean;
         entries: {
+            uniqueRelation: string,
             dayOfWeek: DayOfWeek;
             startTime: string | null;
             endTime: string | null;
@@ -63,7 +64,7 @@ export class WorkingSchedule {
                     Time.fromString(entry.breakEndTime)
                 );
             }
-            return DailyWorkingHours.fromPersistence(entry.dayOfWeek, workingHours, breakTime);
+            return DailyWorkingHours.fromPersistence(entry.uniqueRelation, entry.dayOfWeek, workingHours, breakTime);
         });
         return new WorkingSchedule(WorkingScheduleId.of(data.id), dailyHours, data.isTemporaryClosed);
     }

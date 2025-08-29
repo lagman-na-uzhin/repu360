@@ -5,8 +5,8 @@ export const OrganizationProxy = {
     "ADD": `${ProxyPrefix.ORGANIZATION_PROXY}AddOrganizationUseCaseProxy`,
     "COMPACT_ORGANIZATIONS": `${ProxyPrefix.ORGANIZATION_PROXY}GetCompactOrganizationsUseCaseProxy`,
     "GET_SUMMARY": `${ProxyPrefix.ORGANIZATION_PROXY}GetSummaryUseCaseProxy`,
-    "SYNC_SCHEDULE": `${ProxyPrefix.ORGANIZATION_PROXY}SyncOrganizationScheduleUseCaseProxy`,
     "SYNC_TWOGIS_PROCESS": `${ProxyPrefix.ORGANIZATION_PROXY}SyncTwogisOrganizationProcessUseCaseProxy`,
+    "SYNC_TWOGIS_SCHEDULE": `${ProxyPrefix.ORGANIZATION_PROXY}SyncTwogisOrganizationScheduleUseCaseProxy`,
     // "SYNC_GOOGLE_PROCESS": `${ProxyPrefix.ORGANIZATION_PROXY}SyncGoogleOrganizationProcessUseCaseProxy`,
     "UPDATE": `${ProxyPrefix.ORGANIZATION_PROXY}UpdateOrganizationUseCaseProxy`
 } as const;
@@ -16,6 +16,7 @@ export const organizationProxyExports = [
     OrganizationProxy.ADD,
     OrganizationProxy.COMPACT_ORGANIZATIONS,
     OrganizationProxy.GET_SUMMARY,
-    OrganizationProxy.SYNC_SCHEDULE,
+    OrganizationProxy.SYNC_TWOGIS_PROCESS,
+    OrganizationProxy.SYNC_TWOGIS_SCHEDULE,
     OrganizationProxy.UPDATE,
 ]

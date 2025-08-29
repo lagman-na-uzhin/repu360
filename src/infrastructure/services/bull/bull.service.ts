@@ -8,11 +8,13 @@ import {ITaskPayload, ITaskService, QUEUES} from "@application/interfaces/servic
 export class BullService implements ITaskService {
   constructor(
       @InjectQueue(QUEUES.SEND_MAIL_QUEUE)
-      private SEND_EMAIL: Queue,
+      private SEND_MAIL_QUEUE: Queue,
       @InjectQueue(QUEUES.SYNC_TWOGIS_REVIEWS)
       private SYNC_TWOGIS_REVIEWS: Queue,
       @InjectQueue(QUEUES.SEND_REPLY_QUEUE)
       private SEND_REPLY_QUEUE: Queue,
+      @InjectQueue(QUEUES.SYNC_TWOGIS_ORGANIZATION)
+      private SYNC_TWOGIS_ORGANIZATION: Queue,
   ) {}
 
   async addTask(task: ITaskPayload) {
