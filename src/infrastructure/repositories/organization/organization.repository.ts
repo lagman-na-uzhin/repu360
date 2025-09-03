@@ -85,6 +85,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
             })
             : null;
 
+        const contactPoints = entity?.contactPoints.map(cp => ContactPoint.fromPersistence(cp.id, cp.type, cp.value)) || [];
         return Organization.fromPersistence(
             entity.id,
             entity.companyId,
@@ -92,7 +93,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
             address,
             entity.group?.id || null,
             workingSchedule,
-            [],
+            contactPoints,
             entity.rubrics?.map(r => RubricId.of(r.id)) || [],
         );
     }
@@ -111,6 +112,7 @@ export class OrganizationOrmRepository implements IOrganizationRepository {
 
   private toContactPointEntity(domain: ContactPoint, organizationId: OrganizationId) {
       const entity = new ContactPointEntity();
+      entity.id = domain.id.toString();
       entity.organizationId = organizationId.toString();
       entity.type = domain.type;
       entity.value = domain.value;

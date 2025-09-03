@@ -1,3 +1,5 @@
+import {UniqueID} from "@domain/common/unique-id";
+
 export enum ContactPointType {
     WHATSAPP = 'WHATSAPP',
         VIBER = 'VIBER',
@@ -7,26 +9,47 @@ export enum ContactPointType {
         TELEGRAM = 'TELEGRAM', // Example of adding a new type
         WEBSITE = 'WEBSITE',
 }
-
+export class ContactPointId extends UniqueID {}
 export class ContactPoint {
-    constructor(public readonly type: ContactPointType, private _value: string) {
-        if (!_value || _value.trim() === '') {
-            throw new Error(`Contact point value for type ${type} cannot be empty.`);
+    constructor(
+        private readonly _id: ContactPointId,
+        private readonly _type: ContactPointType,
+        private _value: string
+    ) {};
+
+    static create(type: ContactPointType, value: string) {
+        if (!value || value.trim() === '') {
+            throw new Error(`Contact point value for type ${value} cannot be empty.`);
         }
 
         // Sanitize the value first to remove common noise
-        this._value = this.sanitizeValue(_value);
+        const sanitizedValue = this.sanitizeValue(type, value);
 
         // Then validate the cleaned value
-        this.validateFormat();
+        this.validateFormat(type, value);
+
+        return new ContactPoint(new ContactPointId(), type, sanitizedValue);
     }
 
+    static fromPersistence(id: string,type: ContactPointType, value: string) {
+        if (!value || value.trim() === '') {
+            throw new Error(`Contact point value for type ${value} cannot be empty.`);
+        }
+
+        // Sanitize the value first to remove common noise
+        const sanitizedValue = this.sanitizeValue(type, value);
+
+        // Then validate the cleaned value
+        this.validateFormat(type, value);
+
+        return new ContactPoint(new ContactPointId(id), type, sanitizedValue);
+    }
     /**
      * @description Prepares the contact value by removing unnecessary characters.
      * This method ensures the value is in a consistent format for validation.
      */
-    private sanitizeValue(value: string): string {
-        switch (this.type) {
+    private static sanitizeValue(type: ContactPointType, value: string): string {
+        switch (type) {
             case ContactPointType.WHATSAPP:
             case ContactPointType.VIBER:
             case ContactPointType.PHONE:
@@ -45,23 +68,23 @@ export class ContactPoint {
     /**
      * @description Validates the format of the sanitized contact value based on its type.
      */
-    private validateFormat(): void {
+    private static validateFormat(type: ContactPointType, value: string): void {
         let isValid = false;
-        switch (this.type) {
+        switch (type) {
             case ContactPointType.WHATSAPP:
             case ContactPointType.VIBER:
             case ContactPointType.PHONE:
             case ContactPointType.TELEGRAM:
                 // Checks for a leading '+' followed by 10 to 15 digits
-                isValid = /^\+\d{10,15}$/.test(this._value);
+                isValid = /^\+\d{10,15}$/.test(value);
                 break;
             case ContactPointType.INSTAGRAM:
                 // Checks for a username with allowed characters
-                isValid = /^(?!.*\.\.)(?!.*__)(?!^\.|^__)[a-z0-9_.]{1,30}$/i.test(this._value);
+                isValid = /^(?!.*\.\.)(?!.*__)(?!^\.|^__)[a-z0-9_.]{1,30}$/i.test(value);
                 break;
             case ContactPointType.EMAIL:
                 // More robust email regex
-                isValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(this._value);
+                isValid = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value);
                 break;
             case ContactPointType.WEBSITE:
                 // More comprehensive URL validation
@@ -73,13 +96,16 @@ export class ContactPoint {
         }
 
         if (!isValid) {
-            throw new Error(`Invalid format for ${this.type} contact: "${this._value}"`);
+            throw new Error(`Invalid format for ${type} contact: "${value}"`);
         }
     }
 
     public get value(): string {
         return this._value;
     }
+
+    public get id() {return this._id};
+    public get type() {return this._type};
 
     /**
      * @description Compares two ContactPoint objects for equality based on type and value.

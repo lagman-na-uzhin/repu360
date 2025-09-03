@@ -94,7 +94,7 @@ export class AddOrganizationUseCase {
             "whatsapp": ContactPointType.WHATSAPP,
         }
         const rawContacts = contactGroups[0].contacts;
-        return rawContacts.map(rc => new ContactPoint(contactTypeAdapterMap[rc.type], rc.value));
+        return rawContacts.map(rc => ContactPoint.create(contactTypeAdapterMap[rc.type], rc.value));
     }
 
     private async createOrganizationAddress(orgExternalId: string) {
