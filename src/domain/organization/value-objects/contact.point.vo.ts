@@ -53,10 +53,9 @@ export class ContactPoint {
             case ContactPointType.WHATSAPP:
             case ContactPointType.VIBER:
             case ContactPointType.PHONE:
-            case ContactPointType.TELEGRAM:
-                // Removes all non-digit characters and plus signs, then adds a single leading '+' if it was there
                 const sanitized = value.replace(/[^\d+]/g, '').trim();
                 return sanitized.startsWith('+') ? sanitized : `+${sanitized}`;
+            case ContactPointType.TELEGRAM:
             case ContactPointType.INSTAGRAM:
                 // Removes a leading '@' and trims whitespace
                 return value.replace(/^@/, '').trim();
@@ -74,10 +73,8 @@ export class ContactPoint {
             case ContactPointType.WHATSAPP:
             case ContactPointType.VIBER:
             case ContactPointType.PHONE:
+                isValid = true
             case ContactPointType.TELEGRAM:
-                // Checks for a leading '+' followed by 10 to 15 digits
-                isValid = /^\+\d{10,15}$/.test(value);
-                break;
             case ContactPointType.INSTAGRAM:
                 // Checks for a username with allowed characters
                 isValid = /^(?!.*\.\.)(?!.*__)(?!^\.|^__)[a-z0-9_.]{1,30}$/i.test(value);
